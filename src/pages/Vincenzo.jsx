@@ -1,6 +1,6 @@
 import { PageTransition } from '../components/PageTransition';
 import { motion } from 'framer-motion';
-import { ArrowLeft } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 
 export function Vincenzo() {
   return (
@@ -24,13 +24,15 @@ export function Vincenzo() {
             [SYS_MESSAGE]: Placeholder deployed. Retro terminal layout and Data Science matrices are currently compiling in the background. Waiting for user input.
           </p>
           
-          <button 
-            data-cursor="primary" 
-            className="px-8 py-4 bg-zinc-100 text-zinc-900 border border-zinc-700 font-semibold rounded-xl uppercase tracking-widest text-xs hover:bg-white hover:scale-105 transition-all flex items-center gap-2 mx-auto" 
-            onClick={() => window.history.back()}
+          <a
+            href="/vincenzosite/teste.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-cursor="primary"
+            className="px-8 py-4 bg-zinc-100 text-zinc-900 border border-zinc-700 font-semibold rounded-xl uppercase tracking-widest text-xs hover:bg-white hover:scale-105 transition-all inline-flex items-center gap-2 mx-auto"
           >
-            <ArrowLeft className="w-4 h-4" /> ./kill_process &amp; Return
-          </button>
+            Access Data Scientist World <ExternalLink className="w-4 h-4" />
+          </a>
         </motion.div>
       </main>
     </PageTransition>

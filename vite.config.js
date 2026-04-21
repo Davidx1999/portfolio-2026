@@ -22,5 +22,7 @@ function serveExternalProjects() {
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/porftolio/',
   plugins: [react(), tailwindcss(), serveExternalProjects()],
 })
+

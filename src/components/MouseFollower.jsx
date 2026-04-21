@@ -20,7 +20,7 @@ export function MouseFollower() {
       centerY: -100
     };
 
-    let currentStrokeWidth = 4;
+    let currentStrokeWidth = 3;
 
     const revertBtnState = (el, type) => {
       if (!el) return;
