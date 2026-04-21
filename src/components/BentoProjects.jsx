@@ -99,7 +99,7 @@ export function BentoProjects() {
            </div>
            
            <div className="w-full md:w-auto mt-6 md:mt-0">
-             <Link to="/vincenzo" data-magnetic-button className="w-full md:w-auto inline-flex justify-center items-center gap-3 bg-zinc-100 text-zinc-950 px-8 py-4 rounded-xl font-semibold transition-transform hover:scale-105 active:scale-95">
+             <Link to="/vincenzo" data-magnetic-button className="w-full md:w-auto inline-flex justify-center items-center gap-3 bg-zinc-100 text-zinc-950 px-8 py-4 rounded-full font-semibold transition-all hover:rounded-lg hover:scale-105 active:scale-95">
                 Boot System <Terminal className="w-4 h-4" />
              </Link>
            </div>

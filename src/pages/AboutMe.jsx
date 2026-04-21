@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import davidProfile from '../assets/david+profile.jpg';
 
 export function AboutMe() {
   const containerVariants = {
@@ -28,10 +29,9 @@ export function AboutMe() {
             {/* We will use a gradient placeholder or default user avatar logic since the image might break cross-domain */}
             <div className="absolute inset-0 bg-gradient-to-tr from-zinc-800 to-zinc-950 mix-blend-overlay"></div>
             <img 
-              src="https://avatars.githubusercontent.com/u/53235339?v=4" // GitHub Avatar fallback
+              src={davidProfile}
               alt="David Salviano" 
               className="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700"
-              onError={(e) => e.target.style.display = 'none'}
             />
             <div className="absolute inset-0 border border-white/5 rounded-3xl pointer-events-none"></div>
           </motion.div>

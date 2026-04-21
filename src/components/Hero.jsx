@@ -64,7 +64,7 @@ export function Hero() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 mt-8">
             <a 
               href="#projetos"
-              className="bg-zinc-100 text-zinc-950 px-8 py-4 rounded-xl font-semibold transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
+              className="bg-zinc-100 text-zinc-950 px-8 py-4 rounded-full font-semibold transition-all hover:rounded-lg hover:scale-105 active:scale-95 flex items-center gap-2"
             >
               Explorar Projetos <ChevronRight className="w-4 h-4" />
             </a>

@@ -6,6 +6,8 @@ import { Mapear } from './pages/Mapear';
 import { AulaF75 } from './pages/AulaF75';
 import { Vincenzo } from './pages/Vincenzo';
 import { AboutMe } from './pages/AboutMe';
+import { Projects } from './pages/Projects';
+import { LoadingScreen } from './components/LoadingScreen';
 import { MouseFollower } from './components/MouseFollower';
 
 function App() {
@@ -13,6 +15,7 @@ function App() {
 
   return (
     <div className="w-full bg-background min-h-[100dvh] font-sans overflow-x-hidden text-foreground selection:bg-white/10 selection:text-white">
+      <LoadingScreen />
       <MouseFollower />
       <Navbar />
 
@@ -20,6 +23,7 @@ function App() {
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<AboutMe />} />
+          <Route path="/projects" element={<Projects />} />
           <Route path="/mapear" element={<Mapear />} />
           <Route path="/aula-f75" element={<AulaF75 />} />
           <Route path="/vincenzo" element={<Vincenzo />} />
