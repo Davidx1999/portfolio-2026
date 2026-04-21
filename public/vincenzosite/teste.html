@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vincenzo Fadda - Data Scientist [RETRO OS]</title>
+    <style>
+        /* Fontes Retro: VT323 para texto principal e Share Tech Mono para detalhes */
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap');
+
+        :root {
+            --neon-cyan: #00ffff;
+            --neon-pink: #ff00ff;
+            --neon-green: #00ff00;
+            --dark-bg: #050014;
+            /* Roxo muito escuro */
+            --terminal-bg: rgba(5, 0, 20, 0.85);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body,
+        html {
+            width: 100%;
+            height: 100%;
+            background-color: var(--dark-bg);
+            overflow: hidden;
+            color: var(--neon-cyan);
+            font-family: 'VT323', monospace;
+        }
+
+        /* Efeito de Scanlines (Linhas CRT de TVs antigas) */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 3px 100%;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        #canvas-container {
+            position: absolute;
+            inset: 0;
+            display: block;
+        }
+
+        .ui-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 30px 40px;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid var(--neon-cyan);
+            padding-bottom: 10px;
+        }
+
+        .logo {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 18px;
+            letter-spacing: .1em;
+            color: var(--neon-pink);
+            text-shadow: 0 0 5px var(--neon-pink);
+            text-transform: uppercase;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links span {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 5px var(--neon-cyan);
+            pointer-events: all;
+            cursor: pointer;
+            transition: all 0.2s;
+            padding: 5px 10px;
+            border: 1px solid transparent;
+        }
+
+        .nav-links span:hover {
+            background: var(--neon-cyan);
+            color: var(--dark-bg);
+            text-shadow: none;
+        }
+
+        .hero-copy {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            pointer-events: all;
+            margin-top: 20px;
+        }
+
+        .hero-eyebrow {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            color: var(--neon-green);
+            text-shadow: 0 0 5px var(--neon-green);
+        }
+
+        .hero-title {
+            font-size: clamp(50px, 8vw, 90px);
+            line-height: 0.9;
+            color: #fff;
+            text-shadow: 2px 2px 0px var(--neon-pink), -2px -2px 0px var(--neon-cyan);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .hero-sub {
+            font-size: 24px;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px var(--neon-cyan);
+            max-width: 400px;
+            line-height: 1.2;
+        }
+
+        /* Terminal Window (Oculta por padrão) */
+        .terminal-window {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            max-width: 90%;
+            background: var(--terminal-bg);
+            border: 2px solid var(--neon-pink);
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.3), inset 0 0 10px rgba(255, 0, 255, 0.2);
+            pointer-events: all;
+            display: none;
+            z-index: 50;
+            backdrop-filter: blur(5px);
+        }
+
+        .terminal-window.active {
+            display: block;
+        }
+
+        .term-header {
+            background: var(--neon-pink);
+            color: var(--dark-bg);
+            padding: 5px 10px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .term-close {
+            cursor: pointer;
+            background: var(--dark-bg);
+            color: var(--neon-pink);
+            padding: 0 5px;
+            border: 1px solid var(--dark-bg);
+        }
+
+        .term-close:hover {
+            background: white;
+            color: black;
+        }
+
+        .term-content {
+            padding: 20px;
+            font-size: 20px;
+            color: var(--neon-green);
+            text-shadow: 0 0 5px var(--neon-green);
+            min-height: 200px;
+            white-space: pre-wrap;
+        }
+
+        .blinking-cursor::after {
+            content: '█';
+            animation: blink 1s step-start infinite;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .bottom-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .freq-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: all;
+        }
+
+        .freq-label {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            color: var(--neon-pink);
+            text-transform: uppercase;
+            text-shadow: 0 0 4px var(--neon-pink);
+        }
+
+        .freq-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .fb {
+            width: 36px;
+            height: 36px;
+            border-radius: 0;
+            /* Retro quadrado */
+            border: 1px solid var(--neon-cyan);
+            background: rgba(0, 255, 255, 0.1);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .2s;
+        }
+
+        .fb:hover,
+        .fb.active {
+            background: var(--neon-cyan);
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        .fb svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--neon-cyan);
+        }
+
+        .fb.active svg,
+        .fb:hover svg {
+            stroke: var(--dark-bg);
+            fill: var(--dark-bg);
+        }
+
+        .meta-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        .pattern-name {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            background: rgba(0, 255, 255, 0.1);
+            padding: 2px 6px;
+            border: 1px solid var(--neon-cyan);
+        }
+
+        .vignette {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 5;
+            background: radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(5, 0, 20, 0.9) 100%);
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+
+<body>
+
+    <div id="canvas-container"></div>
+    <div class="vignette"></div>
+    <div class="scanlines"></div> <!-- Efeito CRT -->
+
+    <div class="ui-layer">
+        <div class="top-bar">
+            <div class="logo">SYS.FADDA // DATA_SCIENTIST</div>
+            <nav class="nav-links" id="navMenu">
+                <span data-target="sobre">./sobre.sh</span>
+                <span data-target="modelos">./modelos.py</span>
+                <span data-target="dados">./dados.sql</span>
+                <span data-target="contato">./contato.txt</span>
+            </nav>
+        </div>
+
+        <div class="hero-copy">
+            <div class="hero-eyebrow">Initializing neural network...</div>
+            <h1 class="hero-title">
+                Vincenzo Fadda
+            </h1>
+            <p class="hero-sub">
+                > TRANSFORMING DATA INTO PIRLIMPIMPIM DUST SINCE 2003.<br>
+                > DATA, ALGORITHMS & SYNTHWAVE.
+            </p>
+        </div>
+
+        <!-- JANELA TERMINAL -->
+        <div class="terminal-window" id="termWindow">
+            <div class="term-header">
+                <span id="termTitle">root@vincenzo:~</span>
+                <span class="term-close" id="closeTerm">X</span>
+            </div>
+            <div class="term-content" id="termContent">
+                <span class="blinking-cursor"></span>
+            </div>
+        </div>
+
+        <div class="bottom-bar">
+            <div class="freq-controls">
+                <div class="freq-label">SELECT ALGORITHM SHAPE</div>
+                <div class="freq-btns" id="freqBtns">
+                    <button class="fb active" data-idx="0" title="Solid Square">
+                        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2">
+                            <rect x="3" y="3" width="8" height="8" />
+                        </svg>
+                    </button>
+                    <button class="fb" data-idx="1" title="Grid">
+                        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2">
+                            <rect x="2" y="2" width="5" height="5" />
+                            <rect x="8" y="2" width="5" height="5" />
+                            <rect x="2" y="8" width="5" height="5" />
+                            <rect x="8" y="8" width="5" height="5" />
+                        </svg>
+                    </button>
+                    <button class="fb" data-idx="2" title="Diamond Eyes">
+                        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2">
+                            <ellipse cx="7" cy="7" rx="6" ry="5" />
+                        </svg>
+                    </button>
+                    <button class="fb" data-idx="4" title="Hexagon Matrix">
+                        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2">
+                            <polygon points="7,2 11.5,4.5 11.5,9.5 7,12 2.5,9.5 2.5,4.5" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="meta-right">
+                <div class="pattern-name" id="patName">Solid Square</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ----------------------------------------------------
+        // LÓGICA DO TERMINAL UI (DATA SCIENCE PORTFOLIO)
+        // ----------------------------------------------------
+        const terminalData = {
+            'sobre': `> Executando ./sobre.sh...\n\nOlá, eu sou o Vincenzo Fadda.\nCientista de Dados focado em extrair padrões ocultos do caos.\n\nEspecialidades:\n- Machine Learning Computacional\n- Análise Preditiva\n- Arquitetura de Dados em Larga Escala\n\nStatus: Online e processando.`,
+            'modelos': `> python3 modelos.py --list\n\n[CARREGANDO MODELOS...]\n\n1. Rede Neural Convolucional (Visão Computacional)\n   Precisão: 98.4% | Status: Treinada\n\n2. Processamento de Linguagem Natural (Transformers)\n   Uso: Análise de Sentimento em tempo real.\n\n3. Algoritmos de Otimização Estocástica\n   Redução de custos computacionais em 40%.`,
+            'dados': `> SELECT * FROM projetos_destaque;\n\n+----------------+--------------------------+ \n| ID_PROJETO     | IMPACTO                  | \n+----------------+--------------------------+ \n| Previsão Venda | Aumento de 15% na receita| \n| Detecção Fraude| Queda de 99% em falsos + | \n| Sistema Rec.   | Engajamento +30%         | \n+----------------+--------------------------+ \n\nQuery OK, 3 rows affected.`,
+            'contato': `> cat contato.txt\n\nPRONTO PARA COLABORAR?\nInicie a conexão segura:\n\nEmail: vincenzo@fadda-ds.com\nLinkedIn: /in/vincenzofadda\nGitHub: github.com/vfadda\n\n>_ Aguardando input...`
+        };
+
+        const termWindow = document.getElementById('termWindow');
+        const termContent = document.getElementById('termContent');
+        const closeTerm = document.getElementById('closeTerm');
+
+        document.getElementById('navMenu').addEventListener('click', (e) => {
+            if (e.target.tagName === 'SPAN') {
+                const target = e.target.getAttribute('data-target');
+                termWindow.classList.add('active');
+                typeWriterEffect(terminalData[target]);
+            }
+        });
+
+        closeTerm.addEventListener('click', () => {
+            termWindow.classList.remove('active');
+        });
+
+        function typeWriterEffect(text) {
+            termContent.innerHTML = '<span class="blinking-cursor"></span>';
+            let i = 0;
+            termContent.innerHTML = ''; // Limpa antes de começar
+
+            function type() {
+                if (i < text.length) {
+                    termContent.innerHTML = text.substring(0, i + 1) + '<span class="blinking-cursor"></span>';
+                    i++;
+                    setTimeout(type, 10); // Velocidade de digitação retro
+                }
+            }
+            type();
+        }
+
+
+        // ----------------------------------------------------
+        // 1. CONFIGURAÇÕES BASE E RENDERER 3D
+        // ----------------------------------------------------
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+
+        // Fundo escuro com um leve nevoeiro roxo retro
+        scene.fog = new THREE.FogExp2(0x0a0014, 0.012);
+
+        const camera = new THREE.PerspectiveCamera(85, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 0, 22);
+        camera.lookAt(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(new THREE.Color(0x050014)); // Fundo Roxo Escuro 80s
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        // ----------------------------------------------------
+        // 2. SISTEMA DE PARTÍCULAS (COR NÉON)
+        // ----------------------------------------------------
+        const NUM_PARTICLES = 150000;
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(NUM_PARTICLES * 3);
+        const velocities = new Float32Array(NUM_PARTICLES * 3);
+
+        for (let i = 0; i < NUM_PARTICLES; i++) {
+            positions[i * 3] = (Math.random() - 0.5) * 45;
+            positions[i * 3 + 1] = (Math.random() - 0.5) * 45;
+            positions[i * 3 + 2] = (Math.random() - 0.5) * 2;
+            velocities[i * 3] = 0;
+            velocities[i * 3 + 1] = 0;
+            velocities[i * 3 + 2] = 0;
+        }
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+        // Material Ciano Brilhante (Cyberpunk/Retro vibe)
+        const material = new THREE.PointsMaterial({
+            color: 0x00ffff, // NÉON CIANO
+            size: 0.08, // Ligeiramente maiores
+            transparent: true,
+            opacity: 0.7,
+            blending: THREE.AdditiveBlending, // Ajuda a criar o brilho quando se sobrepõem
+            depthWrite: false
+        });
+
+        const particles = new THREE.Points(geometry, material);
+        scene.add(particles);
+
+        // ----------------------------------------------------
+        // 3. MATEMÁTICA: GRELHAS DE FORMAS 
+        // ----------------------------------------------------
+        const PATTERNS = [
+            { name: 'Solid Square', holeA: 18, holeB: 18, holeK: 8, isFilled: true, C: () => 0 },
+            { name: 'Grid', holeA: 0.5, holeB: 0.5, holeK: 0.5, isFilled: false, C: (x, y) => Math.cos(x * 0.09) * Math.cos(y * 0.15) - 0.015 },
+            { name: 'Diamond Eyes', holeA: 12, holeB: 12, holeK: 2.5, isFilled: false, C: (x, y) => Math.min(Math.sqrt(Math.abs(x * 0.1)) + Math.sqrt(Math.abs(y * 0.1)) - 2.5, Math.sqrt(Math.pow(x - 4, 2) + Math.pow(y, 2)) - 0.8, Math.sqrt(Math.pow(x + 4, 2) + Math.pow(y, 2)) - 0.8) },
+            { name: 'Hexagon Matrix', holeA: 16, holeB: 16, holeK: 4, isFilled: false, C: (x, y) => Math.cos(x * 0.25) + Math.cos(x * 0.125 + y * 0.216) + Math.cos(x * 0.125 - y * 0.216) - 1.0 }
+        ];
+
+        let patIdx = 0;
+        let activePattern = PATTERNS[patIdx];
+
+        let targetHoleA = activePattern.holeA, targetHoleB = activePattern.holeB, targetHoleK = activePattern.holeK;
+        let curHoleA = targetHoleA, curHoleB = targetHoleB, curHoleK = targetHoleK;
+
+        const CHLADNI_STRENGTH = 2.5;
+        const BASIN_RADIUS = 50.0;
+
+        let lastPulseTime = Date.now();
+        const INTERVAL = 7000;
+        let autoPlay = true;
+
+        let mouseX = 0, mouseY = 0, targetMouseX = 0, targetMouseY = 0;
+        let lastMouseX = 0, lastMouseY = 0;
+        const delaySpeed = 0.2;
+
+        let camSmoothX = 0, camSmoothY = 0;
+
+        const raycaster = new THREE.Raycaster();
+        const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+        const mouseVec = new THREE.Vector2();
+
+        window.addEventListener('mousemove', (e) => {
+            mouseVec.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouseVec.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouseVec, camera);
+            const target = new THREE.Vector3();
+            raycaster.ray.intersectPlane(plane, target);
+            targetMouseX = target.x; targetMouseY = target.y;
+        });
+
+        document.getElementById('freqBtns').addEventListener('click', (e) => {
+            const btn = e.target.closest('.fb');
+            if (!btn) return;
+            autoPlay = false;
+            triggerPulse(parseInt(btn.dataset.idx));
+        });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        function triggerPulse(nextIdx) {
+            if (nextIdx !== undefined) patIdx = nextIdx;
+            else patIdx = (patIdx + 1) % PATTERNS.length;
+
+            activePattern = PATTERNS[patIdx];
+            targetHoleA = activePattern.holeA;
+            targetHoleB = activePattern.holeB;
+            targetHoleK = activePattern.holeK;
+
+            lastPulseTime = Date.now();
+            autoPlay = (nextIdx === undefined);
+
+            document.querySelectorAll('.fb').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.fb')[patIdx].classList.add('active');
+            document.getElementById('patName').textContent = activePattern.name;
+
+            for (let i = 0; i < NUM_PARTICLES; i++) {
+                let x = positions[i * 3];
+                let y = positions[i * 3 + 1];
+                let dist = Math.sqrt(x * x + y * y) || 1;
+
+                let pushOut = (Math.random() * 5.0 + 2.0) * Math.max(0, 1.0 - (dist / 40));
+                let swirl = Math.sin(dist * 0.2) * 2.5 + (Math.random() - 0.5) * 3.0;
+
+                velocities[i * 3] += (x / dist) * pushOut - (y / dist) * swirl;
+                velocities[i * 3 + 1] += (y / dist) * pushOut + (x / dist) * swirl;
+                velocities[i * 3 + 2] += (Math.random() - 0.5) * pushOut * 3.0;
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            camSmoothX += (mouseVec.x - camSmoothX) * 0.05;
+            camSmoothY += (mouseVec.y - camSmoothY) * 0.05;
+            camera.position.x = camSmoothX * 3.0;
+            camera.position.y = camSmoothY * 3.0;
+            camera.position.z = 22;
+            camera.lookAt(0, 0, 0);
+
+            mouseX += (targetMouseX - mouseX) * delaySpeed;
+            mouseY += (targetMouseY - mouseY) * delaySpeed;
+
+            let mouseVx = mouseX - lastMouseX;
+            let mouseVy = mouseY - lastMouseY;
+            lastMouseX = mouseX;
+            lastMouseY = mouseY;
+
+            const posArray = geometry.attributes.position.array;
+
+            let now = Date.now();
+            let timeSincePulse = (now - lastPulseTime) / 1000;
+            let toNext = (INTERVAL - (now - lastPulseTime)) / 1000;
+
+            if (autoPlay && toNext <= 0) triggerPulse();
+
+            let anticipation = 0;
+            if (toNext < 0.45 && autoPlay) {
+                let t = 1.0 - (toNext / 0.45);
+                anticipation = -Math.pow(t, 2) * 0.3;
+            }
+
+            let bounce = 0;
+            if (timeSincePulse < 2.5) {
+                let t = timeSincePulse;
+                bounce = Math.exp(-t * 4.5) * Math.sin(t * 16.0) * 1.2;
+            }
+
+            let masterScale = 1.0 + anticipation + bounce;
+            let isFilled = activePattern.isFilled;
+
+            material.opacity = timeSincePulse < 0.6 ? 0.7 + (0.6 - timeSincePulse) * 0.3 : 0.7;
+
+            let currentFriction = timeSincePulse < 0.8 ? 0.985 : 0.94;
+
+            curHoleA += (targetHoleA - curHoleA) * 0.08;
+            curHoleB += (targetHoleB - curHoleB) * 0.08;
+            curHoleK += (targetHoleK - curHoleK) * 0.08;
+
+            let displayHoleA = curHoleA * masterScale;
+            let displayHoleB = curHoleB * masterScale;
+            let holePowA = Math.pow(displayHoleA, curHoleK);
+            let holePowB = Math.pow(displayHoleB, curHoleK);
+
+            let speed = Math.sqrt(mouseVx * mouseVx + mouseVy * mouseVy);
+            let dirX = speed > 0.001 ? mouseVx / speed : 0;
+            let dirY = speed > 0.001 ? mouseVy / speed : 0;
+            let swirlForce = Math.min(speed * 20.0, 15.0);
+            let wakeForce = Math.min(speed * 30.0, 20.0);
+
+            for (let i = 0; i < NUM_PARTICLES; i++) {
+                let x = posArray[i * 3];
+                let y = posArray[i * 3 + 1];
+                let z = posArray[i * 3 + 2];
+
+                let absX = Math.abs(x);
+                let absY = Math.abs(y);
+                let powX_K = Math.pow(absX, curHoleK);
+                let powY_K = Math.pow(absY, curHoleK);
+
+                let dSuper = (powX_K / holePowA) + (powY_K / holePowB);
+                let distNormalized = Math.pow(dSuper, 1.0 / curHoleK);
+
+                let gx = (curHoleK * Math.pow(absX, curHoleK - 1) / holePowA) * Math.sign(x);
+                let gy = (curHoleK * Math.pow(absY, curHoleK - 1) / holePowB) * Math.sign(y);
+                let gMag = Math.sqrt(gx * gx + gy * gy) || 1;
+                let nx = gx / gMag; let ny = gy / gMag;
+                let tx = -ny; let ty = nx;
+
+                let shapeForceX = 0; let shapeForceY = 0;
+                let distFromBorder = distNormalized - 1.0;
+
+                if (distNormalized < 1.0) {
+                    if (!isFilled) {
+                        let push = -distFromBorder * 0.8;
+                        shapeForceX = nx * push; shapeForceY = ny * push;
+                    }
+                } else {
+                    let pull = Math.min(distFromBorder, 0.8) * 0.35;
+                    shapeForceX = -nx * pull; shapeForceY = -ny * pull;
+                }
+
+                let ringProximity = isFilled ? 0 : Math.max(0.0, 1.0 - Math.abs(distFromBorder) * 4.0);
+                let randomSpread = (Math.random() - 0.5) * 0.35;
+
+                if (isFilled && distNormalized < 1.0) {
+                    shapeForceX += (Math.random() - 0.5) * 0.2;
+                    shapeForceY += (Math.random() - 0.5) * 0.2;
+                } else {
+                    shapeForceX += tx * randomSpread * ringProximity;
+                    shapeForceY += ty * randomSpread * ringProximity;
+                }
+
+                let h = 0.1;
+                let C0 = activePattern.C(x, y);
+                let Cdx = (activePattern.C(x + h, y) - C0) / h;
+                let Cdy = (activePattern.C(x, y + h) - C0) / h;
+
+                let chladniForceX = -C0 * Cdx * CHLADNI_STRENGTH;
+                let chladniForceY = -C0 * Cdy * CHLADNI_STRENGTH;
+
+                let blend = Math.min(1.0, Math.max(0.0, (distNormalized - 1.25) / 0.35));
+
+                velocities[i * 3] += shapeForceX * (1.0 - blend) + chladniForceX * blend;
+                velocities[i * 3 + 1] += shapeForceY * (1.0 - blend) + chladniForceY * blend;
+
+                velocities[i * 3 + 2] -= z * 0.08;
+
+                // FÍSICA DO VÓRTICE EM 3D MANTIDA
+                let dx = x - mouseX;
+                let dy = y - mouseY;
+                let dz = z;
+                let distMouse = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                let vortexRadius = 3.0;
+
+                if (distMouse < vortexRadius && speed > 0.001) {
+                    let falloff = 1.0 - (distMouse / vortexRadius);
+                    falloff = falloff * falloff;
+
+                    let cx = dirY * dz;
+                    let cy = -dirX * dz;
+                    let cz = dirX * dy - dirY * dx;
+
+                    let cMag = Math.sqrt(cx * cx + cy * cy + cz * cz) || 1;
+                    cx /= cMag; cy /= cMag; cz /= cMag;
+
+                    velocities[i * 3] += cx * falloff * swirlForce;
+                    velocities[i * 3 + 1] += cy * falloff * swirlForce;
+                    velocities[i * 3 + 2] += cz * falloff * swirlForce;
+
+                    velocities[i * 3] -= dirX * falloff * wakeForce;
+                    velocities[i * 3 + 1] -= dirY * falloff * wakeForce;
+                    velocities[i * 3 + 2] += (Math.random() - 0.5) * falloff * swirlForce * 0.5;
+
+                    let snx = dx / distMouse;
+                    let sny = dy / distMouse;
+                    let snz = dz / distMouse;
+                    velocities[i * 3] -= snx * falloff * 2.0;
+                    velocities[i * 3 + 1] -= sny * falloff * 2.0;
+                    velocities[i * 3 + 2] -= snz * falloff * 2.0;
+                }
+
+                let distCenter = Math.sqrt(x * x + y * y);
+                if (distCenter > BASIN_RADIUS) {
+                    let pull = (distCenter - BASIN_RADIUS) * 0.06;
+                    velocities[i * 3] -= (x / distCenter) * pull;
+                    velocities[i * 3 + 1] -= (y / distCenter) * pull;
+                }
+
+                velocities[i * 3] += (Math.random() - 0.5) * 0.12;
+                velocities[i * 3 + 1] += (Math.random() - 0.5) * 0.12;
+                velocities[i * 3 + 2] += (Math.random() - 0.5) * 0.12;
+
+                velocities[i * 3] *= currentFriction;
+                velocities[i * 3 + 1] *= currentFriction;
+                velocities[i * 3 + 2] *= currentFriction;
+
+                posArray[i * 3] += velocities[i * 3];
+                posArray[i * 3 + 1] += velocities[i * 3 + 1];
+                posArray[i * 3 + 2] += velocities[i * 3 + 2];
+            }
+
+            geometry.attributes.position.needsUpdate = true;
+            renderer.render(scene, camera);
+        }
+
+        window.onload = function () {
+            animate();
+        }
+    </script>
+</body>
+
+</html>
