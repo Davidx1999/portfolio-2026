@@ -17,14 +17,15 @@ export function LoadingScreen() {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5, ease: 'easeInOut' }}
-          className="fixed inset-0 z-[100] bg-[#09090b] flex items-center justify-center"
+          className="fixed inset-0 z-[100] bg-[#000000] flex items-center justify-center"
         >
           <div className="relative w-24 h-24 md:w-32 md:h-32">
-            {/* Background silhouette (dim) */}
+            {/* Background silhouette (dim) - Midnight Black feel */}
             <img
               src={`${import.meta.env.BASE_URL}Union.svg`}
               alt=""
-              className="absolute inset-0 w-full h-full object-contain invert opacity-[0.06]"
+              className="absolute inset-0 w-full h-full object-contain opacity-[0.1]"
+              style={{ filter: 'brightness(0) saturate(100%)' }}
             />
 
             {/* Filling mask — clip-path animated from bottom to top */}
@@ -37,7 +38,8 @@ export function LoadingScreen() {
               <img
                 src={`${import.meta.env.BASE_URL}Union.svg`}
                 alt=""
-                className="w-full h-full object-contain invert opacity-80"
+                className="w-full h-full object-contain"
+                style={{ filter: 'brightness(0) saturate(100%) invert(98%) sepia(2%) saturate(151%) hue-rotate(182deg) brightness(101%) contrast(97%)' }} /* Chill White #f8f8f8 approx */
               />
             </motion.div>
 
