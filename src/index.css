@@ -1,15 +1,31 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #000000;
-  --color-surface: #121212;
-  --color-foreground: #f9fafb;
+  --color-background: #0a0a0a; /* Abyss/Darker than Midnight Black */
+  --color-surface: #222222; /* Midnight Black */
+  --color-foreground: #FFF9FA; /* Chill White */
+  --color-true-pink: #fd1843;
   --font-sans: 'Geist', 'Outfit', 'Satoshi', sans-serif;
 }
 
 @layer base {
   body {
-    @apply bg-background text-foreground antialiased font-sans selection:bg-white/10 selection:text-white;
+    @apply bg-background text-foreground antialiased font-sans selection:bg-true-pink/30 selection:text-white;
   }
 }
 
+[data-injected="true"] {
+  position: relative;
+}
+
+[data-injected="true"]::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border: 1.5px solid var(--color-true-pink);
+  border-radius: inherit;
+  transform: scale(var(--ring-scale, 0.8));
+  opacity: var(--ring-opacity, 0);
+  pointer-events: none;
+  z-index: -1;
+}

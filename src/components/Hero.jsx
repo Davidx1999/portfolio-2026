@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { MagneticButton } from './MagneticButton';
+import { ChevronRight } from 'lucide-react';
 
 export function Hero() {
   return (
@@ -62,10 +62,11 @@ export function Hero() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 mt-8">
-            <a href="#projetos">
-              <MagneticButton>
-                Explorar Projetos
-              </MagneticButton>
+            <a 
+              href="#projetos"
+              className="bg-zinc-100 text-zinc-950 px-8 py-4 rounded-xl font-semibold transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
+            >
+              Explorar Projetos <ChevronRight className="w-4 h-4" />
             </a>
             <Link 
               to="/about" 

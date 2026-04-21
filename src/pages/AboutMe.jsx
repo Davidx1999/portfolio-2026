@@ -45,7 +45,7 @@ export function AboutMe() {
 
           <motion.div variants={itemVariants} className="flex flex-wrap gap-2">
             {['Brazilian Native', 'English Advanced', 'French Basic'].map((lang) => (
-              <span key={lang} className="px-3 py-1 text-xs uppercase tracking-wider font-mono bg-zinc-900 border border-zinc-800 rounded-full text-zinc-400">
+              <span key={lang} className="px-3 py-1 text-xs uppercase tracking-wider font-mono bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-400">
                 {lang}
               </span>
             ))}
@@ -63,7 +63,7 @@ export function AboutMe() {
             
             <div className="flex flex-col gap-8 border-l border-zinc-800/50 ml-4 pl-8 relative">
               <div className="relative">
-                <div className="absolute -left-[37px] top-1.5 w-2 h-2 rounded-full bg-zinc-500 border-4 border-background ring-1 ring-zinc-800"></div>
+                <div className="absolute -left-[37px] top-1.5 w-2 h-2 rounded-xl bg-zinc-500 border-4 border-background ring-1 ring-zinc-800"></div>
                 <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4 mb-2">
                   <h3 className="text-xl font-medium text-zinc-200">UX/UI Designer</h3>
                   <span className="text-zinc-500 font-mono text-sm">@ CEnPE FGV (Mapear)</span>
@@ -78,7 +78,7 @@ export function AboutMe() {
               </div>
 
               <div className="relative">
-                <div className="absolute -left-[37px] top-1.5 w-2 h-2 rounded-full bg-zinc-800 border-4 border-background ring-1 ring-zinc-800"></div>
+                <div className="absolute -left-[37px] top-1.5 w-2 h-2 rounded-xl bg-zinc-800 border-4 border-background ring-1 ring-zinc-800"></div>
                 <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4 mb-2">
                   <h3 className="text-xl font-medium text-zinc-200">Graphic Designer</h3>
                   <span className="text-zinc-500 font-mono text-sm">@ Luz do Saber</span>

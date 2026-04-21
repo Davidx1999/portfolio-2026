@@ -21,12 +21,14 @@ export function Navbar() {
         >
           Mapear
         </Link>
-        <Link 
-          to="/aula-f75" 
-          className={`hover:text-zinc-100 transition-colors ${location.pathname === '/aula-f75' ? 'text-zinc-100' : ''}`}
+        <a 
+          href="https://davidx1999.github.io/f75-site-test-2/#features"
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="hover:text-zinc-100 transition-colors"
         >
           Aula F75
-        </Link>
+        </a>
         <Link 
           to="/vincenzo" 
           className={`hover:text-zinc-100 transition-colors ${location.pathname === '/vincenzo' ? 'text-zinc-100' : ''}`}
