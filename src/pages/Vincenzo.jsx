@@ -28,7 +28,7 @@ export function Vincenzo() {
 
           <div className="flex flex-col sm:flex-row items-stretch justify-center gap-4">
             <a
-              href="/vincenzosite/teste.html"
+              href={`${import.meta.env.BASE_URL}vincenzosite/teste.html`}
               target="_blank"
               rel="noopener noreferrer"
               data-cursor="primary"
@@ -37,7 +37,7 @@ export function Vincenzo() {
               Access Data Scientist World <ExternalLink className="w-4 h-4" />
             </a>
             <a
-              href="/vincenzosite/portfolio_hero_cimatics.html"
+              href={`${import.meta.env.BASE_URL}vincenzosite/portfolio_hero_cimatics.html`}
               target="_blank"
               rel="noopener noreferrer"
               data-cursor="primary"
