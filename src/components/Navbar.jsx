@@ -7,7 +7,8 @@ export function Navbar() {
   return (
     <header className="fixed top-0 left-0 right-0 h-20 border-b border-white/5 bg-background/80 backdrop-blur-lg z-40 px-6 md:px-16 flex items-center justify-between">
       <Link to="/" className="flex items-center gap-3 text-zinc-200 tracking-tight">
-        <img src={`${import.meta.env.BASE_URL}Union.svg`} alt="DS" className="h-6 w-auto invert opacity-80" />
+        <img src={`${import.meta.env.BASE_URL}Union.svg`} alt="DS" className="h-6 w-auto invert opacity-80" style={{ filter: 'brightness(0) saturate(100%) invert(98%) sepia(2%) saturate(151%) hue-rotate(182deg) brightness(101%) contrast(97%)' }}/>
+        
         <span className="font-semibold text-xl">David Salviano</span>
       </Link>
       
