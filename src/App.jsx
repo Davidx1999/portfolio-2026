@@ -34,7 +34,7 @@ function App() {
 
       <footer className="w-full border-t border-zinc-900 py-12 px-6 md:px-16 text-center md:text-left flex flex-col md:flex-row justify-between items-center text-zinc-500 font-mono text-sm max-w-[1400px] mx-auto z-10 relative">
          <span>© 2026 David Salviano.</span>
-         <span className="uppercase mt-4 md:mt-0 tracking-[0.2em] text-xs">Acessando os portões da arte</span>
+         <span className="uppercase mt-4 md:mt-0 tracking-[0.2em] text-xs">Accessing the Gates of Art</span>
       </footer>
     </div>
   )

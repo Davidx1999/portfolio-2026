@@ -53,12 +53,12 @@ export function Hero() {
 
           <h1 className="text-5xl md:text-8xl lg:text-[7rem] tracking-tighter leading-[0.95] text-zinc-50 font-bold backdrop-blur-[2px]">
             Design <br/>
-            <span className="text-zinc-500">&</span> Engenharia<br />
-            de Interfaces.
+            <span className="text-zinc-500">&</span> Interface<br />
+            Egineering.
           </h1>
 
           <p className="max-w-[55ch] text-zinc-400 text-lg md:text-xl leading-relaxed mt-4 backdrop-blur-[2px]">
-            Focado em criar produtos digitais com altíssima agência. Unindo o brutalismo e o minimalismo, meu trabalho aproxima "Business meets Art" garantindo que os handoffs técnicos para os desenvolvedores sejam impecáveis.
+            UI/UX Designer and HCI Researcher crafting interfaces that feel like a trick but scale like an engine. I bridge the gap between complex design and seamless dev handoffs—no illusions, just high-agency products.
           </p>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 mt-8">
@@ -66,13 +66,13 @@ export function Hero() {
               href="#projetos"
               className="bg-zinc-100 text-zinc-950 px-8 py-4 rounded-full font-semibold transition-all hover:rounded-lg hover:scale-105 active:scale-95 flex items-center gap-2"
             >
-              Explorar Projetos <ChevronRight className="w-4 h-4" />
+              Explore Projects <ChevronRight className="w-4 h-4" />
             </a>
             <Link 
               to="/about" 
               className="text-zinc-500 hover:text-zinc-300 transition-colors underline underline-offset-4 decoration-zinc-800 uppercase tracking-wider text-sm font-semibold"
             >
-              Sobre mim
+              About Me
             </Link>
           </div>
         </motion.div>
