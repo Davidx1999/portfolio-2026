@@ -1,6 +1,7 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { Navbar } from './components/Navbar';
+import { BackgroundParticles } from './components/BackgroundParticles';
 import { Home } from './pages/Home';
 import { Mapear } from './pages/Mapear';
 import { AulaF75 } from './pages/AulaF75';
@@ -14,9 +15,10 @@ function App() {
   const location = useLocation();
 
   return (
-    <div className="w-full bg-background min-h-[100dvh] font-sans overflow-x-hidden text-foreground selection:bg-white/10 selection:text-white">
+    <div className="w-full min-h-[100dvh] font-sans overflow-x-hidden text-foreground selection:bg-white/10 selection:text-white">
       <LoadingScreen />
       <MouseFollower />
+      <BackgroundParticles />
       <Navbar />
 
       <AnimatePresence mode="wait">

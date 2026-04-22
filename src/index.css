@@ -10,7 +10,7 @@
 
 @layer base {
   body {
-    @apply bg-background text-foreground antialiased font-sans selection:bg-true-pink/30 selection:text-white;
+    @apply bg-transparent text-foreground antialiased font-sans selection:bg-true-pink/30 selection:text-white;
   }
 }
 
