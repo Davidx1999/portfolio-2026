@@ -43,9 +43,9 @@ export function BentoProjects() {
           
           <div className="relative z-10 w-full md:w-2/3">
             <span className="px-3 py-1 text-xs uppercase tracking-wider font-mono bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-400 mb-6 inline-block">App Platform</span>
-            <h3 className="text-3xl md:text-5xl font-bold text-white mb-4 tracking-tight group-hover:text-zinc-300 transition-colors">Sistema Mapear</h3>
+            <h3 className="text-3xl md:text-5xl font-bold text-white mb-4 tracking-tight group-hover:text-zinc-300 transition-colors">Mapear Plataform</h3>
             <p className="text-zinc-400 mb-8 leading-relaxed line-clamp-3">
-              Plataforma empresarial de 4 anos. A arquitetura UX une design systems complexos com integração assíncrona focada em visualização de dados.
+              An educational platform designed to empower student wisdom. The UX architecture bridges complex design systems with asynchronous integration, focused on data visualization.
             </p>
             <Link to="/mapear" data-magnetic-button className="inline-flex items-center gap-3 text-sm font-semibold text-white uppercase tracking-wider hover:gap-5 transition-all">
               Ler Case Study <MoveRight className="w-4 h-4 text-zinc-500" />
@@ -74,7 +74,7 @@ export function BentoProjects() {
           <div className="mt-12">
             <h3 className="text-2xl font-bold text-white mb-3">AULA F75</h3>
             <p className="text-zinc-400 text-sm mb-6 leading-relaxed">
-               Página sob demanda interativa para teclado mecânico premium. Alta performance de vídeo e renderização 3D simulada.
+               Interactive on-demand page for premium mechanical keyboards. Featuring high-performance video and simulated 3D rendering.
             </p>
             <a href="https://davidx1999.github.io/f75-site-test-2/#features" data-magnetic-button target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-xs font-semibold text-white uppercase tracking-wider border-b border-zinc-700 pb-1 hover:border-white transition-all">
               Access Launch <Plus className="w-3 h-3 text-zinc-500" />
@@ -94,7 +94,7 @@ export function BentoProjects() {
              <span className="px-3 py-1 text-xs uppercase tracking-wider font-mono bg-zinc-950 border border-zinc-800 text-neon-green border-green-900/50 rounded-xl text-green-500 mb-4 inline-block">Retro Terminal OS</span>
              <h3 className="text-3xl font-bold text-white mb-4">Vincenzo Data Science</h3>
              <p className="text-zinc-400 leading-relaxed max-w-xl">
-               Portfólio interativo de alta exclusividade construído em arquitetura esticada e simulador de terminal shell inspirado nos anos 80, integrando visualização de matrizes para Big Data.
+               A high-exclusivity interactive portfolio built on stretched architecture and an 80s-inspired shell terminal simulator, integrating matrix visualization for Big Data.
              </p>
            </div>
            

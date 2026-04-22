@@ -33,13 +33,13 @@ export function Navbar() {
           to="/projects" 
           className={`hover:text-zinc-100 transition-colors ${location.pathname === '/projects' ? 'text-zinc-100' : ''}`}
         >
-          Projetos
+          Projects
         </Link>
         <Link 
           to="/about" 
           className={`hover:text-zinc-100 transition-colors ${location.pathname === '/about' ? 'text-zinc-100' : ''}`}
         >
-          Sobre mim
+          About Me
         </Link>
         <Link 
           to="/mapear" 
@@ -59,7 +59,7 @@ export function Navbar() {
           to="/vincenzo" 
           className={`hover:text-zinc-100 transition-colors ${location.pathname === '/vincenzo' ? 'text-zinc-100' : ''}`}
         >
-          Vincenzo
+          The Legend of Fadda
         </Link>
       </nav>
     </header>
