@@ -1,67 +1,112 @@
 import { Link, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect } from 'react';
 
 export function Navbar() {
   const location = useLocation();
   const [isHovered, setIsHovered] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const links = [
+    { id: '/projects', label: 'Projects' },
+    { id: '/about', label: 'About Me' },
+    { id: '/mapear', label: 'Mapear' },
+    { id: '/aula-f75', label: 'Aula F75' },
+    { id: '/vincenzo', label: 'Fadda' }
+  ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-20 border-b border-white/5 bg-background/80 backdrop-blur-lg z-40 px-6 md:px-16 flex items-center justify-between">
-      <Link 
-        to="/" 
-        className="flex items-center gap-3 text-zinc-200 tracking-tight group transition-colors hover:text-[#fd1843]"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        <img 
-          src={`${import.meta.env.BASE_URL}Union.svg`} 
-          alt="DS" 
-          className="h-6 w-auto transition-all duration-300 group-hover:filter-none" 
-          style={{ 
-            filter: isHovered 
-              ? 'brightness(0) saturate(100%) invert(21%) sepia(91%) saturate(6146%) hue-rotate(344deg) brightness(98%) contrast(101%)' 
-              : 'brightness(0) saturate(100%) invert(98%) sepia(2%) saturate(151%) hue-rotate(182deg) brightness(101%) contrast(97%)'
-          }} 
-        />
-        
-        <span className="font-semibold text-xl transition-colors">David Salviano</span>
-      </Link>
-      
-      <nav className="hidden md:flex gap-8 text-sm text-zinc-400 font-mono uppercase tracking-widest items-center">
+    <>
+      {/* Top HUD - Peripheral Elements */}
+      <div className="fixed top-0 left-0 right-0 p-6 md:p-8 z-50 flex items-start justify-between pointer-events-none">
+        {/* Logo */}
         <Link 
-          to="/projects" 
-          className={`hover:text-zinc-100 transition-colors ${location.pathname === '/projects' ? 'text-zinc-100' : ''}`}
+          to="/" 
+          className="pointer-events-auto flex items-center gap-3 text-zinc-200 tracking-tight group transition-colors focus:outline-none"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
         >
-          Projects
+          <div className="w-8 h-8 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+            <img 
+              src={`${import.meta.env.BASE_URL}Union.svg`} 
+              alt="DS" 
+              className="w-full h-full transition-all duration-300" 
+              style={{ 
+                filter: isHovered 
+                  ? 'brightness(0) saturate(100%) invert(21%) sepia(91%) saturate(6146%) hue-rotate(344deg) brightness(98%) contrast(101%)' 
+                  : 'brightness(0) saturate(100%) invert(98%) sepia(2%) saturate(151%) hue-rotate(182deg) brightness(101%) contrast(97%)'
+              }} 
+            />
+          </div>
+          <span className="font-semibold text-lg drop-shadow-lg hidden sm:block">David Salviano</span>
         </Link>
-        <Link 
-          to="/about" 
-          className={`hover:text-zinc-100 transition-colors ${location.pathname === '/about' ? 'text-zinc-100' : ''}`}
+
+        {/* Status Indicator */}
+        <div className="pointer-events-auto flex items-center gap-2 text-[10px] font-mono tracking-[0.2em] text-zinc-500 uppercase mt-2">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-zinc-500/60 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-zinc-500"></span>
+          </span>
+          <span className="hidden sm:inline">Active Engine</span>
+        </div>
+      </div>
+
+      {/* Floating Dock Navigation */}
+      <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-max px-4">
+        <motion.nav 
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+          className={`flex items-center gap-1 p-1.5 rounded-full border transition-all duration-500 ${
+            scrolled 
+              ? 'bg-black/80 backdrop-blur-xl border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)]' 
+              : 'bg-black/40 backdrop-blur-md border-white/5'
+          }`}
         >
-          About Me
-        </Link>
-        <Link 
-          to="/mapear" 
-          className={`hover:text-zinc-100 transition-colors ${location.pathname === '/mapear' ? 'text-zinc-100' : ''}`}
-        >
-          Mapear
-        </Link>
-        <a 
-          href="https://davidx1999.github.io/f75-site-test-2/#features"
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="hover:text-zinc-100 transition-colors"
-        >
-          Aula F75
-        </a>
-        <Link 
-          to="/vincenzo" 
-          className={`hover:text-zinc-100 transition-colors ${location.pathname === '/vincenzo' ? 'text-zinc-100' : ''}`}
-        >
-          The Legend of Fadda
-        </Link>
-      </nav>
-    </header>
+          {links.map((link) => {
+            const isActive = location.pathname === link.id;
+            
+            if (link.isExternal) {
+              return (
+                <a 
+                  key={link.id}
+                  href={link.id}
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="relative px-4 py-2 text-[11px] text-zinc-400 hover:text-zinc-100 font-mono uppercase tracking-[0.15em] transition-colors duration-300 rounded-full whitespace-nowrap"
+                >
+                  {link.label}
+                </a>
+              );
+            }
+
+            return (
+              <Link
+                key={link.id}
+                to={link.id}
+                className={`relative px-4 py-2 text-[11px] font-mono uppercase tracking-[0.15em] transition-colors duration-300 rounded-full z-10 whitespace-nowrap ${
+                  isActive ? 'text-true-pink font-bold' : 'text-zinc-400 hover:text-zinc-100'
+                }`}
+              >
+                {isActive && (
+                  <motion.div
+                    layoutId="activePill"
+                    className="absolute inset-0 bg-white rounded-full -z-10"
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
+                )}
+                {link.label}
+              </Link>
+            );
+          })}
+        </motion.nav>
+      </div>
+    </>
   );
 }

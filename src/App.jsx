@@ -8,6 +8,7 @@ import { AulaF75 } from './pages/AulaF75';
 import { Vincenzo } from './pages/Vincenzo';
 import { AboutMe } from './pages/AboutMe';
 import { Projects } from './pages/Projects';
+import { ProjectCase } from './pages/ProjectCase';
 import { LoadingScreen } from './components/LoadingScreen';
 import { MouseFollower } from './components/MouseFollower';
 
@@ -29,6 +30,7 @@ function App() {
           <Route path="/mapear" element={<Mapear />} />
           <Route path="/aula-f75" element={<AulaF75 />} />
           <Route path="/vincenzo" element={<Vincenzo />} />
+          <Route path="/project/:projectId" element={<ProjectCase />} />
         </Routes>
       </AnimatePresence>
 

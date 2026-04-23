@@ -31,9 +31,6 @@ export function Hero() {
               </motion.div>
           </motion.div>
           
-          <div className="absolute bottom-10 right-10 text-zinc-700 font-mono text-sm uppercase flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-zinc-600 animate-pulse"></div> Active Motion Engine
-          </div>
       </div>
 
       <div className="container mx-auto px-6 lg:px-12 relative z-10 w-full flex items-center h-full">
@@ -51,19 +48,23 @@ export function Hero() {
             </span>
           </div>
 
-          <h1 className="text-5xl md:text-8xl lg:text-[7rem] tracking-tighter leading-[0.95] text-zinc-50 font-bold backdrop-blur-[2px]">
-            Design <br/>
-            <span className="text-zinc-500">&</span> Interface<br />
-            Egineering.
-          </h1>
+        <motion.h1 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="text-[4rem] md:text-[6rem] lg:text-[7.5rem] font-bold tracking-tighter leading-[0.95] mb-8 text-white drop-shadow-lg"
+        >
+          Design<br />
+          <span className="italic font-normal text-[#52525c]">&amp; Interface Engineering.</span>
+        </motion.h1>
 
           <p className="max-w-[55ch] text-zinc-400 text-lg md:text-xl leading-relaxed mt-4 backdrop-blur-[2px]">
-            UI/UX Designer and HCI Researcher crafting interfaces that feel like a trick but scale like an engine. I bridge the gap between complex design and seamless dev handoffs—no illusions, just high-agency products.
+            Focused on creating digital products with high agency. Bridging the gap between aesthetics and engineering, I ensure technical handoffs are flawless.
           </p>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 mt-8">
             <a 
-              href="#projetos"
+              href="#projects"
               className="bg-zinc-100 text-zinc-950 px-8 py-4 rounded-full font-semibold transition-all hover:rounded-lg hover:scale-105 active:scale-95 flex items-center gap-2"
             >
               Explore Projects <ChevronRight className="w-4 h-4" />

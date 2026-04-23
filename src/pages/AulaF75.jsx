@@ -1,25 +1,24 @@
-import { PageTransition } from '../components/PageTransition';
+import { CaseStudyTemplate } from '../components/CaseStudyTemplate';
+import aulaf75Img from '../assets/aulaf75.png';
 
 export function AulaF75() {
   return (
-    <PageTransition>
-      <main className="max-w-[1400px] mx-auto px-6 md:px-16 pt-32 pb-32">
-        <div className="max-w-3xl">
-          <span className="text-zinc-500 font-mono text-sm tracking-widest uppercase mb-4 block">Product Landing Page</span>
-          <h1 className="text-5xl md:text-7xl font-semibold tracking-tighter text-zinc-100 leading-none mb-8">
-            AULA F75 Antigravity
-          </h1>
-          <p className="text-xl text-zinc-400 leading-relaxed mb-6">
-            Página construída sob demanda para visualização 3D e promoção do teclado mecânico premium AULA F75.
-          </p>
-          <a 
-            href="/AULA F75 ANTIGRAVITY/index.html" 
-            className="inline-block bg-zinc-100 text-zinc-950 px-8 py-4 rounded-full font-semibold transition-colors hover:bg-white"
-          >
-            Acessar Site do AULA F75
-          </a>
-        </div>
-      </main>
-    </PageTransition>
+    <CaseStudyTemplate 
+      title="Aula F75" 
+      subtitle="Interactive on-demand page for premium mechanical keyboards. Featuring high-performance video and simulated 3D rendering."
+      tags={['Product Design', '2024', 'E-learning', 'Hardware']} 
+      image={aulaf75Img}
+      liveLink="https://davidx1999.github.io/f75-site-test-2/#features"
+      challenge="The challenge was to translate the tactile feel of a high-end mechanical keyboard into a digital experience. We needed to showcase the product's features with high-fidelity visuals without sacrificing performance."
+      solution="We leveraged high-performance video backgrounds and simulated 3D rendering techniques to create an immersive 'unboxing' feel. The interface was designed to be as responsive and 'clicky' as the keyboard itself."
+      process={
+        <ul className="list-disc pl-5 space-y-3 mb-6">
+          <li>3D modeling and lighting simulation for product shots.</li>
+          <li>Video optimization for seamless background integration.</li>
+          <li>Interactive gamification elements to showcase key switch tech.</li>
+          <li>Mobile-first optimization for global accessibility.</li>
+        </ul>
+      }
+    />
   );
 }
