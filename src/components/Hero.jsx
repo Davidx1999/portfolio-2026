@@ -4,42 +4,40 @@ import { ChevronRight } from 'lucide-react';
 
 export function Hero() {
   return (
-    <section className="w-full min-h-[90dvh] flex flex-col justify-center py-20 relative overflow-hidden">
-      {/* Background Active Motion Engine */}
-      <div className="absolute inset-0 z-0 flex items-center justify-center opacity-40 pointer-events-none">
-          <motion.div 
-              animate={{ rotate: 360 }}
-              transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
-              className="w-[80vw] h-[80vw] max-w-[1200px] max-h-[1200px] border-[1px] border-zinc-800/60 rounded-full border-dashed flex items-center justify-center relative"
-            >
-              <div className="absolute inset-0 bg-gradient-to-tr from-zinc-800/10 to-transparent mix-blend-overlay rounded-full"></div>
-              
-              <motion.div 
-                animate={{ rotate: -360 }}
-                transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
-                className="w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] border-[1px] border-zinc-700/40 rounded-full flex items-center justify-center relative"
-                >
-                  <div className="w-4 h-4 bg-zinc-300 rounded-full blur-[2px] shadow-[0_0_20px_10px_rgba(255,255,255,0.1)]"></div>
-                  <div className="absolute bottom-10 left-20 w-2 h-2 bg-zinc-500 rounded-full blur-[1px]"></div>
-                  
-                  <motion.div 
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-                    className="w-[40vw] h-[40vw] max-w-[400px] max-h-[400px] border-[1px] border-zinc-600/20 rounded-full border-dotted flex items-center justify-center"
-                    >
-                  </motion.div>
-              </motion.div>
-          </motion.div>
-          
+    <section className="w-full h-screen flex flex-col justify-center relative overflow-hidden">
+      {/* Background Video Engine - Starts at Pixel 0 */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          onContextMenu={(e) => e.preventDefault()}
+          controlsList="nodownload"
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+        >
+          <source src={`${import.meta.env.BASE_URL}assets/bg_hero.mp4`} type="video/mp4" />
+        </video>
+
+        {/* Dynamic Fog Overlay - Left Side Only for readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/60 to-transparent z-[1]"></div>
+
+        {/* Bottom Transition Gradient - Blends with the rest of the page (#0a0a0a) */}
+        <div className="absolute inset-x-0 -bottom-1 h-[50vh] bg-gradient-to-t from-[#0a0a0a] from-15% via-[#0a0a0a]/80 to-transparent z-[2]"></div>
+
+        {/* Subtle vignette for depth */}
+        <div className="absolute inset-0 shadow-[inset_0_0_150px_rgba(0,0,0,0.3)] z-[1]"></div>
       </div>
 
-      <div className="container mx-auto px-6 lg:px-12 relative z-10 w-full flex items-center h-full">
+
+
+      <div className="container mx-auto px-6 lg:px-12 relative z-10 w-full flex items-center justify-center">
         {/* Main Typography content */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ type: "spring", stiffness: 80, damping: 20 }}
-          className="flex flex-col gap-6 max-w-4xl"
+          className="flex flex-col gap-6 max-w-4xl -translate-x-8 md:-translate-x-24 lg:-translate-x-40"
         >
           <div className="flex items-center gap-4">
             <span className="h-[1px] w-12 bg-zinc-700 block"></span>
@@ -48,29 +46,29 @@ export function Hero() {
             </span>
           </div>
 
-        <motion.h1 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="text-[4rem] md:text-[6rem] lg:text-[7.5rem] font-bold tracking-tighter leading-[0.95] mb-8 text-white drop-shadow-lg"
-        >
-          Design<br />
-          <span className="italic font-normal text-[#52525c]">&amp; Interface Engineering.</span>
-        </motion.h1>
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="text-[4rem] md:text-[6rem] lg:text-[7.5rem] font-bold tracking-tighter leading-[0.95] mb-8 text-white drop-shadow-lg"
+          >
+            Design<br />
+            <span className="italic font-normal text-[#52525c]">&amp; Interface Engineering.</span>
+          </motion.h1>
 
           <p className="max-w-[55ch] text-zinc-400 text-lg md:text-xl leading-relaxed mt-4 backdrop-blur-[2px]">
             Focused on creating digital products with high agency. Bridging the gap between aesthetics and engineering, I ensure technical handoffs are flawless.
           </p>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 mt-8">
-            <a 
+            <a
               href="#projects"
               className="bg-zinc-100 text-zinc-950 px-8 py-4 rounded-full font-semibold transition-all hover:rounded-lg hover:scale-105 active:scale-95 flex items-center gap-2"
             >
               Explore Projects <ChevronRight className="w-4 h-4" />
             </a>
-            <Link 
-              to="/about" 
+            <Link
+              to="/about"
               className="text-zinc-500 hover:text-zinc-300 transition-colors underline underline-offset-4 decoration-zinc-800 uppercase tracking-wider text-sm font-semibold"
             >
               About Me
