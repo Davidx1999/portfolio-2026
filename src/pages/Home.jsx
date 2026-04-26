@@ -4,7 +4,8 @@ import { BentoProjects } from '../components/BentoProjects';
 export function Home() {
   return (
     <>
-      <main className="mx-auto pt-32 pb-32">
+      {/* Removido o pt-32 para o Hero colar no topo! */}
+      <main className="w-full pb-32">
         <Hero />
         <div className="mt-20">
           <BentoProjects />
