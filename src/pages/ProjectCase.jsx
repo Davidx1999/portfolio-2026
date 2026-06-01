@@ -1,9 +1,22 @@
 import { useParams, Navigate } from 'react-router-dom';
 import { CaseStudyTemplate } from '../components/CaseStudyTemplate';
 import { PROJECTS } from '../data/projects';
+import { FocuslyCase } from './FocuslyCase';
+import { PlaygroundProjectDetail } from './PlaygroundProjectDetail';
+import { PLAYGROUND_PROJECTS } from '../data/playground';
 
 export function ProjectCase() {
   const { projectId } = useParams();
+
+  if (projectId === 'focusly') {
+    return <FocuslyCase />;
+  }
+
+  const isPlayground = PLAYGROUND_PROJECTS.some(p => p.id === projectId);
+  if (isPlayground) {
+    return <PlaygroundProjectDetail />;
+  }
+
   const project = PROJECTS.find(p => p.id === projectId);
 
   if (!project) {

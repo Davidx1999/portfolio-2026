@@ -1,100 +1,96 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { LimeActionButton } from './Buttons';
+
+const MotionLink = motion(Link);
 
 export function Navbar() {
   const location = useLocation();
-  const [isHovered, setIsHovered] = useState(false);
+  const navigate = useNavigate();
 
-  const links = [
-    { id: '/projects', label: 'Projects' },
-    { id: '/about', label: 'About Me' },
-    { id: '/mapear', label: 'Mapear' },
-    { id: '/aula-f75', label: 'Aula F75' },
-    { id: '/vincenzo', label: 'Fadda' }
+  const navLinks = [
+    { label: 'Cases', path: '/cases' },
+    { label: 'Projects', path: '/projects' },
+    { label: 'About', path: '/about' }
   ];
 
+  const handleLinkClick = (e, path) => {
+    if (path.startsWith('#')) {
+      e.preventDefault();
+      const targetId = path.substring(1);
+      if (location.pathname === '/') {
+        const element = document.getElementById(targetId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      } else {
+        navigate('/');
+        // Wait for page transition, then scroll
+        setTimeout(() => {
+          const element = document.getElementById(targetId);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 150);
+      }
+    }
+  };
+
   return (
-    <>
-      {/* Top HUD - Mantive o mix-blend-difference para o logo e texto lateral */}
-      <div className="fixed top-0 left-0 right-0 p-6 md:p-8 z-[100] flex items-start justify-between pointer-events-none mix-blend-difference text-white">
+    <header className="fixed top-0 left-0 right-0 z-[100] bg-background/90 backdrop-blur-md transition-all duration-300">
+      {/* Top Header Row */}
+      <div className="w-full px-6 md:px-[16%] py-5 flex items-center justify-between">
         <Link
           to="/"
-          className="pointer-events-auto flex items-center gap-3 tracking-tight group transition-colors focus:outline-none"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
+          className="flex items-center gap-3 tracking-tight group focus:outline-none"
         >
           <div className="w-8 h-8 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
             <img
-              src={`${import.meta.env.BASE_URL}Union.svg`}
-              alt="DS"
-              className="w-full h-full transition-all duration-300"
-              style={{
-                filter: isHovered
-                  ? 'brightness(0) saturate(100%) invert(21%) sepia(91%) saturate(6146%) hue-rotate(344deg) brightness(98%) contrast(101%)'
-                  : 'brightness(0) saturate(100%) invert(100%)'
-              }}
+              src={`${import.meta.env.BASE_URL}assets/logo_purple.png`}
+              alt="David Salviano"
+              className="w-full h-full object-contain"
             />
           </div>
-          <span className="font-semibold text-lg drop-shadow-lg hidden sm:block">David Salviano</span>
         </Link>
 
-        {/* Status Indicator */}
-        <div className="pointer-events-auto flex items-center gap-2 text-[10px] font-mono tracking-[0.2em] uppercase mt-2">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-lime-400"></span>
-          </span>
-          <span className="hidden sm:inline">Active Engine</span>
-        </div>
-      </div>
-
-      {/* Floating Dock Navigation - Scroll removido, background permanente */}
-      <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] w-full max-w-max px-4">
-        <motion.nav
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-          /* CLASSES FIXAS AQUI: Sempre com background preto esfumaçado e borda */
-          className="flex items-center gap-1 p-1.5 rounded-full border transition-all duration-500 bg-black/80 backdrop-blur-xl border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
-        >
-          {links.map((link) => {
-            const isActive = location.pathname === link.id;
-
-            if (link.isExternal) {
-              return (
-                <a
-                  key={link.id}
-                  href={link.id}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="relative px-4 py-2 text-[11px] text-zinc-400 hover:text-zinc-100 font-mono uppercase tracking-[0.15em] transition-colors duration-300 rounded-full whitespace-nowrap"
-                >
-                  {link.label}
-                </a>
-              );
-            }
+        {/* Navigation Links */}
+        <nav className="flex items-center gap-4 sm:gap-6 md:gap-8">
+          {navLinks.map((link) => {
+            const isHash = link.path.startsWith('#');
+            const isActive = isHash 
+              ? location.pathname === '/' && location.hash === link.path
+              : location.pathname === link.path;
 
             return (
               <Link
-                key={link.id}
-                to={link.id}
-                className={`relative px-4 py-2 text-[11px] font-mono uppercase tracking-[0.15em] transition-colors duration-300 rounded-full z-10 whitespace-nowrap ${isActive ? 'text-black font-bold' : 'text-zinc-400 hover:text-zinc-100'
-                  }`}
+                key={link.label}
+                to={link.path}
+                onClick={(e) => handleLinkClick(e, link.path)}
+                className={`font-mono text-[10px] sm:text-xs font-semibold uppercase tracking-[0.16em] transition-colors relative group py-1 ${
+                  isActive 
+                    ? 'text-[var(--color-primary)]' 
+                    : 'text-[var(--color-foreground)]/80 hover:text-[var(--color-primary)]'
+                }`}
               >
-                {isActive && (
-                  <motion.div
-                    layoutId="activePill"
-                    className="absolute inset-0 bg-white rounded-full -z-10"
-                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                  />
-                )}
                 {link.label}
+                <span className={`absolute bottom-0 left-0 w-full h-[1px] bg-[var(--color-primary)] transition-transform duration-300 origin-left ${
+                  isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                }`} />
               </Link>
             );
           })}
-        </motion.nav>
+          
+          <LimeActionButton
+            as={MotionLink}
+            to="/contact"
+          >
+            Lets Contact
+          </LimeActionButton>
+        </nav>
       </div>
-    </>
+
+      {/* Thin Editorial Divider Line spanning full viewport */}
+      <div className="w-full h-[1px] bg-neutral-carvao/10" />
+    </header>
   );
 }
