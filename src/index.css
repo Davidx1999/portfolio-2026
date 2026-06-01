@@ -1,19 +1,185 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #0a0a0a; /* Abyss/Darker than Midnight Black */
-  --color-surface: #222222; /* Midnight Black */
-  --color-foreground: #FFF9FA; /* Chill White */
-  --color-true-pink: #fd1843;
-  --font-sans: 'Geist', 'Outfit', 'Satoshi', sans-serif;
+  /* ---------------------------------------------
+   * BASE / BRAND
+   * --------------------------------------------- */
+
+  --color-background: #fbf9f6;
+  --color-foreground: #1A1A1A;
+
+  --color-primary: #8B7EC8;
+  --color-secondary: #B6A9ED;
+  --color-tertiary: #C8E63C;
+
+  --color-semantic-red: #E8502A;
+  --color-semantic-yellow: #F5C842;
+
+  /* ---------------------------------------------
+   * LIGHT / PAPER
+   * Fundo, cards claros, divisórias suaves
+   * --------------------------------------------- */
+
+  --color-light: #fbf9f6;
+  --color-light-50: #FBF9F6;
+  --color-light-100: #FAF8F3;
+  --color-light-200: #F7F5EE;
+  --color-light-300: #F5F1E9;
+  --color-light-400: #F2EEE4;
+  --color-light-500: #fbf9f6;
+  --color-light-600: #CAC5BB;
+  --color-light-700: #A3A098;
+  --color-light-800: #7D7A74;
+  --color-light-900: #565550;
+
+  /* ---------------------------------------------
+   * INK / CHARCOAL
+   * Texto principal, bordas, fundo escuro
+   * --------------------------------------------- */
+
+  --color-ink: #1A1A1A;
+  --color-ink-50: #BFBFBF;
+  --color-ink-100: #ADADAD;
+  --color-ink-200: #888888;
+  --color-ink-300: #636363;
+  --color-ink-400: #3F3F3F;
+  --color-ink-500: #1A1A1A;
+  --color-ink-600: #161616;
+  --color-ink-700: #121212;
+  --color-ink-800: #0E0E0E;
+  --color-ink-900: #090909;
+
+  /* ---------------------------------------------
+   * PURPLE / PRIMARY
+   * Accent principal, links, botões, highlights
+   * --------------------------------------------- */
+
+  --color-purple: #8B7EC8;
+  --color-purple-50: #DFDBF0;
+  --color-purple-100: #D5D1EB;
+  --color-purple-200: #C3BCE2;
+  --color-purple-300: #B0A7DA;
+  --color-purple-400: #9E93D1;
+  --color-purple-500: #8B7EC8;
+  --color-purple-600: #756AA8;
+  --color-purple-700: #5F5688;
+  --color-purple-800: #484268;
+  --color-purple-900: #322D48;
+
+  /* ---------------------------------------------
+   * LILAC / SECONDARY
+   * Backgrounds de cards, áreas suaves, hover
+   * --------------------------------------------- */
+
+  --color-lilac: #B6A9ED;
+  --color-lilac-50: #EBE7FA;
+  --color-lilac-100: #E5E0F9;
+  --color-lilac-200: #D9D2F6;
+  --color-lilac-300: #CDC5F3;
+  --color-lilac-400: #C2B7F0;
+  --color-lilac-500: #B6A9ED;
+  --color-lilac-600: #998EC7;
+  --color-lilac-700: #7C73A1;
+  --color-lilac-800: #5F587B;
+  --color-lilac-900: #423D55;
+
+  /* ---------------------------------------------
+   * LIME / TERTIARY
+   * CTAs, asterisco, marcações e detalhes vivos
+   * --------------------------------------------- */
+
+  --color-lime: #C8E63C;
+  --color-lime-50: #F0F8C8;
+  --color-lime-100: #EBF6B9;
+  --color-lime-200: #E2F29A;
+  --color-lime-300: #DAEE7A;
+  --color-lime-400: #D1EA5B;
+  --color-lime-500: #C8E63C;
+  --color-lime-600: #A8C132;
+  --color-lime-700: #889C29;
+  --color-lime-800: #68781F;
+  --color-lime-900: #485316;
+
+  /* ---------------------------------------------
+   * RED / SEMANTIC
+   * Alertas, detalhes fortes, badges específicos
+   * --------------------------------------------- */
+
+  --color-red: #E8502A;
+  --color-red-50: #F9CEC4;
+  --color-red-100: #F7C0B4;
+  --color-red-200: #F3A492;
+  --color-red-300: #EF8871;
+  --color-red-400: #EC6C4F;
+  --color-red-500: #E8502A;
+  --color-red-600: #C34327;
+  --color-red-700: #9E361F;
+  --color-red-800: #792A18;
+  --color-red-900: #541D11;
+
+  /* ---------------------------------------------
+   * YELLOW / SEMANTIC
+   * Mantido do teu tema original
+   * --------------------------------------------- */
+
+  --color-yellow: #F5C842;
+  --color-yellow-500: #F5C842;
+
+  /* ---------------------------------------------
+   * ALIASES
+   * Mantém compatibilidade com teu código atual
+   * --------------------------------------------- */
+
+  --color-neutral-branco: var(--color-light-500);
+  --color-neutral-carvao: var(--color-ink-500);
+
+  --color-muted: var(--color-ink-200);
+  --color-border: color-mix(in srgb, var(--color-ink-500) 22%, transparent);
+
+  --color-card: var(--color-light-100);
+  --color-card-hover: var(--color-lilac-100);
+
+  --color-link: var(--color-purple-500);
+  --color-link-hover: var(--color-purple-700);
+
+  --color-cta: var(--color-lime-500);
+  --color-cta-hover: var(--color-lime-600);
+
+  /* ---------------------------------------------
+   * FONTS
+   * --------------------------------------------- */
+
+  --font-serif: 'Libre Baskerville', Georgia, serif;
+  --font-sans: 'Geist', system-ui, -apple-system, sans-serif;
+  --font-mono: 'Geist Mono', monospace;
 }
 
 @layer base {
   body {
-    @apply bg-transparent text-foreground antialiased font-sans selection:bg-true-pink/30 selection:text-white;
+    @apply bg-background text-foreground antialiased font-sans selection:bg-secondary/30 selection:text-neutral-carvao;
+    background-color: #fbf9f6;
+    color: #1A1A1A;
   }
 }
 
+/* Subtle paper texture overlay */
+.paper-texture {
+  position: relative;
+}
+
+.paper-texture::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.04;
+  pointer-events: none;
+  z-index: 9999;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Custom button hover injection animation (MouseFollower logic) */
 [data-injected="true"] {
   position: relative;
 }
@@ -22,10 +188,84 @@
   content: '';
   position: absolute;
   inset: -2px;
-  border: 1.5px solid var(--color-true-pink);
+  border: 1.5px solid var(--ring-border-color, var(--color-primary));
   border-radius: inherit;
   transform: scale(var(--ring-scale, 0.8));
   opacity: var(--ring-opacity, 0);
   pointer-events: none;
   z-index: -1;
+}
+
+.font-signature {
+  font-family: 'Caveat', cursive;
+}
+
+hr {
+  border: none;
+  height: 1px;
+  background-color: var(--color-neutral-carvao);
+}
+
+/* Estilo CSS do Botão Hambúrguer */
+.hamb-menu {
+  --size-ui: 18px;
+  --color-ui: currentColor;
+  --thickness-ui: 2px;
+  --duration-ui: 0.4s;
+  --radius-ui: 2px;
+
+  width: var(--size-ui);
+  height: 14px;
+  position: relative;
+  cursor: pointer;
+  transition: transform var(--duration-ui) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hamb-menu .bar {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: var(--thickness-ui);
+  background-color: var(--color-ui);
+  border-radius: var(--radius-ui);
+  transition: transform var(--duration-ui) cubic-bezier(0.4, 0, 0.2, 1),
+    opacity var(--duration-ui) cubic-bezier(0.4, 0, 0.2, 1),
+    width var(--duration-ui) cubic-bezier(0.4, 0, 0.2, 1),
+    left var(--duration-ui) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Configuração das barras (Estilo 2) */
+.style-spin .bar:nth-child(1) {
+  top: 15%;
+  transform: translateY(-50%);
+}
+
+.style-spin .bar:nth-child(2) {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.style-spin .bar:nth-child(3) {
+  top: 85%;
+  transform: translateY(-50%);
+}
+
+/* Rotação inteira do container */
+.style-spin.open {
+  transform: rotate(180deg);
+}
+
+.style-spin.open .bar:nth-child(1) {
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.style-spin.open .bar:nth-child(2) {
+  opacity: 0;
+  transform: translateY(-50%) scale(0);
+}
+
+.style-spin.open .bar:nth-child(3) {
+  top: 50%;
+  transform: translateY(-50%) rotate(-45deg);
 }

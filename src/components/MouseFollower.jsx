@@ -1,7 +1,12 @@
 import { useEffect, useRef } from 'react';
 import { animate, utils } from 'animejs';
 
-const WORM_LENGTH = 60;
+const WORM_LENGTH = 56;
+const MAX_THICKNESS = 4;
+const SLANT_ANGLE = 0;
+const MIN_THICKNESS_RATIO = 0.12; // 88% calligraphic contrast (1 - 0.12 = 0.88)
+const TAIL_COLOR = 'var(--color-secondary)';
+const HOVER_BG_COLOR = 'var(--color-secondary)';
 
 export function MouseFollower() {
   const pathRef = useRef(null);
@@ -27,6 +32,7 @@ export function MouseFollower() {
       el.style.color = el.dataset.oldColor || '';
       if (type === 'primary') {
         el.style.backgroundColor = el.dataset.oldBg || '';
+        el.style.removeProperty('--ring-border-color');
         animate(el, {
           '--btn-y': '0px',
           '--ring-scale': '0.8',
@@ -42,8 +48,9 @@ export function MouseFollower() {
       if (!el) return;
       el.style.transition = 'color 0.2s ease, background-color 0.2s ease';
       if (type === 'primary') {
-        el.style.color = '#FFF9FA';
-        el.style.backgroundColor = '#fd1843';
+        el.style.color = 'var(--color-neutral-carvao)';
+        el.style.backgroundColor = HOVER_BG_COLOR;
+        el.style.setProperty('--ring-border-color', HOVER_BG_COLOR);
 
         el.dataset.injected = "true";
 
@@ -56,14 +63,14 @@ export function MouseFollower() {
 
         // Anima a variável do salto (--btn-y) e o anel (--ring-scale/opacity)
         animate(el, {
-          '--btn-y': '-6px',
+          '--btn-y': '0px',
           '--ring-scale': '1.3',
-          '--ring-opacity': '0',
+          '--ring-opacity': '0.3',
           duration: 600,
           ease: 'outExpo'
         });
       } else {
-        el.style.color = '#fd1843';
+        el.style.color = HOVER_BG_COLOR;
       }
     };
 
@@ -137,7 +144,7 @@ export function MouseFollower() {
     window.addEventListener('scroll', handleScroll, { passive: true });
 
     let frameId;
-    const animate = () => {
+    const animateLoop = () => {
       // Logic for arriving at the button
       if (hoverState.isTargeting) {
         const dx = hoverState.centerX - points[0].x;
@@ -151,8 +158,8 @@ export function MouseFollower() {
       }
 
       // Worm thickness retracts when injected
-      const targetStroke = (hoverState.isTargeting && hoverState.hasInjected) ? 0 : 4;
-      currentStrokeWidth += (targetStroke - currentStrokeWidth) * 0.2;
+      const targetStroke = (hoverState.isTargeting && hoverState.hasInjected) ? 0 : MAX_THICKNESS;
+      currentStrokeWidth += (targetStroke - currentStrokeWidth) * 0.25;
 
       points.forEach((p, i) => {
         if (hoverState.isTargeting) {
@@ -179,29 +186,77 @@ export function MouseFollower() {
         } else {
           // Default trailing worm behavior
           if (i === 0) {
-            p.x += (mouse.x - p.x) * 0.4;
-            p.y += (mouse.y - p.y) * 0.4;
+            p.x += (mouse.x - p.x) * 0.42;
+            p.y += (mouse.y - p.y) * 0.42;
           } else {
-            p.x += (points[i - 1].x - p.x) * 0.5;
-            p.y += (points[i - 1].y - p.y) * 0.5;
+            p.x += (points[i - 1].x - p.x) * 0.48;
+            p.y += (points[i - 1].y - p.y) * 0.48;
           }
         }
       });
 
-      if (pathRef.current) {
-        let d = `M ${points[0].x} ${points[0].y} `;
-        for (let i = 1; i < WORM_LENGTH; i++) {
-          d += `L ${points[i].x} ${points[i].y} `;
+      // --- GEOMETRIA CALIGRÁFICA AVANÇADA ---
+      if (pathRef.current && points.length > 1) {
+        let leftSide = [];
+        let rightSide = [];
+
+        points.forEach((p, i) => {
+          const t = i / points.length;
+
+          // Estreitamento suave e redondo para pontas delicadas
+          const tailTaper = 0.45 + 0.55 * Math.pow(1 - t, 1.1);
+          const headTaper = i < 5 ? (0.5 + 0.5 * (i / 5)) : 1.0;
+          const profile = headTaper * tailTaper;
+
+          const thicknessBase = currentStrokeWidth * profile;
+
+          const next = points[i + 1] || p;
+          const prev = points[i - 1] || p;
+          let dx = next.x - prev.x;
+          let dy = next.y - prev.y;
+          let len = Math.sqrt(dx * dx + dy * dy);
+
+          if (len < 0.01) {
+            dx = 1;
+            dy = 0;
+            len = 1;
+          }
+
+          const nx = -dy / len;
+          const ny = dx / len;
+
+          // --- MODELAÇÃO DE ELIPSE ---
+          const maxR = thicknessBase;
+          const minR = thicknessBase * MIN_THICKNESS_RATIO;
+
+          const slantRad = (SLANT_ANGLE) * Math.PI / 180;
+          const normalAngle = Math.atan2(ny, nx);
+          const diff = normalAngle - slantRad;
+
+          // Raio resultante na direção normal
+          const thickness = Math.sqrt(
+            Math.pow(maxR * Math.cos(diff), 2) +
+            Math.pow(minR * Math.sin(diff), 2)
+          );
+
+          leftSide.push({ x: p.x + nx * thickness, y: p.y + ny * thickness });
+          rightSide.unshift({ x: p.x - nx * thickness, y: p.y - ny * thickness });
+        });
+
+        const polygonPoints = [...leftSide, ...rightSide];
+        let d = `M ${polygonPoints[0].x} ${polygonPoints[0].y} `;
+        for (let i = 1; i < polygonPoints.length; i++) {
+          d += `L ${polygonPoints[i].x} ${polygonPoints[i].y} `;
         }
+        d += 'Z';
 
         pathRef.current.setAttribute("d", d);
-        pathRef.current.setAttribute("stroke-width", currentStrokeWidth);
       }
 
-      frameId = requestAnimationFrame(animate);
+      frameId = requestAnimationFrame(animateLoop);
     };
 
-    frameId = requestAnimationFrame(animate);
+    frameId = requestAnimationFrame(animateLoop);
 
     return () => {
       cancelAnimationFrame(frameId);
@@ -212,12 +267,26 @@ export function MouseFollower() {
 
   return (
     <svg className="fixed inset-0 w-full h-full pointer-events-none z-[9999]">
+      <defs>
+        {/* FILTRO MELODRAMA ADAPTADO PARA LINHAS FINAS */}
+        <filter id="melodrama-marker-fine" x="-20%" y="-20%" width="140%" height="140%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.14" numOctaves="3" result="noise" />
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.8" xChannelSelector="R" yChannelSelector="G" result="displaced" />
+          <feGaussianBlur in="displaced" stdDeviation="0.5" result="blurred" />
+          <feColorMatrix in="blurred" type="matrix" values="
+            1 0 0 0 0
+            0 1 0 0 0
+            0 0 1 0 0
+            0 0 0 35 -12" />
+        </filter>
+      </defs>
+
       <path
         ref={pathRef}
-        fill="transparent"
-        stroke="#fd1843"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        fill={TAIL_COLOR}
+        stroke="none"
+        filter="url(#melodrama-marker-fine)"
+        className="transition-colors duration-300 opacity-[0.98]"
       />
     </svg>
   );
