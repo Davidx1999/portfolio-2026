@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vincenzo Fadda - Data Scientist</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400;1,600&family=DM+Mono:wght@300;400&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body,
+    html {
+      width: 100%;
+      height: 100%;
+      background-color: #000000;
+      overflow: hidden;
+      color: #fff;
+    }
+
+    #canvas-container {
+      position: absolute;
+      inset: 0;
+      display: block;
+    }
+
+    /* Vignette mais densa no centro e bordas para garantir leitura sem sumir as partículas */
+    .vignette {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 5;
+      background: radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.95) 100%);
+    }
+
+    .ui-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 36px 44px;
+    }
+
+    /* Top Bar Elements */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      z-index: 30;
+      position: relative;
+    }
+
+    .logo {
+      font-family: 'DM Mono', monospace;
+      font-weight: 300;
+      font-size: 11px;
+      letter-spacing: .18em;
+      color: #f8f8f8;
+      text-transform: uppercase;
+    }
+
+    .top-bar-right {
+      display: flex;
+      align-items: center;
+      pointer-events: all;
+    }
+
+    .btn-return {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 99px;
+      color: #fff;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(4px);
+    }
+
+    .btn-return:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.3);
+      border-radius: 8px;
+      transform: translateY(-1px);
+    }
+
+    /* Floating Frosted Glass Menu */
+    .floating-nav {
+      position: absolute;
+      top: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 32px;
+      padding: 16px 36px;
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 100px;
+      pointer-events: all;
+      z-index: 20;
+    }
+
+    .floating-nav a {
+      font-family: 'DM Mono', monospace;
+      font-weight: 400;
+      font-size: 11px;
+      letter-spacing: .15em;
+      color: rgba(255, 255, 255, 0.4);
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: color 0.3s, text-shadow 0.3s;
+      cursor: pointer;
+    }
+
+    .floating-nav a:hover,
+    .floating-nav a.active-link {
+      color: #f8f8f8;
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+    }
+
+    /* Content Area - CENTERED LAYOUT */
+    #content-container {
+      position: relative;
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .page-section {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100%;
+      max-width: 1100px;
+      /* Mantém tudo contido em um "cartão" central */
+      transform: translate(-50%, -50%) scale(0.95);
+      opacity: 0;
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      pointer-events: none;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      gap: 60px;
+      /* Distância confortável entre o texto e as imagens/torres */
+      padding: 0 20px;
+    }
+
+    .page-section.active {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+      pointer-events: all;
+    }
+
+    /* Typography */
+    .eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: .2em;
+      color: rgba(255, 255, 255, 0.5);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+    }
+
+    .main-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(42px, 6vw, 68px);
+      line-height: 1.05;
+      color: rgba(255, 255, 255, 0.95);
+      letter-spacing: -.02em;
+      margin-bottom: 20px;
+      text-shadow: 0 4px 24px rgba(0, 0, 0, 1);
+    }
+
+    .main-title em {
+      font-style: italic;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .sub-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 300;
+      font-size: 18px;
+      color: rgba(255, 255, 255, 0.8);
+      letter-spacing: .04em;
+      max-width: 480px;
+      line-height: 1.6;
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
+    }
+
+    .text-content {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-width: 500px;
+    }
+
+    /* About Me Image Placeholder */
+    .about-image-frame {
+      width: 320px;
+      height: 420px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      flex-shrink: 0;
+    }
+
+    .about-image-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Spells Tower Layout (Matriz 4x4) */
+    .spells-grid-container {
+      position: relative;
+      width: 140px;
+      /* Largura base fechada */
+      height: 440px;
+      /* 4 andares */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 12px;
+      flex-shrink: 0;
+      /* Ocupa espaço pra direita pra não cortar na expansão */
+      margin-right: 420px;
+    }
+
+    .spells-hint {
+      position: absolute;
+      bottom: -30px;
+      left: 0;
+      width: 140px;
+      text-align: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      color: rgba(255, 255, 255, 0.4);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: opacity 0.3s ease;
+    }
+
+    .spell-row {
+      position: relative;
+      width: 140px;
+      height: 100px;
+      cursor: pointer;
+      /* O hit-area precisa expandir com o hover para o mouse não "cair" */
+    }
+
+    .spell-box {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 140px;
+      height: 100px;
+      background: rgba(25, 25, 30, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      pointer-events: none;
+      /* Apenas a fileira recebe os eventos do mouse */
+    }
+
+    .spell-box::after {
+      content: '[ Spell Icon ]';
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Grimoire Skills Grid */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 32px;
+      margin-top: 10px;
+      width: 100%;
+    }
+
+    .skill-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .skill-info h4 {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 4px;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+    }
+
+    .skill-info p {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.6);
+      line-height: 1.4;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+    }
+
+    .helix-container {
+      width: 100%;
+      height: 16px;
+      position: relative;
+    }
+
+    .helix-bar {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Bottom Bar & Controls */
+    .bottom-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      pointer-events: none;
+    }
+
+    #home-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: all;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    #home-controls.hidden {
+      opacity: 0;
+      transform: translateY(20px);
+      pointer-events: none;
+    }
+
+    .freq-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .freq-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: .16em;
+      color: rgba(255, 255, 255, 0.4);
+      text-transform: uppercase;
+    }
+
+    .controls-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-pause {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      color: rgba(255, 255, 255, 0.5);
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-pause:hover,
+    .btn-pause.is-paused {
+      border-color: rgba(255, 255, 255, 0.6);
+      color: #fff;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-pause svg {
+      width: 10px;
+      height: 10px;
+      fill: currentColor;
+    }
+
+    .freq-btns {
+      display: flex;
+      gap: 6px;
+    }
+
+    .fb {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color .3s, background .3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .fb:hover {
+      border-color: rgba(255, 255, 255, 0.4);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .fb.active {
+      border-color: rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .fb svg {
+      width: 12px;
+      height: 12px;
+      opacity: 0.5;
+      transition: opacity .3s;
+    }
+
+    .fb:hover svg,
+    .fb.active svg {
+      opacity: 1;
+    }
+
+    .meta-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+    }
+
+    .pattern-name {
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: .14em;
+      color: rgba(255, 255, 255, 0.4);
+      text-transform: uppercase;
+      text-align: right;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 20px;
+      margin-top: 30px;
+      pointer-events: all;
+    }
+
+    .social-links a {
+      padding: 10px 24px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 100px;
+      color: white;
+      text-decoration: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      transition: all 0.3s;
+      background: rgba(255, 255, 255, 0.02);
+      backdrop-filter: blur(4px);
+    }
+
+    .social-links a:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.6);
+      transform: translateY(-2px);
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+</head>
+
+<body>
+
+  <div id="canvas-container"></div>
+  <div class="vignette"></div>
+
+  <div class="ui-layer">
+
+    <div class="top-bar">
+      <div class="logo">Vincenzo Fadda</div>
+      <div class="top-bar-right">
+        <a href="https://davidx1999.github.io/porftolio/" class="btn-return">
+          Produced by David Salviano
+        </a>
+      </div>
+    </div>
+
+    <nav class="floating-nav" id="main-nav">
+      <a data-target="home" class="active-link">Home</a>
+      <a data-target="about">About Me</a>
+      <a data-target="spells">Spells</a>
+      <a data-target="grimoire">Grimoire</a>
+      <a data-target="contact">Contact</a>
+    </nav>
+
+    <div id="content-container">
+
+      <!-- HOME SECTION -->
+      <section id="home" class="page-section active" style="flex-direction: column; text-align: center;">
+        <div class="text-content" style="align-items: center; max-width: 600px;">
+          <div class="eyebrow">Zero surveillance</div>
+          <h1 class="main-title">
+            The Legend of Fadda<br>
+            <em>transforming data into pixie dust.</em>
+          </h1>
+          <p class="sub-text" style="text-align: center;">
+            I'm Vincenzo Fadda. Data Scientist by day, Fortune Tiger algorithm whisperer by night. I apply Machine
+            Learning to predict the impossible and drop the magic letter.
+          </p>
+        </div>
+      </section>
+
+      <!-- ABOUT ME SECTION -->
+      <section id="about" class="page-section">
+        <div class="text-content">
+          <div class="eyebrow">Lore & Origins</div>
+          <h1 class="main-title">The Legend of Fadda</h1>
+          <p class="sub-text" style="font-size: 16px; margin-top: 10px;">
+            Deep in the Server Forest, where arrays grow on trees and data lakes are crystal clear, a legend emerged:
+            The Fadda.
+            <br><br>
+            As a true magical being of tech, my wand is Python and my spells are written in SQL. I specialize in
+            extracting gold from dirty data quarries (also known as ETL) and training artificial intelligence constructs
+            to predict the future.
+            <br><br>
+            But the real magic happens at midnight. Using advanced regression models and time series analysis, I seek
+            the impossible: unraveling the Fortune Tiger's paying minutes. While mortals rely on luck, I rely on
+            probability distributions and pixie dust.
+          </p>
+        </div>
+        <div class="about-image-frame">
+          <img src="../assets/vincenzo.jpg" alt="Vincenzo Fadda">
+        </div>
+      </section>
+
+      <!-- SPELLS (PROJECTS) SECTION -->
+      <section id="spells" class="page-section">
+        <div class="text-content">
+          <div class="eyebrow">Works & Projects</div>
+          <h1 class="main-title">My Spells</h1>
+          <p class="sub-text">
+            Hover over the artifacts to unveil the constructs I've conjured into existence.<br>
+            From predictive models to complex data architectures.
+          </p>
+        </div>
+
+        <div class="spells-grid-container" id="spells-tower">
+          <div class="spells-hint" id="spellsHintText">Hover a row to expand</div>
+
+          <!-- ROW 1 -->
+          <div class="spell-row" style="z-index: 4;">
+            <div class="spell-box"></div>
+            <div class="spell-box"></div>
+            <div class="spell-box"></div>
+            <div class="spell-box"></div>
+          </div>
+          <!-- ROW 2 -->
+          <div class="spell-row" style="z-index: 3;">
+            <div class="spell-box"></div>
+            <div class="spell-box"></div>
+            <div class="spell-box"></div>
+            <div class="spell-box"></div>
+          </div>
+          <!-- ROW 3 -->
+          <div class="spell-row" style="z-index: 2;">
+            <div class="spell-box"></div>
+            <div class="spell-box"></div>
+            <div class="spell-box"></div>
+            <div class="spell-box"></div>
+          </div>
+          <!-- ROW 4 -->
+          <div class="spell-row" style="z-index: 1;">
+            <div class="spell-box"></div>
+            <div class="spell-box"></div>
+            <div class="spell-box"></div>
+            <div class="spell-box"></div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- GRIMOIRE (SKILLS) SECTION -->
+      <section id="grimoire" class="page-section" style="flex-direction: column;">
+        <div class="text-content" style="align-items: center; text-align: center; max-width: 600px;">
+          <div class="eyebrow">Knowledge & Arsenal</div>
+          <h1 class="main-title">The Grimoire</h1>
+        </div>
+
+        <div class="skills-grid">
+          <div class="skill-item">
+            <div class="skill-info">
+              <h4>Python Alchemy</h4>
+              <p>Pandas, NumPy, and Scikit-Learn. I transform raw data into pure gold.</p>
+            </div>
+            <div class="helix-container">
+              <canvas class="helix-bar" data-progress="0.95"></canvas>
+            </div>
+          </div>
+
+          <div class="skill-item">
+            <div class="skill-info">
+              <h4>SQL Enchantment</h4>
+              <p>Magical queries that summon lost tables from the database abyss.</p>
+            </div>
+            <div class="helix-container">
+              <canvas class="helix-bar" data-progress="0.90"></canvas>
+            </div>
+          </div>
+
+          <div class="skill-item">
+            <div class="skill-info">
+              <h4>Fortune Tiger Algorithms</h4>
+              <p>RTP (Return to Player) calculation and slot algorithm reading.</p>
+            </div>
+            <div class="helix-container">
+              <canvas class="helix-bar" data-progress="1.0"></canvas>
+            </div>
+          </div>
+
+          <div class="skill-item">
+            <div class="skill-info">
+              <h4>Faerie Neural Networks</h4>
+              <p>Deep Learning, TensorFlow, and temporal prediction potions.</p>
+            </div>
+            <div class="helix-container">
+              <canvas class="helix-bar" data-progress="0.85"></canvas>
+            </div>
+          </div>
+
+          <div class="skill-item">
+            <div class="skill-info">
+              <h4>Glowing Dashboards</h4>
+              <p>PowerBI and Tableau that shine brighter than Tinker Bell's lantern.</p>
+            </div>
+            <div class="helix-container">
+              <canvas class="helix-bar" data-progress="0.80"></canvas>
+            </div>
+          </div>
+
+          <div class="skill-item">
+            <div class="skill-info">
+              <h4>Magical Bankroll Management</h4>
+              <p>The art of not losing the kingdom's entire treasure in a single spin.</p>
+            </div>
+            <div class="helix-container">
+              <canvas class="helix-bar" data-progress="0.95"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTACT SECTION -->
+      <section id="contact" class="page-section" style="flex-direction: column; text-align: center;">
+        <div class="text-content" style="align-items: center;">
+          <div class="eyebrow">Summon Me</div>
+          <h1 class="main-title">Send a Raven</h1>
+          <p class="sub-text" style="text-align: center;">
+            Ready to transmute your data into pure gold? <br> Reach across the ether.
+          </p>
+          <div class="social-links">
+            <a href="mailto:vincenzo@example.com">Email</a>
+            <a href="https://linkedin.com/in/vincenzo" target="_blank">LinkedIn</a>
+            <a href="https://github.com/vincenzo" target="_blank">GitHub</a>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Controls stay at the bottom -->
+    <div class="bottom-bar">
+      <div id="home-controls">
+        <div class="freq-header">
+          <div class="freq-label">Resonance Frequency</div>
+          <div class="controls-buttons">
+            <!-- PAUSE BUTTON -->
+            <button id="btnPause" class="btn-pause" title="Pause/Play Auto Rotation">
+              <svg id="icon-pause" viewBox="0 0 14 14">
+                <rect x="3" y="2" width="3" height="10" rx="0.5" />
+                <rect x="8" y="2" width="3" height="10" rx="0.5" />
+              </svg>
+              <svg id="icon-play" viewBox="0 0 14 14" style="display: none;">
+                <polygon points="4,2 11,7 4,12" rx="0.5" />
+              </svg>
+            </button>
+            <!-- RESET BUTTON -->
+            <button id="btnReset" class="btn-pause" title="Reset Particles (Fix Glitches)">
+              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M7 2a5 5 0 1 1-4.95 5.7" />
+                <path d="M2 3.5V7h3.5" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="freq-btns" id="freqBtns">
+          <button class="fb active" data-idx="0" title="Solid Square">
+            <svg viewBox="0 0 14 14" fill="white" stroke="none">
+              <rect x="3" y="3" width="8" height="8" rx="1" opacity="0.8" />
+            </svg>
+          </button>
+          <button class="fb" data-idx="1" title="Grid">
+            <svg viewBox="0 0 14 14" fill="none" stroke="white" stroke-width="1.2">
+              <rect x="2" y="2" width="5" height="5" rx="2" />
+              <rect x="8" y="2" width="5" height="5" rx="2" />
+              <rect x="2" y="8" width="5" height="5" rx="2" />
+              <rect x="8" y="8" width="5" height="5" rx="2" />
+            </svg>
+          </button>
+          <button class="fb" data-idx="2" title="Diamond Eyes">
+            <svg viewBox="0 0 14 14" fill="none" stroke="white" stroke-width="1.2">
+              <ellipse cx="7" cy="7" rx="6" ry="5" />
+              <rect x="4.5" y="4.5" width="5" height="5" rx="1" />
+            </svg>
+          </button>
+          <button class="fb" data-idx="3" title="Target Hole">
+            <svg viewBox="0 0 14 14" fill="none" stroke="white" stroke-width="1.2">
+              <ellipse cx="7" cy="7" rx="6" ry="6" />
+              <ellipse cx="7" cy="7" rx="4" ry="4" />
+              <ellipse cx="7" cy="7" rx="2" ry="2" />
+            </svg>
+          </button>
+          <button class="fb" data-idx="4" title="Hexagon Matrix">
+            <svg viewBox="0 0 14 14" fill="none" stroke="white" stroke-width="1.2">
+              <polygon points="7,2 11.5,4.5 11.5,9.5 7,12 2.5,9.5 2.5,4.5" />
+            </svg>
+          </button>
+          <button class="fb" data-idx="5" title="Supernova">
+            <svg viewBox="0 0 14 14" fill="none" stroke="white" stroke-width="1.2">
+              <path d="M7 1 Q7 7 13 7 Q7 7 7 13 Q7 7 1 7 Q7 7 7 1" />
+            </svg>
+          </button>
+          <button class="fb" data-idx="6" title="Infinity Waves">
+            <svg viewBox="0 0 14 14" fill="none" stroke="white" stroke-width="1.2">
+              <path d="M2 7 C 2 3, 7 3, 7 7 C 7 11, 12 11, 12 7 C 12 3, 7 3, 7 7 C 7 11, 2 11, 2 7" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="meta-right">
+        <div class="pattern-name" id="patName">Solid Square</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANIME.JS INTERACTION FOR SPELLS TOWER 4x4 (INDEPENDENT ROWS) -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const tower = document.getElementById('spells-tower');
+      const rows = document.querySelectorAll('.spell-row');
+      const hintText = document.getElementById('spellsHintText');
+
+      // Interação independente por fileira (Row)
+      rows.forEach((row) => {
+        row.addEventListener('mouseenter', () => {
+          // Aumenta a área clicável da row imediatamente para o mouse não "cair" fora
+          row.style.width = '590px';
+          hintText.style.opacity = '0';
+
+          const boxes = row.querySelectorAll('.spell-box');
+          anime({
+            targets: boxes,
+            translateX: (el, i) => i * 150, // Expande para o lado
+            rotate: '1turn',
+            duration: 800,
+            delay: anime.stagger(100),
+            easing: 'easeOutElastic(1, .8)'
+          });
+        });
+
+        row.addEventListener('mouseleave', () => {
+          // Volta a área clicável ao normal
+          row.style.width = '140px';
+          hintText.style.opacity = '1';
+
+          const boxes = row.querySelectorAll('.spell-box');
+          anime({
+            targets: boxes,
+            translateX: 0, // Retrai para o centro
+            rotate: '0turn',
+            duration: 600,
+            delay: anime.stagger(50, { direction: 'reverse' }),
+            easing: 'easeOutQuad'
+          });
+        });
+      });
+    });
+  </script>
+
+  <!-- SPA ROUTING & THREE.JS LOGIC -->
+  <script>
+    // ----------------------------------------------------
+    // 0. SPA ROUTING & PAUSE LOGIC
+    // ----------------------------------------------------
+    const navLinks = document.querySelectorAll('.floating-nav a');
+    const sections = document.querySelectorAll('.page-section');
+    const homeControls = document.getElementById('home-controls');
+
+    let autoPlay = true;
+    let userPaused = false;
+    let pageTransitionTimeout;
+
+    const btnPause = document.getElementById('btnPause');
+    const btnReset = document.getElementById('btnReset');
+    const iconPause = document.getElementById('icon-pause');
+    const iconPlay = document.getElementById('icon-play');
+
+    btnPause.addEventListener('click', () => {
+      userPaused = !userPaused;
+      autoPlay = !userPaused;
+
+      if (userPaused) {
+        btnPause.classList.add('is-paused');
+        iconPause.style.display = 'none';
+        iconPlay.style.display = 'block';
+      } else {
+        btnPause.classList.remove('is-paused');
+        iconPause.style.display = 'block';
+        iconPlay.style.display = 'none';
+      }
+    });
+
+    const pagePatterns = {
+      'home': 5,      // Supernova
+      'about': 0,     // Solid Square
+      'spells': 4,    // Hexagon Matrix
+      'grimoire': 3,  // Target Hole
+      'contact': 6    // Infinity Waves
+    };
+
+    navLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = link.getAttribute('data-target');
+
+        // Ignora se já estiver na página
+        if (document.getElementById(targetId).classList.contains('active')) return;
+
+        navLinks.forEach(l => l.classList.remove('active-link'));
+        link.classList.add('active-link');
+
+        // Some com a seção antiga imediatamente
+        sections.forEach(sec => sec.classList.remove('active'));
+
+        if (targetId === 'home') {
+          homeControls.classList.remove('hidden');
+          if (!userPaused) autoPlay = true;
+        } else {
+          homeControls.classList.add('hidden');
+          autoPlay = false;
+        }
+
+        // --- Mega Blast de Transição com Partículas ---
+        if (pagePatterns[targetId] !== undefined) {
+          triggerPulse(pagePatterns[targetId], true); // true = Explosão maior para transição
+        }
+
+        // Aguarda as partículas voarem para mostrar o texto novo
+        clearTimeout(pageTransitionTimeout);
+        pageTransitionTimeout = setTimeout(() => {
+          document.getElementById(targetId).classList.add('active');
+        }, 500);
+      });
+    });
+
+    // ----------------------------------------------------
+    // 1. CONFIGURAÇÕES BASE E RENDERER
+    // ----------------------------------------------------
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x000000, 0.015);
+
+    const camera = new THREE.PerspectiveCamera(85, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 0, 22);
+    camera.lookAt(0, 0, 0);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(new THREE.Color(0x000000));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+
+    // ----------------------------------------------------
+    // 2. SISTEMA DE PARTÍCULAS
+    // ----------------------------------------------------
+    const NUM_PARTICLES = 150000;
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(NUM_PARTICLES * 3);
+    const velocities = new Float32Array(NUM_PARTICLES * 3);
+
+    function initParticles() {
+      for (let i = 0; i < NUM_PARTICLES; i++) {
+        positions[i * 3] = (Math.random() - 0.5) * 45;
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 45;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 2;
+        velocities[i * 3] = 0;
+        velocities[i * 3 + 1] = 0;
+        velocities[i * 3 + 2] = 0;
+      }
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geometry.attributes.position.needsUpdate = true;
+    }
+
+    initParticles();
+
+    // Reset button Logic
+    btnReset.addEventListener('click', () => {
+      initParticles();
+      triggerPulse(patIdx);
+
+      // Animação visual no botão de reset para feedback
+      anime({
+        targets: '#btnReset svg',
+        rotate: '1turn',
+        duration: 600,
+        easing: 'easeInOutQuad'
+      });
+    });
+
+    const material = new THREE.PointsMaterial({
+      color: 0xc4c7d6,
+      size: 0.1,
+      transparent: true,
+      opacity: 0.45,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+
+    const particles = new THREE.Points(geometry, material);
+    scene.add(particles);
+
+    // ----------------------------------------------------
+    // 3. MATEMÁTICA: GRELHAS DE FORMAS 
+    // ----------------------------------------------------
+    const PATTERNS = [
+      { name: 'Solid Square', holeA: 18, holeB: 18, holeK: 8, isFilled: true, C: (x, y) => 0 },
+      { name: 'Grid of Circles', holeA: 0.5, holeB: 0.5, holeK: 0.5, isFilled: false, C: (x, y) => Math.cos(x * 0.09) * Math.cos(y * 0.15) - 0.015 },
+      {
+        name: 'Diamond Eyes', holeA: 12, holeB: 12, holeK: 2.5, isFilled: false, C: (x, y) => {
+          let shape = Math.sqrt(Math.abs(x * 0.1)) + Math.sqrt(Math.abs(y * 0.1)) - 2.5;
+          let eye1 = Math.sqrt(Math.pow(x - 4, 2) + Math.pow(y, 2)) - 0.8;
+          let eye2 = Math.sqrt(Math.pow(x + 4, 2) + Math.pow(y, 2)) - 0.8;
+          return Math.min(shape, eye1, eye2);
+        }
+      },
+      {
+        name: 'Concentric Circles', holeA: 11, holeB: 11, holeK: 2, isFilled: false, C: (x, y) => {
+          let distance = Math.sqrt(x * x + y * y); return Math.cos(distance * 0.3);
+        }
+      },
+      { name: 'Hexagon Matrix', holeA: 16, holeB: 16, holeK: 4, isFilled: false, C: (x, y) => Math.cos(x * 0.25) + Math.cos(x * 0.125 + y * 0.216) + Math.cos(x * 0.125 - y * 0.216) - 1.0 },
+      { name: 'Supernova', holeA: 12, holeB: 12, holeK: 1.5, isFilled: false, C: (x, y) => Math.sqrt(Math.abs(x * 0.3)) + Math.sqrt(Math.abs(y * 0.3)) - 1.5 },
+      { name: 'Infinity Waves', holeA: 20, holeB: 10, holeK: 2, isFilled: false, C: (x, y) => Math.sin(x * 0.2) * Math.cos(y * 0.4) - 0.2 }
+    ];
+
+    let patIdx = pagePatterns['home'];
+    let activePattern = PATTERNS[patIdx];
+
+    let targetHoleA = activePattern.holeA;
+    let targetHoleB = activePattern.holeB;
+    let targetHoleK = activePattern.holeK;
+    let curHoleA = targetHoleA;
+    let curHoleB = targetHoleB;
+    let curHoleK = targetHoleK;
+
+    const CHLADNI_STRENGTH = 2.5;
+    const BASIN_RADIUS = 50.0;
+    let lastPulseTime = Date.now();
+    const INTERVAL = 7000;
+
+    let mouseX = 0; let mouseY = 0;
+    let targetMouseX = 0; let targetMouseY = 0;
+    let lastMouseX = 0; let lastMouseY = 0;
+
+    const delaySpeed = 0.2;
+    let camSmoothX = 0; let camSmoothY = 0;
+
+    const raycaster = new THREE.Raycaster();
+    const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+    const mouseVec = new THREE.Vector2();
+
+    // ----------------------------------------------------
+    // 4. UI INTERACTION
+    // ----------------------------------------------------
+    window.addEventListener('mousemove', (e) => {
+      mouseVec.x = (e.clientX / window.innerWidth) * 2 - 1;
+      mouseVec.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      raycaster.setFromCamera(mouseVec, camera);
+      const target = new THREE.Vector3();
+      raycaster.ray.intersectPlane(plane, target);
+      targetMouseX = target.x; targetMouseY = target.y;
+    });
+
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('.fb') || e.target.closest('.floating-nav a') || e.target.closest('.btn-pause') || e.target.closest('.btn-return') || e.target.closest('.spells-grid-container')) return;
+      triggerPulse();
+    });
+
+    document.getElementById('freqBtns').addEventListener('click', (e) => {
+      const btn = e.target.closest('.fb');
+      if (!btn) return;
+
+      userPaused = true;
+      autoPlay = false;
+      btnPause.classList.add('is-paused');
+      iconPause.style.display = 'none';
+      iconPlay.style.display = 'block';
+
+      triggerPulse(parseInt(btn.dataset.idx));
+    });
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      setupHelixes();
+    });
+
+    // Inicialização
+    document.querySelectorAll('.fb').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.fb')[patIdx].classList.add('active');
+    document.getElementById('patName').textContent = activePattern.name;
+
+    // ----------------------------------------------------
+    // 5. PRINCÍPIOS DA ANIMAÇÃO (O PULSO)
+    // ----------------------------------------------------
+    function triggerPulse(nextIdx, isMegaBlast = false) {
+      if (nextIdx !== undefined) patIdx = nextIdx;
+      else patIdx = (patIdx + 1) % PATTERNS.length;
+
+      activePattern = PATTERNS[patIdx];
+      targetHoleA = activePattern.holeA;
+      targetHoleB = activePattern.holeB;
+      targetHoleK = activePattern.holeK;
+
+      lastPulseTime = Date.now();
+
+      document.querySelectorAll('.fb').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.fb')[patIdx].classList.add('active');
+      document.getElementById('patName').textContent = activePattern.name;
+
+      // Multiplicador de força para transições de página
+      let force = isMegaBlast ? 0.5 : 1.0;
+
+      for (let i = 0; i < NUM_PARTICLES; i++) {
+        let x = positions[i * 3];
+        let y = positions[i * 3 + 1];
+        let dist = Math.sqrt(x * x + y * y) || 1;
+
+        let pushOut = (Math.random() * 5.0 + 2.0) * Math.max(0, 1.0 - (dist / 40)) * force;
+        let swirl = (Math.sin(dist * 0.2) * 2.5 + (Math.random() - 0.5) * 3.0) * force;
+
+        velocities[i * 3] += (x / dist) * pushOut - (y / dist) * swirl;
+        velocities[i * 3 + 1] += (y / dist) * pushOut + (x / dist) * swirl;
+        velocities[i * 3 + 2] += (Math.random() - 0.5) * pushOut * 3.0 * force;
+      }
+    }
+
+    // ----------------------------------------------------
+    // 6. MOTOR FÍSICO CONTÍNUO E VÓRTICE 3D
+    // ----------------------------------------------------
+    function animate() {
+      requestAnimationFrame(animate);
+
+      camSmoothX += (mouseVec.x - camSmoothX) * 0.05;
+      camSmoothY += (mouseVec.y - camSmoothY) * 0.05;
+      camera.position.x = camSmoothX * 3.0;
+      camera.position.y = camSmoothY * 3.0;
+      camera.position.z = 22;
+      camera.lookAt(0, 0, 0);
+
+      mouseX += (targetMouseX - mouseX) * delaySpeed;
+      mouseY += (targetMouseY - mouseY) * delaySpeed;
+
+      let mouseVx = mouseX - lastMouseX;
+      let mouseVy = mouseY - lastMouseY;
+      lastMouseX = mouseX;
+      lastMouseY = mouseY;
+
+      const posArray = geometry.attributes.position.array;
+
+      let now = Date.now();
+      let timeSincePulse = (now - lastPulseTime) / 1000;
+      let toNext = (INTERVAL - (now - lastPulseTime)) / 1000;
+
+      if (autoPlay && toNext <= 0) triggerPulse();
+
+      let anticipation = 0;
+      if (toNext < 0.45 && autoPlay) {
+        let t = 1.0 - (toNext / 0.45);
+        anticipation = -Math.pow(t, 2) * 0.3;
+      }
+
+      let bounce = 0;
+      if (timeSincePulse < 2.5) {
+        let t = timeSincePulse;
+        bounce = Math.exp(-t * 4.5) * Math.sin(t * 16.0) * 1.2;
+      }
+
+      let masterScale = 1.0 + anticipation + bounce;
+      let isFilled = activePattern.isFilled;
+
+      // Opacidade base aumentada para 0.45 (visível o tempo todo) e pico até 0.75
+      material.opacity = timeSincePulse < 0.6 ? 0.45 + (0.6 - timeSincePulse) * 0.3 : 0.45;
+
+      let currentFriction = timeSincePulse < 0.8 ? 0.985 : 0.94;
+
+      curHoleA += (targetHoleA - curHoleA) * 0.08;
+      curHoleB += (targetHoleB - curHoleB) * 0.08;
+      curHoleK += (targetHoleK - curHoleK) * 0.08;
+
+      let displayHoleA = curHoleA * masterScale;
+      let displayHoleB = curHoleB * masterScale;
+      let holePowA = Math.pow(displayHoleA, curHoleK);
+      let holePowB = Math.pow(displayHoleB, curHoleK);
+
+      let speed = Math.sqrt(mouseVx * mouseVx + mouseVy * mouseVy);
+      let dirX = speed > 0.001 ? mouseVx / speed : 0;
+      let dirY = speed > 0.001 ? mouseVy / speed : 0;
+      let swirlForce = Math.min(speed * 20.0, 15.0);
+      let wakeForce = Math.min(speed * 30.0, 20.0);
+
+      for (let i = 0; i < NUM_PARTICLES; i++) {
+        let x = posArray[i * 3];
+        let y = posArray[i * 3 + 1];
+        let z = posArray[i * 3 + 2];
+
+        let absX = Math.abs(x);
+        let absY = Math.abs(y);
+        let powX_K = Math.pow(absX, curHoleK);
+        let powY_K = Math.pow(absY, curHoleK);
+
+        let dSuper = (powX_K / holePowA) + (powY_K / holePowB);
+        let distNormalized = Math.pow(dSuper, 1.0 / curHoleK);
+
+        let gx = (curHoleK * Math.pow(absX, curHoleK - 1) / holePowA) * Math.sign(x);
+        let gy = (curHoleK * Math.pow(absY, curHoleK - 1) / holePowB) * Math.sign(y);
+        let gMag = Math.sqrt(gx * gx + gy * gy) || 1;
+        let nx = gx / gMag; let ny = gy / gMag;
+        let tx = -ny; let ty = nx;
+
+        let shapeForceX = 0; let shapeForceY = 0;
+        let distFromBorder = distNormalized - 1.0;
+
+        if (distNormalized < 1.0) {
+          if (!isFilled) {
+            let push = -distFromBorder * 0.8;
+            shapeForceX = nx * push; shapeForceY = ny * push;
+          }
+        } else {
+          let pull = Math.min(distFromBorder, 0.8) * 0.35;
+          shapeForceX = -nx * pull; shapeForceY = -ny * pull;
+        }
+
+        let ringProximity = isFilled ? 0 : Math.max(0.0, 1.0 - Math.abs(distFromBorder) * 4.0);
+        let randomSpread = (Math.random() - 0.5) * 0.35;
+
+        if (isFilled && distNormalized < 1.0) {
+          shapeForceX += (Math.random() - 0.5) * 0.2;
+          shapeForceY += (Math.random() - 0.5) * 0.2;
+        } else {
+          shapeForceX += tx * randomSpread * ringProximity;
+          shapeForceY += ty * randomSpread * ringProximity;
+        }
+
+        let h = 0.1;
+        let C0 = activePattern.C(x, y);
+        let Cdx = (activePattern.C(x + h, y) - C0) / h;
+        let Cdy = (activePattern.C(x, y + h) - C0) / h;
+
+        let chladniForceX = -C0 * Cdx * CHLADNI_STRENGTH;
+        let chladniForceY = -C0 * Cdy * CHLADNI_STRENGTH;
+
+        let blend = Math.min(1.0, Math.max(0.0, (distNormalized - 1.25) / 0.35));
+
+        velocities[i * 3] += shapeForceX * (1.0 - blend) + chladniForceX * blend;
+        velocities[i * 3 + 1] += shapeForceY * (1.0 - blend) + chladniForceY * blend;
+
+        velocities[i * 3 + 2] -= z * 0.08;
+
+        let dx = x - mouseX;
+        let dy = y - mouseY;
+        let dz = z;
+        let distMouse = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        let vortexRadius = 2.0;
+
+        if (distMouse < vortexRadius && speed > 0.001) {
+          let falloff = 1.0 - (distMouse / vortexRadius);
+          falloff = falloff * falloff;
+
+          let cx = dirY * dz;
+          let cy = -dirX * dz;
+          let cz = dirX * dy - dirY * dx;
+
+          let cMag = Math.sqrt(cx * cx + cy * cy + cz * cz) || 1;
+          cx /= cMag; cy /= cMag; cz /= cMag;
+
+          velocities[i * 3] += cx * falloff * swirlForce;
+          velocities[i * 3 + 1] += cy * falloff * swirlForce;
+          velocities[i * 3 + 2] += cz * falloff * swirlForce;
+
+          velocities[i * 3] -= dirX * falloff * wakeForce;
+          velocities[i * 3 + 1] -= dirY * falloff * wakeForce;
+
+          velocities[i * 3 + 2] += (Math.random() - 0.5) * falloff * swirlForce * 0.5;
+
+          let snx = dx / distMouse;
+          let sny = dy / distMouse;
+          let snz = dz / distMouse;
+          velocities[i * 3] -= snx * falloff * 2.0;
+          velocities[i * 3 + 1] -= sny * falloff * 2.0;
+          velocities[i * 3 + 2] -= snz * falloff * 2.0;
+        }
+
+        let distCenter = Math.sqrt(x * x + y * y);
+        if (distCenter > BASIN_RADIUS) {
+          let pull = (distCenter - BASIN_RADIUS) * 0.06;
+          velocities[i * 3] -= (x / distCenter) * pull;
+          velocities[i * 3 + 1] -= (y / distCenter) * pull;
+        }
+
+        velocities[i * 3] += (Math.random() - 0.5) * 0.12;
+        velocities[i * 3 + 1] += (Math.random() - 0.5) * 0.12;
+        velocities[i * 3 + 2] += (Math.random() - 0.5) * 0.12;
+
+        velocities[i * 3] *= currentFriction;
+        velocities[i * 3 + 1] *= currentFriction;
+        velocities[i * 3 + 2] *= currentFriction;
+
+        posArray[i * 3] += velocities[i * 3];
+        posArray[i * 3 + 1] += velocities[i * 3 + 1];
+        posArray[i * 3 + 2] += velocities[i * 3 + 2];
+      }
+
+      geometry.attributes.position.needsUpdate = true;
+      renderer.render(scene, camera);
+    }
+
+    // ----------------------------------------------------
+    // 7. HELIX PROGRESS BARS (GRIMOIRE)
+    // ----------------------------------------------------
+    let helixCanvasesData = [];
+    let helixTime = 0;
+
+    function setupHelixes() {
+      const canvases = document.querySelectorAll('.helix-bar');
+      helixCanvasesData = Array.from(canvases).map(c => {
+        const rect = c.parentElement.getBoundingClientRect();
+        c.width = rect.width * window.devicePixelRatio;
+        c.height = rect.height * window.devicePixelRatio;
+        return {
+          ctx: c.getContext('2d'),
+          width: c.width,
+          height: c.height,
+          progress: parseFloat(c.dataset.progress)
+        };
+      });
+    }
+
+    function animateHelixes() {
+      helixTime += 0.04;
+
+      helixCanvasesData.forEach(obj => {
+        const { ctx, width, height, progress } = obj;
+        ctx.clearRect(0, 0, width, height);
+
+        const midY = height / 2;
+        const amplitude = height * 0.35;
+        const fillWidth = width * progress;
+        const spacing = 10;
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        ctx.shadowBlur = 6;
+        ctx.shadowColor = 'rgba(255, 255, 255, 0.5)';
+
+        for (let x = 0; x < width; x += spacing) {
+          if (x > fillWidth) {
+            ctx.globalAlpha = 0.1;
+            ctx.shadowBlur = 0;
+          } else {
+            ctx.globalAlpha = 1.0;
+            ctx.shadowBlur = 6;
+          }
+
+          let y1 = midY + Math.sin(x * 0.04 - helixTime) * amplitude;
+          ctx.beginPath();
+          ctx.arc(x, y1, 1.5, 0, Math.PI * 2);
+          ctx.fill();
+
+          let y2 = midY + Math.sin(x * 0.04 - helixTime + Math.PI) * amplitude;
+          ctx.beginPath();
+          ctx.arc(x, y2, 1.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+
+      requestAnimationFrame(animateHelixes);
+    }
+
+    window.onload = function () {
+      setupHelixes();
+      animateHelixes();
+      animate();
+    }
+  </script>
+</body>
+
+</html>

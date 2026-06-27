@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vincenzo Fadda - Data Scientist [RETRO OS]</title>
+    <style>
+        /* Fontes Retro: VT323 para texto principal e Share Tech Mono para detalhes */
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap');
+
+        :root {
+            --neon-cyan: #00ffff;
+            --neon-pink: #ff00ff;
+            --neon-green: #00ff00;
+            --dark-bg: #050014;
+            --terminal-bg: rgba(5, 0, 20, 0.85);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body,
+        html {
+            width: 100%;
+            height: 100%;
+            background-color: var(--dark-bg);
+            overflow: hidden;
+            color: var(--neon-cyan);
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        /* Efeito de Scanlines (Linhas CRT) */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 3px 100%;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        #canvas-container {
+            position: absolute;
+            inset: 0;
+            display: block;
+        }
+
+        /* Vignette escurecida para legibilidade */
+        .vignette {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 5;
+            background: radial-gradient(ellipse at 50% 50%, rgba(5, 0, 20, 0.3) 0%, rgba(5, 0, 20, 0.95) 100%);
+        }
+
+        .ui-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 30px 40px;
+        }
+
+        /* Top Bar Elements */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            z-index: 30;
+            position: relative;
+            border-bottom: 2px solid var(--neon-cyan);
+            padding-bottom: 10px;
+        }
+
+        .logo {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 18px;
+            letter-spacing: .1em;
+            color: #f8f8f8;
+            text-shadow: 0 0 8px rgba(248, 248, 248, 0.4);
+            text-transform: uppercase;
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            pointer-events: all;
+        }
+
+        .btn-return {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 8px 16px;
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 11px;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .btn-return:hover {
+            background: var(--neon-cyan);
+            color: var(--dark-bg);
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        .btn-return img {
+            width: 14px;
+            height: 14px;
+            filter: brightness(0) saturate(100%) invert(98%) sepia(2%) saturate(151%) hue-rotate(182deg) brightness(101%) contrast(97%);
+        }
+
+        .btn-return:hover img {
+            filter: brightness(0) saturate(100%) invert(10%) sepia(50%) saturate(6000%) hue-rotate(250deg);
+        }
+
+        /* Retro Main Nav */
+        .main-nav {
+            display: flex;
+            gap: 20px;
+            pointer-events: all;
+        }
+
+        .main-nav a {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 13px;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+
+        .main-nav a:hover,
+        .main-nav a.active-link {
+            background: var(--neon-cyan);
+            color: var(--dark-bg);
+            text-shadow: none;
+        }
+
+        /* Content Area - CENTERED LAYOUT */
+        #content-container {
+            position: relative;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            margin-top: 20px;
+        }
+
+        .page-section {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            max-width: 1100px;
+            transform: translate(-50%, -50%) scale(0.95);
+            opacity: 0;
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            pointer-events: none;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            gap: 60px;
+            padding: 0 20px;
+        }
+
+        .page-section.active {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+            pointer-events: all;
+        }
+
+        /* Typography Retro */
+        .eyebrow {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            color: var(--neon-green);
+            text-shadow: 0 0 5px var(--neon-green);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .main-title {
+            font-family: 'VT323', monospace;
+            font-size: clamp(50px, 8vw, 90px);
+            line-height: 0.9;
+            color: #fff;
+            text-shadow: 3px 3px 0px var(--neon-pink), -3px -3px 0px var(--neon-cyan);
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        .main-title em {
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .sub-text {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 18px;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+            max-width: 500px;
+            line-height: 1.4;
+        }
+
+        .text-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            max-width: 550px;
+        }
+
+        /* About Me Image Placeholder */
+        .about-image-frame {
+            width: 320px;
+            height: 420px;
+            border: 2px solid var(--neon-pink);
+            background: rgba(255, 0, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.2), inset 0 0 10px rgba(255, 0, 255, 0.1);
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .about-image-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 1s ease;
+            filter: grayscale(100%) contrast(1.2) brightness(0.9);
+        }
+
+        .about-image-frame.loaded img {
+            opacity: 1;
+        }
+
+        .about-image-frame::after {
+            content: '[ LOADING: VINCENZO.JPG ]';
+            position: absolute;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            color: var(--neon-pink);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            animation: blink 1.5s infinite;
+            z-index: 1;
+        }
+
+        .about-image-frame.loaded::after {
+            display: none;
+        }
+
+        /* Spells Tower Layout (Matriz 4x4) */
+        .spells-grid-container {
+            position: relative;
+            width: 140px;
+            height: 440px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 12px;
+            flex-shrink: 0;
+            margin-right: 420px;
+        }
+
+        .spells-hint {
+            position: absolute;
+            bottom: -30px;
+            left: 0;
+            width: 140px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--neon-pink);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: opacity 0.3s ease;
+            text-shadow: 0 0 5px var(--neon-pink);
+        }
+
+        .spell-row {
+            position: relative;
+            width: 140px;
+            height: 100px;
+            cursor: pointer;
+        }
+
+        .spell-box {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 140px;
+            height: 100px;
+            background: var(--terminal-bg);
+            border: 1px solid var(--neon-cyan);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+            cursor: pointer;
+            transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
+        }
+
+        .spell-box:hover {
+            border-color: var(--neon-pink);
+            background: rgba(255, 0, 255, 0.1);
+            box-shadow: 0 0 15px var(--neon-pink);
+        }
+
+        .spell-box::after {
+            content: '[ .EXE ]';
+            font-size: 12px;
+            color: var(--neon-cyan);
+        }
+
+        .spell-box:hover::after {
+            color: var(--neon-pink);
+        }
+
+        /* Grimoire Skills Grid */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 32px;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .skill-item {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 120px;
+            background: rgba(0, 255, 255, 0.02);
+            border: 1px solid rgba(0, 255, 255, 0.1);
+            padding: 16px;
+            gap: 8px;
+        }
+
+        .skill-info h4 {
+            font-size: 14px;
+            color: var(--neon-pink);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 2px;
+            text-shadow: 0 0 5px var(--neon-pink);
+        }
+
+        .skill-info p {
+            font-size: 14px;
+            color: var(--neon-cyan);
+            line-height: 1.3;
+        }
+
+        .retro-bar-container {
+            width: 100%;
+            height: 14px;
+            background: var(--terminal-bg);
+            border: 1px solid var(--neon-cyan);
+            padding: 2px;
+            box-shadow: inset 0 0 5px rgba(0, 255, 255, 0.2);
+        }
+
+        .retro-bar-fill {
+            height: 100%;
+            background: repeating-linear-gradient(90deg,
+                    var(--neon-cyan) 0px,
+                    var(--neon-cyan) 6px,
+                    transparent 6px,
+                    transparent 8px);
+            width: 0%;
+            box-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        /* Project Details Specifics */
+        .project-details-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            max-width: 700px;
+            gap: 20px;
+        }
+
+        .tech-stack {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .tech-tag {
+            padding: 4px 12px;
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            text-shadow: 0 0 5px var(--neon-green);
+            box-shadow: 0 0 8px rgba(0, 255, 0, 0.2);
+        }
+
+        /* Terminal Window inside Contact Section */
+        .terminal-window {
+            width: 600px;
+            max-width: 100%;
+            background: var(--terminal-bg);
+            border: 2px solid var(--neon-pink);
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.3), inset 0 0 10px rgba(255, 0, 255, 0.2);
+        }
+
+        .term-header {
+            background: var(--neon-pink);
+            color: var(--dark-bg);
+            padding: 5px 10px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .term-content {
+            padding: 20px;
+            font-size: 18px;
+            color: var(--neon-green);
+            text-shadow: 0 0 5px var(--neon-green);
+            min-height: 250px;
+            white-space: pre-wrap;
+            text-align: left;
+        }
+
+        /* Clickable Links inside Terminal */
+        .term-content a {
+            color: var(--neon-pink);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--neon-pink);
+            text-shadow: 0 0 5px var(--neon-pink);
+            transition: all 0.2s;
+        }
+
+        .term-content a:hover {
+            background: var(--neon-pink);
+            color: var(--dark-bg);
+            text-shadow: none;
+        }
+
+        .blinking-cursor::after {
+            content: '█';
+            animation: blink 1s step-start infinite;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        /* Bottom Bar & Controls */
+        .bottom-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            pointer-events: none;
+        }
+
+        #home-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: all;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        #home-controls.hidden {
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+        }
+
+        .freq-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .freq-label {
+            font-size: 12px;
+            color: var(--neon-pink);
+            text-transform: uppercase;
+            text-shadow: 0 0 4px var(--neon-pink);
+        }
+
+        .controls-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-pause {
+            background: transparent;
+            border: 1px solid var(--neon-cyan);
+            border-radius: 0;
+            color: var(--neon-cyan);
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-pause:hover,
+        .btn-pause.is-paused {
+            background: var(--neon-cyan);
+            color: var(--dark-bg);
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        .btn-pause svg {
+            width: 10px;
+            height: 10px;
+            fill: currentColor;
+            stroke: currentColor;
+        }
+
+        .freq-btns {
+            display: flex;
+            gap: 6px;
+        }
+
+        .fb {
+            width: 32px;
+            height: 32px;
+            border-radius: 0;
+            border: 1px solid var(--neon-cyan);
+            background: rgba(0, 255, 255, 0.1);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .fb:hover,
+        .fb.active {
+            background: var(--neon-cyan);
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        .fb svg {
+            width: 14px;
+            height: 14px;
+            stroke: var(--neon-cyan);
+        }
+
+        .fb:hover svg,
+        .fb.active svg {
+            stroke: var(--dark-bg);
+            fill: var(--dark-bg);
+        }
+
+        .meta-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        .pattern-name {
+            font-size: 12px;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            background: rgba(0, 255, 255, 0.1);
+            padding: 2px 6px;
+            border: 1px solid var(--neon-cyan);
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+</head>
+
+<body>
+
+    <div id="canvas-container"></div>
+    <div class="vignette"></div>
+    <div class="scanlines"></div>
+
+    <div class="ui-layer">
+
+        <div class="top-bar">
+            <div class="logo">SYS.FADDA // DATA_SCIENTIST</div>
+            <nav class="main-nav" id="main-nav">
+                <a data-target="home" class="active-link">[ ./home.exe ]</a>
+                <a data-target="about">[ ./about.sh ]</a>
+                <a data-target="spells">[ ./spells.bin ]</a>
+                <a data-target="grimoire">[ ./grimoire.sys ]</a>
+                <a data-target="contact">[ ./contact.bat ]</a>
+            </nav>
+            <div class="top-bar-right">
+                <a href="https://davidx1999.github.io/porftolio/" class="btn-return">
+                    <img src="https://cdn.pixabay.com/photo/2016/10/10/01/49/plus-1727487_1280.png" alt="Return Icon">
+                    Produced by David Salviano
+                </a>
+            </div>
+        </div>
+
+        <div id="content-container">
+
+            <!-- HOME SECTION -->
+            <section id="home" class="page-section active" style="flex-direction: column; text-align: center;">
+                <div class="text-content" style="align-items: center; max-width: 600px;">
+                    <div class="eyebrow">> SYSTEM_BOOT: OK...</div>
+                    <h1 class="main-title">Vincenzo Fadda</h1>
+                    <p class="sub-text" style="text-align: center;">
+                        > TRANSFORMING DATA INTO PIXIE DUST SINCE 2003.<br>
+                        > DATA, ALGORITHMS & SYNTHWAVE.<br><br>
+                        Data Scientist by day, Fortune Tiger algorithm whisperer by night. Applying Machine Learning to
+                        predict the impossible.
+                    </p>
+                </div>
+            </section>
+
+            <!-- ABOUT ME SECTION -->
+            <section id="about" class="page-section">
+                <div class="text-content">
+                    <div class="eyebrow">> ./read_lore.sh</div>
+                    <h1 class="main-title">The Entity</h1>
+                    <p class="sub-text" style="font-size: 16px; margin-top: 10px;">
+                        Deep in the Mainframe, where arrays grow on nodes and data lakes are crystal clear, a legend
+                        emerged: The Fadda.
+                        <br><br>
+                        As a true cyber-magical being, my terminal runs Python and my spells are written in SQL. I
+                        specialize in extracting gold from dirty data quarries (ETL) and training artificial
+                        intelligence constructs to predict the future.
+                        <br><br>
+                        But the real magic happens at midnight. Using advanced regression models and time series
+                        analysis, I seek the impossible: unraveling the Fortune Tiger's paying minutes. While mortals
+                        rely on luck, I rely on probability distributions and neon pixie dust.
+                    </p>
+                </div>
+                <div class="about-image-frame" id="about-image-frame">
+                    <img src="../assets/vincenzo.jpg" alt="Vincenzo Fadda" onload="this.parentElement.classList.add('loaded')">
+                </div>
+            </section>
+
+            <!-- SPELLS (PROJECTS) SECTION -->
+            <section id="spells" class="page-section">
+                <div class="text-content">
+                    <div class="eyebrow">> ./execute_projects.bat</div>
+                    <h1 class="main-title">Constructs</h1>
+                    <p class="sub-text">
+                        > Hover over a memory block to expand the data matrix.<br>
+                        > Click an executable to inspect the artifact's source code and architecture.
+                    </p>
+                </div>
+
+                <div class="spells-grid-container" id="spells-tower">
+                    <div class="spells-hint" id="spellsHintText">Hover a row to expand</div>
+
+                    <div class="spell-row" style="z-index: 4;">
+                        <div class="spell-box" data-id="1"></div>
+                        <div class="spell-box" data-id="2"></div>
+                        <div class="spell-box" data-id="3"></div>
+                        <div class="spell-box" data-id="4"></div>
+                    </div>
+                    <div class="spell-row" style="z-index: 3;">
+                        <div class="spell-box" data-id="5"></div>
+                        <div class="spell-box" data-id="6"></div>
+                        <div class="spell-box" data-id="7"></div>
+                        <div class="spell-box" data-id="8"></div>
+                    </div>
+                    <div class="spell-row" style="z-index: 2;">
+                        <div class="spell-box" data-id="9"></div>
+                        <div class="spell-box" data-id="10"></div>
+                        <div class="spell-box" data-id="11"></div>
+                        <div class="spell-box" data-id="12"></div>
+                    </div>
+                    <div class="spell-row" style="z-index: 1;">
+                        <div class="spell-box" data-id="13"></div>
+                        <div class="spell-box" data-id="14"></div>
+                        <div class="spell-box" data-id="15"></div>
+                        <div class="spell-box" data-id="16"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PROJECT DETAILS SUB-PAGE -->
+            <section id="project-details" class="page-section" style="flex-direction: column;">
+                <div class="project-details-wrapper">
+                    <div class="eyebrow">> Inspecting Memory Block...</div>
+                    <h1 class="main-title" id="pd-title">Spell Construct Name</h1>
+
+                    <div class="tech-stack" id="pd-tech">
+                        <div class="tech-tag">Python</div>
+                        <div class="tech-tag">TensorFlow</div>
+                        <div class="tech-tag">SQL</div>
+                    </div>
+
+                    <p class="sub-text" id="pd-desc" style="margin-top: 20px; font-size: 16px;">
+                        An intricate data architecture weaving together neural networks and temporal prediction to
+                        foresee the unpredictable. Developed using advanced dark alchemy and probability distributions
+                        to ensure zero surveillance and absolute precision.
+                    </p>
+
+                    <button class="btn-return" id="btn-back-spells" style="margin-top: 40px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            style="width: 14px; height: 14px;">
+                            <path d="M19 12H5M12 19l-7-7 7-7" />
+                        </svg>
+                        Return to Directory
+                    </button>
+                </div>
+            </section>
+
+            <!-- GRIMOIRE (SKILLS) SECTION -->
+            <section id="grimoire" class="page-section" style="flex-direction: column;">
+                <div class="text-content" style="align-items: center; text-align: center; max-width: 600px;">
+                    <div class="eyebrow">> ./load_modules.sys</div>
+                    <h1 class="main-title">The Arsenal</h1>
+                </div>
+
+                <div class="skills-grid">
+                    <div class="skill-item">
+                        <div class="skill-info">
+                            <h4>Python Alchemy</h4>
+                            <p>Pandas, NumPy, and Scikit-Learn. Transforming raw data into pure neon gold.</p>
+                        </div>
+                        <div class="retro-bar-container">
+                            <div class="retro-bar-fill" data-progress="0.95"></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item">
+                        <div class="skill-info">
+                            <h4>SQL Enchantment</h4>
+                            <p>Magical queries that summon lost tables from the database abyss.</p>
+                        </div>
+                        <div class="retro-bar-container">
+                            <div class="retro-bar-fill" data-progress="0.90"></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item">
+                        <div class="skill-info">
+                            <h4>Fortune Tiger Algorithms</h4>
+                            <p>RTP (Return to Player) calculation and slot algorithm deep reading.</p>
+                        </div>
+                        <div class="retro-bar-container">
+                            <div class="retro-bar-fill" data-progress="1.0"></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item">
+                        <div class="skill-info">
+                            <h4>Faerie Neural Networks</h4>
+                            <p>Deep Learning, TensorFlow, and temporal prediction potions.</p>
+                        </div>
+                        <div class="retro-bar-container">
+                            <div class="retro-bar-fill" data-progress="0.85"></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item">
+                        <div class="skill-info">
+                            <h4>Glowing Dashboards</h4>
+                            <p>PowerBI and Tableau that shine brighter than Tinker Bell's lantern.</p>
+                        </div>
+                        <div class="retro-bar-container">
+                            <div class="retro-bar-fill" data-progress="0.80"></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item">
+                        <div class="skill-info">
+                            <h4>Magical Bankroll Management</h4>
+                            <p>The art of not losing the kingdom's entire treasure in a single spin.</p>
+                        </div>
+                        <div class="retro-bar-container">
+                            <div class="retro-bar-fill" data-progress="0.95"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CONTACT SECTION (TERMINAL) -->
+            <section id="contact" class="page-section" style="flex-direction: column; text-align: center;">
+                <div class="terminal-window">
+                    <div class="term-header">
+                        <span id="termTitle">root@vincenzo:~/contact</span>
+                        <span class="term-close">_</span>
+                    </div>
+                    <div class="term-content" id="termContent">
+                        <!-- Typed text goes here -->
+                        <span class="blinking-cursor"></span>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Controls stay at the bottom -->
+        <div class="bottom-bar">
+            <div id="home-controls">
+                <div class="freq-header">
+                    <div class="freq-label">ALGORITHM SHAPE</div>
+                    <div class="controls-buttons">
+                        <!-- PAUSE BUTTON -->
+                        <button id="btnPause" class="btn-pause" title="Pause/Play Auto Rotation">
+                            <svg id="icon-pause" viewBox="0 0 14 14">
+                                <rect x="3" y="2" width="3" height="10" />
+                                <rect x="8" y="2" width="3" height="10" />
+                            </svg>
+                            <svg id="icon-play" viewBox="0 0 14 14"
+                                style="display: none; fill: none; stroke: currentColor;">
+                                <polygon points="4,2 11,7 4,12" />
+                            </svg>
+                        </button>
+                        <!-- RESET BUTTON -->
+                        <button id="btnReset" class="btn-pause" title="Reset Particles (Fix Glitches)">
+                            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M7 2a5 5 0 1 1-4.95 5.7" />
+                                <path d="M2 3.5V7h3.5" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="freq-btns" id="freqBtns">
+                    <button class="fb active" data-idx="0" title="Solid Square">
+                        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2">
+                            <rect x="3" y="3" width="8" height="8" />
+                        </svg>
+                    </button>
+                    <button class="fb" data-idx="1" title="Grid">
+                        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2">
+                            <rect x="2" y="2" width="5" height="5" />
+                            <rect x="8" y="2" width="5" height="5" />
+                            <rect x="2" y="8" width="5" height="5" />
+                            <rect x="8" y="8" width="5" height="5" />
+                        </svg>
+                    </button>
+                    <button class="fb" data-idx="2" title="Diamond Eyes">
+                        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2">
+                            <ellipse cx="7" cy="7" rx="6" ry="5" />
+                        </svg>
+                    </button>
+                    <button class="fb" data-idx="3" title="Hexagon Matrix">
+                        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2">
+                            <polygon points="7,2 11.5,4.5 11.5,9.5 7,12 2.5,9.5 2.5,4.5" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="meta-right">
+                <div class="pattern-name" id="patName">Solid Square</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ROUTING, TERMINAL, E INTERAÇÕES DAS PÁGINAS -->
+    <script>
+        const navLinks = document.querySelectorAll('.main-nav a');
+        const sections = document.querySelectorAll('.page-section');
+        const homeControls = document.getElementById('home-controls');
+        const termContent = document.getElementById('termContent');
+        let pageTransitionTimeout;
+        let typingInterval;
+
+        const pagePatterns = {
+            'home': 1,      // Grid
+            'about': 0,     // Solid Square
+            'spells': 3,    // Hexagon Matrix
+            'grimoire': 2,  // Diamond Eyes
+            'contact': 1    // Grid
+        };
+
+        // Raw text to type out
+        const contactTextRaw = `> cat contact.txt\n\nREADY TO COLLABORATE?\nInitialize secure connection to the mainframe:\n\nEmail: vincenzo.fadda@cenpe.ufc.br\nLinkedIn: /in/vincenzofadda\nGitHub: https://github.com/vincenzofadda\n\n>_ Awaiting input...`;
+
+        // HTML to replace the raw text once typing is complete (adds clickable links)
+        const contactTextHTML = `> cat contact.txt\n\nREADY TO COLLABORATE?\nInitialize secure connection to the mainframe:\n\nEmail: <a href="mailto:vincenzo@fadda-ds.com" target="_blank">vincenzo@fadda-ds.com</a>\nLinkedIn: <a href="https://linkedin.com/in/vincenzofadda" target="_blank">/in/vincenzofadda</a>\nGitHub: <a href="https://github.com/vfadda" target="_blank">github.com/vfadda</a>\n\n>_ Awaiting input...<span class="blinking-cursor"></span>`;
+
+        function typeWriterEffect(rawText, htmlText) {
+            clearTimeout(typingInterval);
+            termContent.innerHTML = '<span class="blinking-cursor"></span>';
+            let i = 0;
+
+            function type() {
+                if (i < rawText.length) {
+                    termContent.innerHTML = rawText.substring(0, i + 1) + '<span class="blinking-cursor"></span>';
+                    i++;
+                    typingInterval = setTimeout(type, 15);
+                } else if (htmlText) {
+                    // Ao terminar, substitui pelo HTML onde as tags <a> estão ativas
+                    termContent.innerHTML = htmlText;
+                }
+            }
+            type();
+        }
+
+        // Função universal para navegar entre as páginas
+        function navigateToPage(targetId) {
+            if (document.getElementById(targetId).classList.contains('active')) return;
+
+            navLinks.forEach(l => {
+                const navTarget = l.getAttribute('data-target');
+                if (navTarget === targetId || (targetId === 'project-details' && navTarget === 'spells')) {
+                    l.classList.add('active-link');
+                } else {
+                    l.classList.remove('active-link');
+                }
+            });
+
+            sections.forEach(sec => sec.classList.remove('active'));
+
+            if (targetId === 'home') {
+                homeControls.classList.remove('hidden');
+                if (!userPaused) autoPlay = true;
+            } else {
+                homeControls.classList.add('hidden');
+                autoPlay = false;
+            }
+
+            // Mega Blast Particle Transition
+            if (pagePatterns[targetId] !== undefined) {
+                triggerPulse(pagePatterns[targetId], true);
+            } else if (targetId === 'project-details') {
+                triggerPulse(pagePatterns['spells'], true);
+            }
+
+            // Delay to show content after blast
+            clearTimeout(pageTransitionTimeout);
+            pageTransitionTimeout = setTimeout(() => {
+                document.getElementById(targetId).classList.add('active');
+
+                if (targetId === 'contact') {
+                    typeWriterEffect(contactTextRaw, contactTextHTML);
+                } else {
+                    clearTimeout(typingInterval);
+                }
+
+                // Trigger Retro 8-bit bars
+                if (targetId === 'grimoire') {
+                    animateRetroBars();
+                } else {
+                    resetRetroBars();
+                }
+
+            }, 500);
+        }
+
+        function animateRetroBars() {
+            const bars = document.querySelectorAll('.retro-bar-fill');
+            bars.forEach(bar => {
+                const progress = parseFloat(bar.getAttribute('data-progress')) * 100;
+                anime({
+                    targets: bar,
+                    width: `${progress}%`,
+                    duration: 1200,
+                    easing: 'steps(10)'
+                });
+            });
+        }
+
+        function resetRetroBars() {
+            const bars = document.querySelectorAll('.retro-bar-fill');
+            bars.forEach(bar => { bar.style.width = '0%'; });
+        }
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                navigateToPage(link.getAttribute('data-target'));
+            });
+        });
+
+        document.querySelectorAll('.spell-box').forEach(box => {
+            box.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const projectId = box.getAttribute('data-id');
+                document.getElementById('pd-title').innerText = `Construct_Data_Block_${projectId}.exe`;
+                navigateToPage('project-details');
+            });
+        });
+
+        document.getElementById('btn-back-spells').addEventListener('click', () => {
+            navigateToPage('spells');
+        });
+
+    </script>
+
+    <!-- ANIME.JS INTERACTION FOR SPELLS TOWER 4x4 -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const rows = document.querySelectorAll('.spell-row');
+            const hintText = document.getElementById('spellsHintText');
+
+            rows.forEach((row) => {
+                const originalZ = row.style.zIndex;
+
+                row.addEventListener('mouseenter', () => {
+                    row.style.width = '590px';
+                    row.style.zIndex = '10'; // Traz a fileira para frente evitando bloqueios das linhas de baixo
+                    hintText.style.opacity = '0';
+
+                    const boxes = row.querySelectorAll('.spell-box');
+                    anime.remove(boxes);
+
+                    anime({
+                        targets: boxes,
+                        translateX: (el, i) => i * 150,
+                        scale: [1, .5, 1],
+                        duration: 800,
+                        delay: anime.stagger(100),
+                        easing: 'easeOutElastic(1, .8)'
+                    });
+                });
+
+                row.addEventListener('mouseleave', () => {
+                    row.style.width = '140px';
+                    row.style.zIndex = originalZ; // Restaura o z-index original
+                    hintText.style.opacity = '1';
+
+                    const boxes = row.querySelectorAll('.spell-box');
+                    anime.remove(boxes);
+
+                    anime({
+                        targets: boxes,
+                        translateX: 0,
+                        scale: [1, .5, 1],
+                        duration: 600,
+                        delay: anime.stagger(50, { direction: 'reverse' }),
+                        easing: 'easeOutQuad'
+                    });
+                });
+            });
+        });
+    </script>
+
+    <!-- THREE.JS & PHYSICS LOGIC -->
+    <script>
+        let autoPlay = true;
+        let userPaused = false;
+
+        const btnPause = document.getElementById('btnPause');
+        const btnReset = document.getElementById('btnReset');
+        const iconPause = document.getElementById('icon-pause');
+        const iconPlay = document.getElementById('icon-play');
+
+        btnPause.addEventListener('click', () => {
+            userPaused = !userPaused;
+            autoPlay = !userPaused;
+
+            if (userPaused) {
+                btnPause.classList.add('is-paused');
+                iconPause.style.display = 'none';
+                iconPlay.style.display = 'block';
+            } else {
+                btnPause.classList.remove('is-paused');
+                iconPause.style.display = 'block';
+                iconPlay.style.display = 'none';
+            }
+        });
+
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x0a0014, 0.015);
+
+        const camera = new THREE.PerspectiveCamera(85, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 0, 22);
+        camera.lookAt(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(new THREE.Color(0x050014));
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        const NUM_PARTICLES = 150000;
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(NUM_PARTICLES * 3);
+        const velocities = new Float32Array(NUM_PARTICLES * 3);
+
+        function initParticles() {
+            for (let i = 0; i < NUM_PARTICLES; i++) {
+                positions[i * 3] = (Math.random() - 0.5) * 45;
+                positions[i * 3 + 1] = (Math.random() - 0.5) * 45;
+                positions[i * 3 + 2] = (Math.random() - 0.5) * 2;
+                velocities[i * 3] = 0;
+                velocities[i * 3 + 1] = 0;
+                velocities[i * 3 + 2] = 0;
+            }
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.attributes.position.needsUpdate = true;
+        }
+
+        initParticles();
+
+        btnReset.addEventListener('click', () => {
+            initParticles();
+            triggerPulse(patIdx);
+            anime({ targets: '#btnReset svg', rotate: '1turn', duration: 600, easing: 'easeInOutQuad' });
+        });
+
+        const material = new THREE.PointsMaterial({
+            color: 0x00ffff, // NÉON CIANO
+            size: 0.1,
+            transparent: true,
+            opacity: 0.45,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+        });
+
+        const particles = new THREE.Points(geometry, material);
+        scene.add(particles);
+
+        const PATTERNS = [
+            { name: 'Solid Square', holeA: 18, holeB: 18, holeK: 8, isFilled: true, C: (x, y) => 0 },
+            { name: 'Grid', holeA: 0.5, holeB: 0.5, holeK: 0.5, isFilled: false, C: (x, y) => Math.cos(x * 0.09) * Math.cos(y * 0.15) - 0.015 },
+            { name: 'Diamond Eyes', holeA: 12, holeB: 12, holeK: 2.5, isFilled: false, C: (x, y) => Math.min(Math.sqrt(Math.abs(x * 0.1)) + Math.sqrt(Math.abs(y * 0.1)) - 2.5, Math.sqrt(Math.pow(x - 4, 2) + Math.pow(y, 2)) - 0.8, Math.sqrt(Math.pow(x + 4, 2) + Math.pow(y, 2)) - 0.8) },
+            { name: 'Hexagon Matrix', holeA: 16, holeB: 16, holeK: 4, isFilled: false, C: (x, y) => Math.cos(x * 0.25) + Math.cos(x * 0.125 + y * 0.216) + Math.cos(x * 0.125 - y * 0.216) - 1.0 }
+        ];
+
+        let patIdx = pagePatterns['home'];
+        let activePattern = PATTERNS[patIdx];
+
+        let targetHoleA = activePattern.holeA, targetHoleB = activePattern.holeB, targetHoleK = activePattern.holeK;
+        let curHoleA = targetHoleA, curHoleB = targetHoleB, curHoleK = targetHoleK;
+
+        const CHLADNI_STRENGTH = 2.5;
+        const BASIN_RADIUS = 50.0;
+        let lastPulseTime = Date.now();
+        const INTERVAL = 7000;
+
+        let mouseX = 0, mouseY = 0, targetMouseX = 0, targetMouseY = 0;
+        let lastMouseX = 0, lastMouseY = 0;
+        const delaySpeed = 0.2;
+        let camSmoothX = 0, camSmoothY = 0;
+
+        const raycaster = new THREE.Raycaster();
+        const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+        const mouseVec = new THREE.Vector2();
+
+        window.addEventListener('mousemove', (e) => {
+            mouseVec.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouseVec.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouseVec, camera);
+            const target = new THREE.Vector3();
+            raycaster.ray.intersectPlane(plane, target);
+            targetMouseX = target.x; targetMouseY = target.y;
+        });
+
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.fb') || e.target.closest('.main-nav a') || e.target.closest('.btn-pause') || e.target.closest('.btn-return') || e.target.closest('.spells-grid-container') || e.target.closest('.term-content a')) return;
+            triggerPulse();
+        });
+
+        document.getElementById('freqBtns').addEventListener('click', (e) => {
+            const btn = e.target.closest('.fb');
+            if (!btn) return;
+            userPaused = true;
+            autoPlay = false;
+            btnPause.classList.add('is-paused');
+            iconPause.style.display = 'none';
+            iconPlay.style.display = 'block';
+            triggerPulse(parseInt(btn.dataset.idx));
+        });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        document.querySelectorAll('.fb').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.fb')[patIdx].classList.add('active');
+        document.getElementById('patName').textContent = activePattern.name;
+
+        function triggerPulse(nextIdx, isMegaBlast = false) {
+            if (nextIdx !== undefined) patIdx = nextIdx;
+            else patIdx = (patIdx + 1) % PATTERNS.length;
+
+            activePattern = PATTERNS[patIdx];
+            targetHoleA = activePattern.holeA; targetHoleB = activePattern.holeB; targetHoleK = activePattern.holeK;
+            lastPulseTime = Date.now();
+
+            document.querySelectorAll('.fb').forEach(b => b.classList.remove('active'));
+            if (document.querySelectorAll('.fb')[patIdx]) {
+                document.querySelectorAll('.fb')[patIdx].classList.add('active');
+            }
+            document.getElementById('patName').textContent = activePattern.name;
+
+            let force = isMegaBlast ? 2.5 : 1.0;
+
+            for (let i = 0; i < NUM_PARTICLES; i++) {
+                let x = positions[i * 3], y = positions[i * 3 + 1];
+                let dist = Math.sqrt(x * x + y * y) || 1;
+                let pushOut = (Math.random() * 5.0 + 2.0) * Math.max(0, 1.0 - (dist / 40)) * force;
+                let swirl = (Math.sin(dist * 0.2) * 2.5 + (Math.random() - 0.5) * 3.0) * force;
+
+                velocities[i * 3] += (x / dist) * pushOut - (y / dist) * swirl;
+                velocities[i * 3 + 1] += (y / dist) * pushOut + (x / dist) * swirl;
+                velocities[i * 3 + 2] += (Math.random() - 0.5) * pushOut * 3.0 * force;
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            camSmoothX += (mouseVec.x - camSmoothX) * 0.05;
+            camSmoothY += (mouseVec.y - camSmoothY) * 0.05;
+            camera.position.x = camSmoothX * 3.0;
+            camera.position.y = camSmoothY * 3.0;
+            camera.position.z = 22;
+            camera.lookAt(0, 0, 0);
+
+            mouseX += (targetMouseX - mouseX) * delaySpeed;
+            mouseY += (targetMouseY - mouseY) * delaySpeed;
+
+            let mouseVx = mouseX - lastMouseX, mouseVy = mouseY - lastMouseY;
+            lastMouseX = mouseX; lastMouseY = mouseY;
+
+            const posArray = geometry.attributes.position.array;
+            let now = Date.now();
+            let timeSincePulse = (now - lastPulseTime) / 1000;
+            let toNext = (INTERVAL - (now - lastPulseTime)) / 1000;
+
+            if (autoPlay && toNext <= 0) triggerPulse();
+
+            let anticipation = 0, bounce = 0;
+            if (toNext < 0.45 && autoPlay) anticipation = -Math.pow(1.0 - (toNext / 0.45), 2) * 0.3;
+            if (timeSincePulse < 2.5) bounce = Math.exp(-timeSincePulse * 4.5) * Math.sin(timeSincePulse * 16.0) * 1.2;
+
+            let masterScale = 1.0 + anticipation + bounce;
+            let isFilled = activePattern.isFilled;
+
+            material.opacity = timeSincePulse < 0.6 ? 0.45 + (0.6 - timeSincePulse) * 0.3 : 0.45;
+            let currentFriction = timeSincePulse < 0.8 ? 0.985 : 0.94;
+
+            curHoleA += (targetHoleA - curHoleA) * 0.08;
+            curHoleB += (targetHoleB - curHoleB) * 0.08;
+            curHoleK += (targetHoleK - curHoleK) * 0.08;
+
+            let displayHoleA = curHoleA * masterScale, displayHoleB = curHoleB * masterScale;
+            let holePowA = Math.pow(displayHoleA, curHoleK), holePowB = Math.pow(displayHoleB, curHoleK);
+
+            let speed = Math.sqrt(mouseVx * mouseVx + mouseVy * mouseVy);
+            let dirX = speed > 0.001 ? mouseVx / speed : 0, dirY = speed > 0.001 ? mouseVy / speed : 0;
+            let swirlForce = Math.min(speed * 20.0, 15.0), wakeForce = Math.min(speed * 30.0, 20.0);
+
+            for (let i = 0; i < NUM_PARTICLES; i++) {
+                let x = posArray[i * 3], y = posArray[i * 3 + 1], z = posArray[i * 3 + 2];
+                let absX = Math.abs(x), absY = Math.abs(y);
+                let distNormalized = Math.pow((Math.pow(absX, curHoleK) / holePowA) + (Math.pow(absY, curHoleK) / holePowB), 1.0 / curHoleK);
+
+                let gx = (curHoleK * Math.pow(absX, curHoleK - 1) / holePowA) * Math.sign(x);
+                let gy = (curHoleK * Math.pow(absY, curHoleK - 1) / holePowB) * Math.sign(y);
+                let gMag = Math.sqrt(gx * gx + gy * gy) || 1;
+                let nx = gx / gMag, ny = gy / gMag;
+
+                let shapeForceX = 0, shapeForceY = 0, distFromBorder = distNormalized - 1.0;
+                if (distNormalized < 1.0) {
+                    if (!isFilled) { shapeForceX = nx * -distFromBorder * 0.8; shapeForceY = ny * -distFromBorder * 0.8; }
+                } else {
+                    let pull = Math.min(distFromBorder, 0.8) * 0.35;
+                    shapeForceX = -nx * pull; shapeForceY = -ny * pull;
+                }
+
+                let ringProximity = isFilled ? 0 : Math.max(0.0, 1.0 - Math.abs(distFromBorder) * 4.0);
+                let randomSpread = (Math.random() - 0.5) * 0.35;
+                if (isFilled && distNormalized < 1.0) {
+                    shapeForceX += (Math.random() - 0.5) * 0.2; shapeForceY += (Math.random() - 0.5) * 0.2;
+                } else {
+                    shapeForceX += -ny * randomSpread * ringProximity; shapeForceY += nx * randomSpread * ringProximity;
+                }
+
+                let h = 0.1, C0 = activePattern.C(x, y);
+                let chladniForceX = -C0 * ((activePattern.C(x + h, y) - C0) / h) * CHLADNI_STRENGTH;
+                let chladniForceY = -C0 * ((activePattern.C(x, y + h) - C0) / h) * CHLADNI_STRENGTH;
+                let blend = Math.min(1.0, Math.max(0.0, (distNormalized - 1.25) / 0.35));
+
+                velocities[i * 3] += shapeForceX * (1.0 - blend) + chladniForceX * blend;
+                velocities[i * 3 + 1] += shapeForceY * (1.0 - blend) + chladniForceY * blend;
+                velocities[i * 3 + 2] -= z * 0.08;
+
+                let dx = x - mouseX, dy = y - mouseY, dz = z;
+                let distMouse = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                let vortexRadius = 3.0; // Retro vortex bit wider
+
+                if (distMouse < vortexRadius && speed > 0.001) {
+                    let falloff = Math.pow(1.0 - (distMouse / vortexRadius), 2);
+                    let cx = dirY * dz, cy = -dirX * dz, cz = dirX * dy - dirY * dx;
+                    let cMag = Math.sqrt(cx * cx + cy * cy + cz * cz) || 1;
+
+                    velocities[i * 3] += (cx / cMag) * falloff * swirlForce - dirX * falloff * wakeForce - (dx / distMouse) * falloff * 2.0;
+                    velocities[i * 3 + 1] += (cy / cMag) * falloff * swirlForce - dirY * falloff * wakeForce - (dy / distMouse) * falloff * 2.0;
+                    velocities[i * 3 + 2] += (cz / cMag) * falloff * swirlForce + (Math.random() - 0.5) * falloff * swirlForce * 0.5 - (dz / distMouse) * falloff * 2.0;
+                }
+
+                let distCenter = Math.sqrt(x * x + y * y);
+                if (distCenter > BASIN_RADIUS) {
+                    let pull = (distCenter - BASIN_RADIUS) * 0.06;
+                    velocities[i * 3] -= (x / distCenter) * pull; velocities[i * 3 + 1] -= (y / distCenter) * pull;
+                }
+
+                velocities[i * 3] += (Math.random() - 0.5) * 0.12; velocities[i * 3 + 1] += (Math.random() - 0.5) * 0.12; velocities[i * 3 + 2] += (Math.random() - 0.5) * 0.12;
+                velocities[i * 3] *= currentFriction; velocities[i * 3 + 1] *= currentFriction; velocities[i * 3 + 2] *= currentFriction;
+
+                posArray[i * 3] += velocities[i * 3]; posArray[i * 3 + 1] += velocities[i * 3 + 1]; posArray[i * 3 + 2] += velocities[i * 3 + 2];
+            }
+            geometry.attributes.position.needsUpdate = true; renderer.render(scene, camera);
+        }
+
+        window.onload = function () {
+            animate();
+        }
+    </script>
+</body>
+
+</html>
