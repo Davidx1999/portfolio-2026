@@ -41,32 +41,59 @@ export function LoadingScreen({ onComplete }) {
   return (
     <motion.div
       key="loader"
-      initial={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.5, ease: 'easeInOut' }}
-      className="fixed inset-0 z-[100] bg-[#000000] overflow-hidden select-none"
+      className="fixed inset-0 z-[100] overflow-hidden select-none"
     >
-      {/* Background Image */}
-      <div className="absolute inset-0 z-0">
-        <img
-          src={`${import.meta.env.BASE_URL}assets//BG/LoadingScreen16por9.png`}
-          alt=""
-          className="w-full h-full object-cover pointer-events-none select-none"
-        />
-      </div>
+      {/* Top Panel (0 to 50vh) */}
+      <motion.div
+        initial={{ y: 0 }}
+        exit={{ y: "-100%" }}
+        transition={{ duration: 0.9, ease: [0.85, 0, 0.15, 1] }}
+        className="absolute top-0 left-0 right-0 h-[50vh] overflow-hidden bg-[#000000] z-0"
+      >
+        {/* Full-height background image anchored to the top of the viewport */}
+        <div className="absolute top-0 left-0 w-full h-[100vh]">
+          <img
+            src={`${import.meta.env.BASE_URL}assets/BG/LoadingScreen16por9.png`}
+            alt=""
+            className="w-full h-full object-cover pointer-events-none select-none"
+          />
+        </div>
+      </motion.div>
+
+      {/* Bottom Panel (50vh to 100vh) */}
+      <motion.div
+        initial={{ y: 0 }}
+        exit={{ y: "100%" }}
+        transition={{ duration: 0.9, ease: [0.85, 0, 0.15, 1] }}
+        className="absolute bottom-0 left-0 right-0 h-[50vh] overflow-hidden bg-[#000000] z-0"
+      >
+        {/* Full-height background image anchored to the bottom of the viewport */}
+        <div className="absolute bottom-0 left-0 w-full h-[100vh]">
+          <img
+            src={`${import.meta.env.BASE_URL}assets/BG/LoadingScreen16por9.png`}
+            alt=""
+            className="w-full h-full object-cover pointer-events-none select-none"
+          />
+        </div>
+      </motion.div>
 
       {/* Loading Content Box, anchored at exactly 50vh (viewport center) */}
-      <div className="absolute top-[50vh] left-1/2 -translate-x-1/2 -translate-y-56 z-10 flex flex-col items-center w-full max-w-[640px] px-6">
+      <motion.div
+        initial={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
+        className="absolute top-[50vh] left-1/2 -translate-x-1/2 -translate-y-56 z-10 flex flex-col items-center w-full max-w-[640px] px-6"
+      >
 
         {/* Name Logo: Semi-opaque base + full-color fill layer, shifted up by half its height to align center to 50vh */}
         <div className="relative w-[280px] md:w-[640px] lg:w-[480px]">
 
           {/* Logo aligned to top-right of the /David/my_name.png wrapper */}
-          <div className="absolute top-0 right-0 z-20">
+          <div className="absolute top-0 right-2 z-20">
             <img
               src={`${import.meta.env.BASE_URL}assets/logo.png`}
               alt="Logo"
-              className="h-8 md:h-10 w-auto object-contain pointer-events-none select-none"
+              className="h-10 md:h-12 w-auto object-contain pointer-events-none select-none"
             />
           </div>
 
@@ -158,7 +185,7 @@ export function LoadingScreen({ onComplete }) {
           </AnimatePresence>
         </div>
 
-      </div>
+      </motion.div>
     </motion.div>
   );
 }

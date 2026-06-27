@@ -152,6 +152,18 @@
   --font-serif: 'Libre Baskerville', Georgia, serif;
   --font-sans: 'Geist', system-ui, -apple-system, sans-serif;
   --font-mono: 'Geist Mono', monospace;
+
+  /* Fluid Typography */
+  --font-size-title-h1: clamp(2.5rem, 5.5vw, 4rem);     /* 40px mobile -> 64px desktop */
+  --font-size-title-h2: clamp(2rem, 4.5vw, 3rem);       /* 32px mobile -> 48px desktop */
+  --font-size-title-h3: clamp(1.5rem, 3vw, 2rem);       /* 24px mobile -> 32px desktop */
+  
+  --font-size-subtitle-lg: clamp(1.25rem, 2.5vw, 2rem); /* 20px mobile -> 32px desktop */
+  --font-size-subtitle-sm: clamp(1.125rem, 1.5vw, 1.25rem); /* 18px mobile -> 20px desktop */
+  
+  --font-size-body-lg: clamp(1rem, 1.25vw, 1.125rem);   /* 16px mobile -> 18px desktop */
+  --font-size-body-base: clamp(0.875rem, 1vw, 1rem);    /* 14px mobile -> 16px desktop */
+  --font-size-body-sm: 0.875rem;                        /* 14px constant */
 }
 
 @layer base {
@@ -268,4 +280,93 @@ hr {
 .style-spin.open .bar:nth-child(3) {
   top: 50%;
   transform: translateY(-50%) rotate(-45deg);
+}
+
+/* ---------------------------------------------
+ * LOGO ANIMATING CROP  (increased)
+ * --------------------------------------------- */
+.logo-crop-container {
+  width: 34px;
+  height: 32px;
+  overflow: hidden;
+  position: relative;
+  transition: width 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.logo-crop-container.expanded {
+  width: 218px;
+}
+
+@media (min-width: 768px) {
+  .logo-crop-container {
+    width: 40px;
+    height: 38px;
+  }
+  .logo-crop-container.expanded {
+    width: 259px;
+  }
+}
+
+/* ---------------------------------------------
+ * ABOUT PAGE FULL-BLEED STRETCH UTILITIES
+ * --------------------------------------------- */
+.about-full-bleed-skills {
+  margin-left: -16px;
+  margin-right: -16px;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+@media (min-width: 768px) {
+  .about-full-bleed-skills {
+    margin-left: calc(24px - 16vw);
+    margin-right: calc(24px - 16vw);
+    padding-left: calc(16vw - 24px);
+    padding-right: calc(16vw - 24px);
+  }
+}
+@media (min-width: 1024px) {
+  .about-full-bleed-skills {
+    margin-left: calc(24px - 16vw);
+    margin-right: 0;
+    padding-left: calc(16vw - 24px);
+    padding-right: 2rem;
+  }
+}
+
+.about-full-bleed-tools {
+  margin-left: -16px;
+  margin-right: -16px;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+@media (min-width: 768px) {
+  .about-full-bleed-tools {
+    margin-left: calc(24px - 16vw);
+    margin-right: calc(24px - 16vw);
+    padding-left: calc(16vw - 24px);
+    padding-right: calc(16vw - 24px);
+  }
+}
+@media (min-width: 1024px) {
+  .about-full-bleed-tools {
+    margin-left: 0;
+    margin-right: calc(24px - 16vw);
+    padding-left: 2rem;
+    padding-right: calc(16vw - 24px);
+  }
+}
+
+/* ---------------------------------------------
+ * IDLE PULSE / GROW ANIMATION
+ * --------------------------------------------- */
+@keyframes idle-grow {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+.animate-idle-grow {
+  animation: idle-grow 4s ease-in-out infinite;
 }

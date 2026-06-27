@@ -38,7 +38,7 @@ export function FocuslyCase() {
             {/* Left Column: Heading, subtitle, summary */}
             <div className="flex flex-col gap-6">
               <div className="relative">
-                <h1 className="text-6xl md:text-7xl lg:text-[7rem] font-extrabold text-neutral-carvao leading-[0.8] tracking-tighter uppercase font-sans select-none">
+                <h1 className="text-title-h1 font-extrabold text-neutral-carvao leading-[0.8] tracking-tighter uppercase font-sans select-none">
                   Focusly
                 </h1>
                 <div className="text-[var(--color-lime-500)] mt-2">
@@ -55,7 +55,7 @@ export function FocuslyCase() {
                 <span className="font-sans text-lg font-bold text-neutral-carvao/60 block mt-3 uppercase tracking-wider">Productivity App</span>
               </div>
 
-              <h2 className="text-xl md:text-2xl lg:text-3xl font-extrabold text-neutral-carvao leading-snug tracking-tight uppercase max-w-xl font-sans">
+              <h2 className="text-title-h3 font-extrabold text-neutral-carvao leading-snug tracking-tight uppercase max-w-xl font-sans">
                 A clean and motivating <span className="text-[#E6A045]">productivity app</span> that helps users <span className="text-[#8b7ec8]">build better routines</span> and stay focused.
               </h2>
 
@@ -65,7 +65,7 @@ export function FocuslyCase() {
                   Project Summary
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-8">
-                  <p className="font-sans text-sm text-neutral-carvao/75 leading-relaxed">
+                  <p className="font-sans text-body-base text-neutral-carvao/75 leading-relaxed">
                     Focusly is a productivity mobile app designed to help users plan their day, minimize distractions, and build consistent habits. The app combines simple planning, timed focus sessions, and insightful analytics in a clean, motivating experience that promotes clarity and progress.
                   </p>
                   
@@ -117,7 +117,7 @@ export function FocuslyCase() {
               <h3 className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-neutral-carvao/45">
                 Overview
               </h3>
-              <p className="font-sans text-sm text-neutral-carvao/75 leading-relaxed">
+              <p className="font-sans text-body-base text-neutral-carvao/75 leading-relaxed">
                 Focusly was created to solve a common problem: most productivity tools are either too complex or not motivating enough to use daily. The goal was to design a minimal, engaging app that helps users plan with intention, stay focused, and reflect on progress.
               </p>
               <div className="border border-neutral-carvao/10 rounded-[2px] overflow-hidden aspect-video w-full shadow-sm">
@@ -130,7 +130,7 @@ export function FocuslyCase() {
               <h3 className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-neutral-carvao/45">
                 The Challenge
               </h3>
-              <p className="font-sans text-sm text-neutral-carvao/75 leading-relaxed">
+              <p className="font-sans text-body-base text-neutral-carvao/75 leading-relaxed">
                 Users struggle to maintain focus in a world of constant distractions. Existing apps overwhelm with features, complex workflows, and lack of emotional connection—leading to low retention and inconsistent use.
               </p>
               {/* Highlight Challenge Box */}
@@ -227,7 +227,7 @@ export function FocuslyCase() {
                 <h3 className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-[#8b7ec8]">
                   Design System
                 </h3>
-                <p className="font-sans text-xs text-neutral-carvao/75 leading-relaxed">
+                <p className="font-sans text-body-sm text-neutral-carvao/75 leading-relaxed">
                   A cohesive system built for clarity, consistency and calm. Includes:
                 </p>
               </div>
@@ -388,7 +388,7 @@ export function FocuslyCase() {
                   <div className="flex items-baseline gap-2">
                     <span className="font-sans font-extrabold text-3xl text-neutral-carvao leading-none">{stat.val}</span>
                   </div>
-                  <p className="font-sans text-xs text-neutral-carvao/75 leading-relaxed mt-1">{stat.text}</p>
+                  <p className="font-sans text-body-sm text-neutral-carvao/75 leading-relaxed mt-1">{stat.text}</p>
                 </div>
               ))}
             </div>
@@ -396,7 +396,7 @@ export function FocuslyCase() {
             {/* Quote Block */}
             <div className="bg-[#B3A0E6]/5 border border-neutral-carvao/10 p-6 md:p-8 rounded-[2px] flex flex-col gap-4 relative shadow-sm">
               <span className="font-serif text-[4rem] text-[#8b7ec8]/20 leading-none absolute top-2 left-4 select-none">“</span>
-              <p className="font-sans text-sm italic text-neutral-carvao/80 leading-relaxed pt-4 pl-4 z-10 relative">
+              <p className="font-sans text-body-base italic text-neutral-carvao/80 leading-relaxed pt-4 pl-4 z-10 relative">
                 Focusly has completely changed how I work. It's simple, beautiful, and helps me actually get things done.
               </p>
               <div className="flex items-center gap-3 pl-4 mt-2">
@@ -420,9 +420,9 @@ export function FocuslyCase() {
             <div className="p-8 bg-[#B3A0E6]/10 flex flex-col justify-between gap-6 border-b md:border-b-0 border-neutral-carvao/10">
               <div className="flex flex-col gap-2">
                 <span className="font-mono text-[8px] uppercase tracking-widest text-neutral-carvao/45 font-bold">Finished Reading?</span>
-                <h4 className="font-sans font-extrabold text-2xl text-neutral-carvao uppercase tracking-tight">What's Next?</h4>
+                <h4 className="font-sans font-extrabold text-title-h3 text-neutral-carvao uppercase tracking-tight">What's Next?</h4>
               </div>
-              <p className="font-sans text-xs text-neutral-carvao/70 leading-relaxed">
+              <p className="font-sans text-body-sm text-neutral-carvao/70 leading-relaxed">
                 Take a look at other digital products designed for agencies and tech brands.
               </p>
             </div>
@@ -433,7 +433,7 @@ export function FocuslyCase() {
                 <span className="font-mono text-[8px] uppercase tracking-widest text-[#E6A045] font-bold">Next Project</span>
                 <Link
                   to="/project/forma-studio"
-                  className="font-sans font-extrabold text-lg md:text-xl text-neutral-carvao uppercase tracking-tight hover:text-[var(--color-primary)] transition-colors leading-tight"
+                  className="font-sans font-extrabold text-subtitle-sm text-neutral-carvao uppercase tracking-tight hover:text-[var(--color-primary)] transition-colors leading-tight"
                 >
                   Forma Studio
                   <span className="font-sans text-xs text-neutral-carvao/50 block font-normal normal-case mt-0.5">Design Agency Website</span>
