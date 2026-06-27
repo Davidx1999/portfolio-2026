@@ -47,20 +47,12 @@ function TagsCard() {
 function HandCard() {
   return (
     <div className="rounded-[1px] bg-neutral-branco border border-neutral-carvao/10 flex items-center justify-center overflow-hidden relative group w-full h-full">
-      <div className="absolute inset-0 opacity-[0.06] bg-[radial-gradient(#1a1a1a_1px,transparent_1px)] [background-size:6px_6px]" />
-      {/* Technical SVG Hand/Pencil illustration */}
-      <svg className="w-20 h-20 text-neutral-carvao/70 z-10 transition-transform duration-500 group-hover:rotate-3" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.5">
-        {/* Paper line */}
-        <line x1="10" y1="80" x2="90" y2="80" strokeDasharray="3 3" />
-        {/* Drafting grid */}
-        <path d="M20 20h60v60H20z" strokeWidth="0.7" strokeDasharray="1 4" />
-        {/* Pencil */}
-        <path d="M65 25 L75 35 L40 70 L30 70 L30 60 Z" />
-        <path d="M30 70 L33 60 M30 70 L40 67" />
-        <path d="M70 30 L60 40 M65 35 L55 45" />
-        {/* Wavy drawing line */}
-        <path d="M10 80 Q 25 65 30 70" strokeWidth="2" strokeLinecap="round" />
-      </svg>
+      <div className="absolute inset-0 opacity-[0.06] bg-[radial-gradient(#1a1a1a_1px,transparent_1px)] [background-size:6px_6px] z-10" />
+      <img
+        src={`${import.meta.env.BASE_URL}assets/apoio/hand_sketching.png`}
+        alt="Hand sketching"
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%+48px)] h-[calc(100%+48px)] max-w-none object-cover transition-transform duration-500 group-hover:scale-105"
+      />
     </div>
   );
 }

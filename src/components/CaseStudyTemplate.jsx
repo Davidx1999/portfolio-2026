@@ -1,19 +1,23 @@
 import { motion } from 'framer-motion';
 import { ExternalLink, MoveLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { MagneticTextLink } from './Buttons';
 
 export function CaseStudyTemplate({ title, subtitle, tags, liveLink, image, challenge, solution, process }) {
   return (
-    <main className="min-h-screen w-full pt-32 pb-24 px-6 md:px-24 bg-background">
-      <div className="max-w-5xl mx-auto">
+    <main className="min-h-screen w-full pt-32 pb-24 px-4 md:px-[calc(16%-24px)] bg-background">
+      <div className="w-full">
         
         {/* Back Button */}
-        <Link 
+        <MagneticTextLink 
+          as={Link}
           to="/projects" 
-          className="inline-flex items-center gap-2 text-neutral-carvao/60 hover:text-primary transition-colors mb-12 font-mono text-xs uppercase tracking-widest font-semibold"
+          theme="dark"
+          className="mb-12"
         >
-          <MoveLeft size={14} /> Back to Projects
-        </Link>
+          <MoveLeft size={14} className="transform transition-transform duration-300 group-hover/link:-translate-x-1" />
+          Back to Projects
+        </MagneticTextLink>
 
         {/* Header do Projeto */}
         <header className="mb-16">
@@ -87,7 +91,16 @@ export function CaseStudyTemplate({ title, subtitle, tags, liveLink, image, chal
           className="w-full h-[50vh] md:h-[70vh] rounded-2xl bg-white border border-neutral-carvao/10 flex flex-col items-center justify-center mb-20 overflow-hidden relative group shadow-sm"
         >
           {image ? (
-            <img src={image} alt={title} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-all duration-700" />
+            <>
+              <img src={image} alt={title} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-all duration-700" />
+              <div 
+                className="absolute inset-0 pointer-events-none opacity-[0.05] mix-blend-overlay bg-repeat z-10"
+                style={{ 
+                  backgroundImage: `url('${import.meta.env.BASE_URL}assets/Textures/texture.png')`, 
+                  backgroundSize: '120px 120px' 
+                }}
+              />
+            </>
           ) : (
             <>
               <div className="absolute inset-0 bg-gradient-to-tr from-neutral-carvao/5 to-transparent opacity-50 mix-blend-overlay"></div>
@@ -100,7 +113,7 @@ export function CaseStudyTemplate({ title, subtitle, tags, liveLink, image, chal
         </motion.div>
 
         {/* Corpo do Case */}
-        <article className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 max-w-5xl">
+        <article className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 w-full">
           
           <div className="md:col-span-4">
             <h2 className="text-xl md:text-2xl font-serif font-bold tracking-tight md:sticky md:top-32 text-neutral-carvao">

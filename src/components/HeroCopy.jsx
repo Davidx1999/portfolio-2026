@@ -3,10 +3,13 @@ import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { Planet } from '@phosphor-icons/react';
 import { AsymmetricDrawerButton, TagPillButton, RotatingStamp, TextButton, LimeActionButton } from './Buttons';
+import { useLanguage } from '../context/LanguageContext';
 
 const PlanetIcon = (props) => <Planet {...props} weight="duotone" />;
 
 export function HeroCopy() {
+  const { t } = useLanguage();
+
   return (
     <div className="flex flex-col justify-between lg:h-full relative pr-4">
       {/* Top Star Ornament */}
@@ -24,9 +27,8 @@ export function HeroCopy() {
       {/* RotatingStamp in place of Top Star Ornament */}
       <div className="absolute -top-0 left-52 md:left-84 z-20">
         <RotatingStamp
-          as={Link}
-          to="/about"
-          text="Beyond the master designer • Beyond the master designer •"
+          as="div"
+          text={t('hero_stamp')}
           icon={PlanetIcon}
         />
       </div>
@@ -36,7 +38,7 @@ export function HeroCopy() {
           <h1 className="font-sans text-neutral-carvao">
             <span className="sr-only">David Salviano</span>
             <img
-              src={`${import.meta.env.BASE_URL}assets//David/my_name_lime.png`}
+              src={`${import.meta.env.BASE_URL}assets//David/my_name_purple.png`}
               alt="David Salviano"
               className="w-[280px] md:w-[340px] lg:w-[380px] xl:w-[420px] h-auto object-contain block"
             />
@@ -52,18 +54,19 @@ export function HeroCopy() {
 
         {/* Editorial Hook with Star Ornament */}
         <div className="relative mb-4 xl:mb-6">
-          <h2 className="font-serif text-[1.8rem] md:text-[1.8rem] lg:text-[2rem] xl:text-[3.2rem] leading-[1.1] text-neutral-carvao font-normal max-w-xl">
-            Editorial digital experiences with{' '}
+          <h1 className="font-serif text-[2.75rem] md:text-[3rem] lg:text-[3.25rem] font-bold leading-[1.1] text-neutral-carvao max-w-3xl">
+            {t('hero_title_editorial')}{' '}
+            {t('hero_title_with')}{' '}
             <span className="relative inline-block text-semantic-red italic font-semibold">
-              clarity
+              {t('hero_title_clarity')}
               <span className="absolute bottom-1 left-0 right-0 h-[1.5px] bg-semantic-red" />
             </span>{' '}
-            and{' '}
+            {t('hero_title_and')}{' '}
             <span className="relative inline-block text-semantic-red italic font-semibold">
-              personality
+              {t('hero_title_personality')}
               <span className="absolute bottom-1 left-0 right-0 h-[1.5px] bg-semantic-red" />
             </span>
-          </h2>
+          </h1>
 
           {/* Right Side Star Ornament */}
           <div className="absolute top-12 -right-4 md:-right-8 pointer-events-none select-none">
@@ -76,8 +79,8 @@ export function HeroCopy() {
         <hr className="w-full max-w-xl mb-4 xl:mb-6" />
 
         {/* Body description */}
-        <p className="font-sans text-neutral-carvao/75 text-[14px] md:text-[15px] xl:text-[16px] max-w-[48ch] leading-relaxed mb-6 xl:mb-10">
-          UI/UX designer crafting intuitive, accessible and impactful digital products for forwards-thinking brands and startups
+        <p className="font-sans text-neutral-carvao/75 text-body-base max-w-[48ch] leading-relaxed mb-6 xl:mb-10">
+          {t('hero_description')}
         </p>
 
         {/* Tags section under copy 
@@ -95,20 +98,11 @@ export function HeroCopy() {
           as={motion.a}
           href="#projects"
           icon={ArrowRight}
-          theme="purple"
-          variant="primary"
+          theme="lime"
+          variant="secondary"
         >
-          View my work
+          {t('hero_cta')}
         </AsymmetricDrawerButton>
-
-        {/* ABOUT ME Link */}
-        <LimeActionButton
-          as={motion(Link)}
-          to="/about"
-          icon={PlanetIcon}
-        >
-          About me
-        </LimeActionButton>
       </div>
     </div>
   );

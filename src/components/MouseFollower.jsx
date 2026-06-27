@@ -7,6 +7,8 @@ const SLANT_ANGLE = 0;
 const MIN_THICKNESS_RATIO = 0.12; // 88% calligraphic contrast (1 - 0.12 = 0.88)
 const TAIL_COLOR = 'var(--color-secondary)';
 const HOVER_BG_COLOR = 'var(--color-secondary)';
+const FEATURED_BTN_BG = '#B6A9ED';   // light purple hover – injected by mouse follower on featured cards
+const FEATURED_BTN_FG = '#ffffff';   // white text when purple
 
 export function MouseFollower() {
   const pathRef = useRef(null);
@@ -30,7 +32,7 @@ export function MouseFollower() {
     const revertBtnState = (el, type) => {
       if (!el) return;
       el.style.color = el.dataset.oldColor || '';
-      if (type === 'primary') {
+      if (type === 'primary' || type === 'featured') {
         el.style.backgroundColor = el.dataset.oldBg || '';
         el.style.removeProperty('--ring-border-color');
         animate(el, {
@@ -69,6 +71,28 @@ export function MouseFollower() {
           duration: 600,
           ease: 'outExpo'
         });
+      } else if (type === 'featured') {
+        // Purple injection for featured work card buttons
+        el.style.color = FEATURED_BTN_FG;
+        el.style.backgroundColor = FEATURED_BTN_BG;
+        el.style.setProperty('--ring-border-color', FEATURED_BTN_BG);
+
+        el.dataset.injected = "true";
+
+        utils.set(el, {
+          '--btn-y': '0px',
+          '--ring-scale': '0',
+          '--ring-opacity': '0',
+          translateY: () => 'var(--btn-y)'
+        });
+
+        animate(el, {
+          '--btn-y': '0px',
+          '--ring-scale': '1.3',
+          '--ring-opacity': '0.3',
+          duration: 600,
+          ease: 'outExpo'
+        });
       } else {
         el.style.color = HOVER_BG_COLOR;
       }
@@ -86,19 +110,9 @@ export function MouseFollower() {
       mouse.x = e.clientX;
       mouse.y = e.clientY;
 
-      const directHover = e.target.closest('a, button, [role="button"]');
-      const magneticCard = e.target.closest('[data-magnetic-card]');
-
+      // The user requested to remove the action of the mouse arrow filling the buttons.
+      // We set targetEl = null so the worm simply follows the cursor without magnetically attaching.
       let targetEl = null;
-
-      // Decide which element we are magnetically pulling towards
-      if (directHover && !directHover.hasAttribute('data-magnetic-card')) {
-        targetEl = directHover;
-      } else if (magneticCard) {
-        targetEl = magneticCard.querySelector('a, button, [data-magnetic-button]');
-      } else if (directHover) { // fallback
-        targetEl = directHover;
-      }
 
       if (targetEl && hoverState.el !== targetEl) {
         // Clear previous targeting 
@@ -106,13 +120,16 @@ export function MouseFollower() {
           revertBtnState(hoverState.el, hoverState.type);
         }
 
-        const isSecondary = targetEl.getAttribute('data-cursor') === 'secondary' ||
+        const isFeaturedBtn = targetEl.hasAttribute('data-magnetic-button');
+        const isSecondary = !isFeaturedBtn && (
+          targetEl.getAttribute('data-cursor') === 'secondary' ||
           targetEl.closest('nav') !== null ||
           targetEl.className.includes('underline') ||
-          (window.getComputedStyle(targetEl).backgroundColor === 'rgba(0, 0, 0, 0)' && !targetEl.className.includes('bg-'));
+          (window.getComputedStyle(targetEl).backgroundColor === 'rgba(0, 0, 0, 0)' && !targetEl.className.includes('bg-'))
+        );
 
         hoverState.el = targetEl;
-        hoverState.type = isSecondary ? 'secondary' : 'primary';
+        hoverState.type = isFeaturedBtn ? 'featured' : (isSecondary ? 'secondary' : 'primary');
         hoverState.isTargeting = true;
         hoverState.hasInjected = false;
 

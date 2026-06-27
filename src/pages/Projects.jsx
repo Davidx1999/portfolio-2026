@@ -155,6 +155,51 @@ export function Projects() {
           </div>
         );
       default:
+        if (project.image) {
+          const isNoGrayscale = project.id === 'vincenzo' || project.id === 'focusly';
+          const hasHoverImage = !!project.imageHover;
+          
+          return (
+            <div className="absolute inset-y-0 right-0 w-[55%] h-full overflow-hidden border-l border-neutral-carvao/10 select-none relative group/img bg-neutral-carvao/5">
+              {hasHoverImage ? (
+                <>
+                  {/* Base Image */}
+                  <img
+                    src={project.image}
+                    alt={project.title}
+                    className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-700 ease-out ${
+                      isNoGrayscale ? '' : 'grayscale group-hover/card:grayscale-0'
+                    } group-hover/card:opacity-0 scale-100 group-hover/card:scale-[1.02]`}
+                  />
+                  {/* Hover Image */}
+                  <img
+                    src={project.imageHover}
+                    alt={`${project.title} hover`}
+                    className={`w-full h-full object-cover absolute inset-0 opacity-0 transition-all duration-700 ease-out ${
+                      isNoGrayscale ? '' : 'grayscale group-hover/card:grayscale-0'
+                    } group-hover/card:opacity-100 scale-[1.01] group-hover/card:scale-[1.02]`}
+                  />
+                </>
+              ) : (
+                <img
+                  src={project.image}
+                  alt={project.title}
+                  className={`w-full h-full object-cover ${
+                    isNoGrayscale ? '' : 'grayscale group-hover/card:grayscale-0'
+                  } transition-all duration-750 ease-out scale-100 group-hover/card:scale-[1.02]`}
+                />
+              )}
+              {/* Repeating paper texture overlay */}
+              <div 
+                className="absolute inset-0 pointer-events-none opacity-[0.06] mix-blend-overlay bg-repeat z-10"
+                style={{ 
+                  backgroundImage: `url('${import.meta.env.BASE_URL}assets/Textures/texture.png')`, 
+                  backgroundSize: '120px 120px' 
+                }}
+              />
+            </div>
+          );
+        }
         return null;
     }
   };
@@ -169,7 +214,7 @@ export function Projects() {
       >
         {/* Row 1: Hero */}
         <div className="w-full border-b border-neutral-carvao/10">
-          <div className="px-6 md:px-[16%] py-12 md:py-16 grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-12 items-center">
+          <div className="px-4 md:px-[calc(16%-24px)] py-12 md:py-16 grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-12 items-center">
             {/* Left side */}
             <div className="flex flex-col gap-6">
               <div className="relative">
@@ -181,7 +226,7 @@ export function Projects() {
               </div>
 
               <div className="relative">
-                <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-neutral-carvao leading-snug tracking-tight uppercase max-w-xl font-sans">
+                <h2 className="text-title-h2 font-extrabold text-neutral-carvao leading-snug tracking-tight uppercase max-w-xl font-sans">
                   A space for <span className="text-[#E6A045]">experimentation</span>, curiosity and <span className="text-[var(--color-primary)]">creative play.</span>
                 </h2>
                 <svg className="absolute -right-8 top-0 w-6 h-6 text-neutral-carvao/30 hidden sm:block animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
@@ -189,7 +234,7 @@ export function Projects() {
                 </svg>
               </div>
 
-              <p className="text-sm md:text-base text-neutral-carvao/75 max-w-lg leading-relaxed font-sans">
+              <p className="text-body-lg text-neutral-carvao/75 max-w-lg leading-relaxed font-sans">
                 Ideas in progress. Visual experiments, motion studies, type explorations and early prototypes. Where direction starts to take shape.
               </p>
 
@@ -271,7 +316,7 @@ export function Projects() {
 
         {/* Row 2: Filters and Grid of Cards */}
         <div className="w-full border-b border-neutral-carvao/10">
-          <div className="px-6 md:px-[16%] py-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="px-4 md:px-[calc(16%-24px)] py-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             {/* Filter Tabs */}
             <div className="flex flex-wrap gap-2 items-center">
               {["ALL EXPERIMENTS", "MOTION", "TYPE", "POSTERS", "INTERACTIONS", "CODE EXPERIMENTS", "PROTOTYPES"].map((tab) => (
@@ -297,7 +342,7 @@ export function Projects() {
           </div>
 
           {/* Playground Bento Grid */}
-          <div className="px-6 md:px-[16%] pb-16 w-full">
+          <div className="px-4 md:px-[calc(16%-24px)] pb-16 w-full">
             <motion.div
               variants={containerVariants}
               initial="hidden"
@@ -317,10 +362,10 @@ export function Projects() {
                       <span className="font-mono text-[8px] uppercase tracking-widest text-[#8b7ec8] font-bold">
                         {p.category}
                       </span>
-                      <h3 className="font-sans font-bold text-sm text-neutral-carvao uppercase tracking-tight leading-none group-hover:text-[var(--color-primary)] transition-colors">
+                      <h3 className="font-sans font-bold text-title-h3 text-neutral-carvao uppercase tracking-tight leading-none group-hover:text-[var(--color-primary)] transition-colors">
                         {p.title}
                       </h3>
-                      <p className="font-sans text-[10px] text-neutral-carvao/60 mt-2 leading-relaxed line-clamp-3">
+                      <p className="font-sans text-body-sm text-neutral-carvao/60 mt-2 leading-relaxed line-clamp-3">
                         {p.description}
                       </p>
                     </div>
@@ -344,7 +389,7 @@ export function Projects() {
         </div>
 
         {/* Row 3: Featured Experiment */}
-        <div className="w-full border-b border-neutral-carvao/10 py-16 px-6 md:px-[16%]">
+        <div className="w-full border-b border-neutral-carvao/10 py-16 px-4 md:px-[calc(16%-24px)]">
           <div className="flex items-center gap-2 mb-6">
             <span className="w-2 h-2 rounded-full bg-[var(--color-lime-500)]" />
             <h3 className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-neutral-carvao/45">
@@ -360,12 +405,12 @@ export function Projects() {
                   Interactions
                 </span>
                 <div className="flex flex-col gap-2">
-                  <h4 className="font-sans font-extrabold text-2xl text-neutral-carvao uppercase tracking-tight leading-none">
+                  <h4 className="font-sans font-extrabold text-title-h3 text-neutral-carvao uppercase tracking-tight leading-none">
                     Fluid Grid
                   </h4>
-                  <span className="font-sans text-sm font-medium text-neutral-carvao/60">Interface Concept</span>
+                  <span className="font-sans text-body-sm font-medium text-neutral-carvao/60">Interface Concept</span>
                 </div>
-                <p className="font-sans text-xs text-neutral-carvao/75 leading-relaxed">
+                <p className="font-sans text-body-base text-neutral-carvao/75 leading-relaxed">
                   An interface concept that adapts, reflows and rethinks structure in real time. Built to explore responsive component boundaries.
                 </p>
               </div>
@@ -423,13 +468,13 @@ export function Projects() {
         </div>
 
         {/* Row 4: bottom CTA banner */}
-        <div className="w-full px-6 md:px-[16%] py-12">
+        <div className="w-full px-4 md:px-[calc(16%-24px)] py-12">
           <div className="bg-[#B3A0E6]/5 border border-neutral-carvao/10 rounded-sm relative overflow-hidden flex flex-col lg:flex-row items-center justify-between p-8 md:p-12 gap-8 shadow-sm">
             <div className="flex flex-col gap-3 max-w-lg text-center lg:text-left">
-              <h3 className="font-sans font-extrabold text-2xl text-neutral-carvao leading-none uppercase tracking-tight">
+              <h3 className="font-sans font-extrabold text-title-h2 text-neutral-carvao leading-none uppercase tracking-tight">
                 There's always <span className="text-[#E6A045]">more</span> to explore.
               </h3>
-              <p className="font-sans text-xs md:text-sm text-neutral-carvao/70 leading-relaxed">
+              <p className="font-sans text-body-base text-neutral-carvao/70 leading-relaxed">
                 New experiments, ideas and prototypes are always in the works. Let's build something great together.
               </p>
             </div>

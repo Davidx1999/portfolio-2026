@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useLanguage } from '../context/LanguageContext';
 
 const steps = [
   {
@@ -82,6 +83,7 @@ const DashedArrow = () => (
 );
 
 export function MyApproach() {
+  const { t } = useLanguage();
   const containerVariants = {
     hidden: { opacity: 0 },
     show: {
@@ -106,7 +108,7 @@ export function MyApproach() {
   };
 
   return (
-    <section id="approach" className="w-full bg-[var(--color-background)] px-6 md:px-[16%] py-16 md:py-24 border-t border-neutral-carvao/10">
+    <section id="approach" className="w-full bg-white px-0 md:px-[calc(16%-24px)] py-16 md:py-24 border-t border-neutral-carvao/10 mt-[40px]">
       <motion.div
         variants={containerVariants}
         initial="hidden"
@@ -118,11 +120,11 @@ export function MyApproach() {
         <motion.div variants={itemVariants} className="w-full lg:w-[28%] flex flex-col gap-4">
             <img 
               src={`${import.meta.env.BASE_URL}assets/titles/my_approach.png`} 
-              alt="My Approach" 
+              alt={t('approach_title_alt')} 
               className="w-full max-w-[240px] h-auto object-contain select-none"
             />
           <p className="text-sm md:text-base text-neutral-carvao/75 max-w-xs mt-2 leading-relaxed">
-            A thoughtful process that balances strategy, creativity and empathy to create experiences that connect.
+            {t('approach_description')}
           </p>
         </motion.div>
 
@@ -144,11 +146,11 @@ export function MyApproach() {
                 </div>
                 {/* Title */}
                 <h3 className="font-sans font-bold text-sm tracking-wider uppercase text-neutral-carvao mb-2">
-                  {step.title}
+                  {t('approach_step_' + step.number + '_title')}
                 </h3>
                 {/* Description */}
                 <p className="font-sans text-xs text-neutral-carvao/70 leading-relaxed">
-                  {step.description}
+                  {t('approach_step_' + step.number + '_desc')}
                 </p>
               </motion.div>
               {idx < steps.length - 1 && <DashedArrow />}

@@ -8,7 +8,7 @@ export function Vincenzo() {
       title="Vincenzo Data Science" 
       subtitle="A high-exclusivity interactive portfolio built on stretched architecture and an 80s-inspired shell terminal simulator, integrating matrix visualization for Big Data."
       tags={['Interface Engineering', '2023', 'Retro Terminal', 'Data Science']} 
-      image={vincenzoImg}
+      image={`${import.meta.env.BASE_URL}assets/projects_cape/vincenzo_cape.png`}
       liveLink={`${import.meta.env.BASE_URL}vincenzosite/teste.html`}
       challenge="The goal was to create a digital environment that felt like a secret terminal from the 80s, but with modern performance and the ability to visualize massive data streams in an artistic way. The user needed to feel the 'weight' of the data."
       solution={

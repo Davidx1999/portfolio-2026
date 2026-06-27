@@ -1,8 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ArrowUpRight } from 'lucide-react';
-import { LimeActionButton, RotatingStamp } from '../components/Buttons';
+import { ArrowUpRight, ArrowRight } from 'lucide-react';
+import { LimeActionButton, RotatingStamp, MagneticTextLink } from '../components/Buttons';
+import { useLanguage } from '../context/LanguageContext';
 
 const values = [
   {
@@ -131,60 +132,15 @@ const processSteps = [
 ];
 
 const ProfileCollage = () => (
-  <div className="relative w-full aspect-[4/3] md:aspect-square max-w-sm md:max-w-md mx-auto flex items-center justify-center pt-8">
-    {/* Wavy Purple Blob behind profile on the left */}
-    <div className="absolute left-4 top-1/4 w-[45%] h-[45%] bg-[#B3A0E6]/30 rounded-[40%_60%_70%_30%_/_40%_50%_60%_50%] -rotate-12 blur-[1px]" />
-    
-    {/* Grid-patterned Orange Box on the right */}
-    <div 
-      className="absolute right-4 bottom-4 w-[42%] h-[55%] border border-neutral-carvao/10 bg-[#E6A045]/20 rounded-[2px]"
-      style={{
-        backgroundImage: `radial-gradient(var(--color-foreground) 0.75px, transparent 0.75px)`,
-        backgroundSize: '12px 12px'
-      }}
-    >
-      <div className="absolute inset-0 bg-[#E6A045]/10" />
-    </div>
-
-    {/* Black Square with Lime Asterisk on top right */}
-    <div className="absolute right-6 top-6 w-14 h-14 bg-neutral-carvao rounded-[2px] flex items-center justify-center shadow-md rotate-3 z-20">
-      <svg className="w-7 h-7 text-[var(--color-lime-500)] fill-current" viewBox="0 0 100 100">
-        <path d="M46 15 h8 v70 h-8 z" />
-        <path d="M15 46 h70 v8 h-70 z" />
-        <path d="M24.75 30.41 l49.5 49.5 l-5.66 5.66 l-49.5 -49.5 z" />
-        <path d="M74.25 30.41 l-49.5 49.5 l-5.66 -5.66 l49.5 -49.5 z" />
-      </svg>
-    </div>
-
-    {/* Rotating Stamp "DESIGNING WITH PURPOSE" */}
-    <div className="absolute right-0 top-1/3 translate-x-4 z-20 scale-75 md:scale-90">
-      <RotatingStamp 
-        text="DESIGNING WITH PURPOSE • DESIGNING WITH PURPOSE •" 
-        icon={ArrowUpRight} 
-      />
-    </div>
-
-    {/* The profile photo */}
-    <div className="relative z-10 w-[68%] aspect-[3/4] rounded-[2px] overflow-hidden border border-neutral-carvao bg-neutral-carvao/5 shadow-lg rotate-[-2.5deg]">
-      <img
-        src={`${import.meta.env.BASE_URL}assets/profile/profile3.png`}
-        alt="David Salviano"
-        className="w-full h-full object-cover grayscale contrast-115"
-      />
-      {/* Halftone texture blend */}
-      <div 
-        className="absolute inset-0 pointer-events-none mix-blend-overlay opacity-50" 
-        style={{
-          backgroundImage: `url(${import.meta.env.BASE_URL}assets/Textures/texture.png)`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center'
-        }}
-      />
-    </div>
-  </div>
+  <img
+    src={`${import.meta.env.BASE_URL}assets/profile/profile3.png`}
+    alt="David Salviano"
+    className="w-full max-w-sm md:max-w-md mx-auto lg:ml-auto lg:mr-0 object-contain lg:-translate-x-[2px]"
+  />
 );
 
 export function AboutMe() {
+  const { t } = useLanguage();
   const containerVariants = {
     hidden: { opacity: 0 },
     show: {
@@ -199,7 +155,7 @@ export function AboutMe() {
   };
 
   return (
-    <div className="min-h-screen pt-28 pb-16 bg-[var(--color-background)]">
+    <div className="min-h-screen pt-28 pb-0 bg-[var(--color-background)]">
       <motion.div 
         variants={containerVariants}
         initial="hidden"
@@ -208,28 +164,31 @@ export function AboutMe() {
       >
         {/* Row 1: Hero Intro */}
         <div className="w-full border-b border-neutral-carvao/10">
-          <div className="px-6 md:px-[16%] py-12 md:py-16 grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-12 items-center">
+          <div className="px-4 md:px-[calc(16%-24px)] py-12 md:py-16 grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-12 items-center">
             {/* Left Column: Heading, intro, CTA */}
             <motion.div variants={itemVariants} className="flex flex-col gap-6">
               <div className="relative">
                 <img 
                   src={`${import.meta.env.BASE_URL}assets/titles/about.png`} 
-                  alt="About" 
+                  alt={t('about_title_alt')} 
                   className="w-full max-w-[280px] md:max-w-[350px] h-auto object-contain select-none"
                 />
               </div>
 
               <div className="relative">
-                <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-neutral-carvao leading-snug tracking-tight uppercase max-w-2xl font-sans">
-                  I'm David Salviano, a UI/UX designer creating editorial digital experiences with <span className="text-neutral-carvao">clarity</span> and <span className="text-[#E6A045]">personality.</span>
+                <h2 className="text-title-h2 font-extrabold text-neutral-carvao leading-snug tracking-tight uppercase max-w-2xl font-sans">
+                  {t('about_subtitle_intro', "I'm David Salviano, a UI/UX designer creating editorial digital experiences with")}{' '}
+                  <span className="text-neutral-carvao">{t('about_subtitle_clarity', "clarity")}</span>{' '}
+                  {t('about_subtitle_and', "and")}{' '}
+                  <span className="text-[#E6A045]">{t('about_subtitle_personality', "personality.")}</span>
                 </h2>
                 <svg className="absolute -right-8 top-0 w-6 h-6 text-neutral-carvao/30 hidden sm:block animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 3.143L13 22l-2.286-6.857L5 12l5.714-3.143L13 3z" />
                 </svg>
               </div>
 
-              <p className="text-sm md:text-base text-neutral-carvao/75 max-w-xl leading-relaxed font-sans">
-                I believe great design is equal parts strategy and soul. I craft purposeful, intuitive experiences that help brands communicate clearly, connect deeply, and grow with confidence.
+              <p className="text-body-lg text-neutral-carvao/75 max-w-xl leading-relaxed font-sans">
+                {t('about_description')}
               </p>
 
               <div className="flex flex-wrap items-center gap-6 mt-2">
@@ -237,18 +196,17 @@ export function AboutMe() {
                   as="a"
                   href="mailto:davidsalviano52@gmail.com"
                 >
-                  Let's connect
+                  {t('about_cta_connect')}
                 </LimeActionButton>
-                
-                <a 
+                <MagneticTextLink
+                  as="a"
                   href="#"
-                  className="group flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-[0.16em] text-neutral-carvao/70 hover:text-neutral-carvao transition-colors py-2 cursor-pointer"
                 >
-                  <span>Download Résumé</span>
-                  <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  {t('about_cta_resume')}
+                  <svg className="w-4 h-4 transition-transform duration-300 group-hover/link:translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
-                </a>
+                </MagneticTextLink>
               </div>
             </motion.div>
 
@@ -260,41 +218,108 @@ export function AboutMe() {
         </div>
 
         {/* Row 2: Bento Grid info */}
-        <div className="w-full border-b border-neutral-carvao/10">
-          <div className="px-6 md:px-[16%] grid grid-cols-1 lg:grid-cols-[1.2fr_1.5fr_2.3fr] gap-0">
-            
-            {/* Column 1: My Story */}
-            <div className="py-10 lg:pr-8 border-b border-neutral-carvao/10 lg:border-b-0 lg:border-r border-neutral-carvao/10 flex flex-col gap-6">
-              <h3 className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-neutral-carvao/45">
-                My Story
-              </h3>
-              <div className="font-sans text-sm text-neutral-carvao/75 leading-relaxed space-y-4">
-                <p>
-                  I've always been drawn to the intersection of design, technology, and human behavior. My path started in graphic design, evolved through front-end development, and led me to UI/UX design—where strategy, creativity, and empathy come together.
-                </p>
-                <p>
-                  Today, I partner with forward-thinking teams and early-stage startups to turn complex ideas into clear, engaging digital experiences that make an impact.
-                </p>
-              </div>
+        {/* Selected Clients & Collaborators - light background */}
+        <div className="w-full border-b border-neutral-carvao/10 bg-background/50">
+          <div className="px-4 md:px-[calc(16%-24px)] py-6 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden">
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <span className="w-2 h-2 rounded-full bg-[var(--color-lime-500)]" />
+              <span className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-neutral-carvao">
+                {t('about_clients_tag')}
+              </span>
             </div>
 
-            {/* Column 2: Values & Approach */}
-            <div className="py-10 lg:px-8 border-b border-neutral-carvao/10 lg:border-b-0 lg:border-r border-neutral-carvao/10 bg-[#B3A0E6]/5 flex flex-col gap-6">
-              <h3 className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-neutral-carvao/45 pl-2 lg:pl-0">
-                Values & Approach
+            {/* Logos List */}
+            <div className="flex flex-wrap items-center justify-center gap-12 md:gap-20">
+              <a
+                href="https://www.escutha.com.br/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-all duration-300 hover:scale-[1.03]"
+              >
+                <img
+                  src="https://static.wixstatic.com/media/f37da2_0d1c8ad4e0354077bc39cc667a2b5a0f~mv2.png/v1/fill/w_141,h_42,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/f37da2_0d1c8ad4e0354077bc39cc667a2b5a0f~mv2.png"
+                  alt="Escutha"
+                  className="h-8 md:h-10 w-auto object-contain"
+                />
+              </a>
+              <a
+                href="https://www.atlantahomeconcierge.com/home"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-all duration-300 hover:scale-[1.03]"
+              >
+                <img
+                  src={`${import.meta.env.BASE_URL}assets/apoio/ahc.png`}
+                  alt="Atlanta Home Concierge"
+                  className="h-11 md:h-14 w-auto object-contain"
+                />
+              </a>
+              <a
+                href="https://dgpe.fgv.br/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-all duration-300 hover:scale-[1.03]"
+              >
+                <img
+                  src="https://dgpe.fgv.br/sites/default/files/Marca_DGPE%20%281%29.png"
+                  alt="FGV DGPE"
+                  className="h-9 md:h-12 w-auto object-contain"
+                />
+              </a>
+            </div>
+
+            <Link
+              to="/projects"
+              className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#8b7ec8] hover:text-[#B6A9ED] transition-colors flex items-center gap-1 flex-shrink-0 cursor-pointer"
+            >
+              <span>{t('about_clients_all')}</span>
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
+        </div>
+
+        {/* My Story - dark background */}
+        <div id="about-dark-start" className="w-full border-b border-neutral-branco/10 bg-[#171717] text-[#fbf9f6]">
+          <div className="px-4 md:px-[calc(16%-24px)] py-12 md:py-16 grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-8">
+            <div>
+              <h3 className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-[#fbf9f6]/45">
+                {t('about_story_title')}
               </h3>
-              <div className="flex flex-col gap-6 pl-2 lg:pl-0 pr-2 lg:pr-0">
-                {values.map((val) => (
+            </div>
+            <div className="font-sans text-body-base text-[#fbf9f6]/75 leading-relaxed space-y-4 max-w-2xl">
+              <p>
+                {t('about_story_p1')}
+              </p>
+              <p>
+                {t('about_story_p2')}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Values, Approach & Experience - dark background */}
+        <div className="w-full border-b border-neutral-branco/10 bg-[#171717] text-[#fbf9f6]">
+          <div className="px-4 md:px-[calc(16%-24px)] py-12 md:py-16 grid grid-cols-1 lg:grid-cols-[1.5fr_2.3fr] gap-12 lg:gap-16">
+            
+            {/* Column 1: Values & Approach */}
+            <div className="flex flex-col gap-6">
+              <h3 className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-[#fbf9f6]/45">
+                {t('about_values_title')}
+              </h3>
+              <div className="flex flex-col gap-6">
+                {values.map((val, idx) => (
                   <div key={val.title} className="flex gap-4 items-start">
-                    <div className="w-8 h-8 rounded-full border border-neutral-carvao/15 flex items-center justify-center text-neutral-carvao/60 flex-shrink-0 bg-background/30 shadow-sm">
+                    <div className="w-8 h-8 rounded-full border border-neutral-branco/15 flex items-center justify-center text-[#fbf9f6]/60 flex-shrink-0 bg-background/5 shadow-sm">
                       {val.icon}
                     </div>
                     <div className="flex flex-col gap-1">
-                      <h4 className="font-sans font-bold text-xs tracking-wider text-neutral-carvao uppercase">
-                        {val.title}
+                      <h4 className="font-sans font-bold text-xs tracking-wider text-[#fbf9f6] uppercase">
+                        {t('about_value_0' + (idx + 1) + '_title')}
                       </h4>
-                      <p className="font-sans text-xs text-neutral-carvao/65 leading-normal">
-                        {val.text}
+                      <p className="font-sans text-xs text-[#fbf9f6]/65 leading-normal">
+                        {t('about_value_0' + (idx + 1) + '_text')}
                       </p>
                     </div>
                   </div>
@@ -302,24 +327,24 @@ export function AboutMe() {
               </div>
             </div>
 
-            {/* Column 3: Experience Highlights */}
-            <div className="py-10 lg:pl-8 flex flex-col gap-6">
-              <h3 className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-neutral-carvao/45">
-                Experience Highlights
+            {/* Column 2: Experience Highlights */}
+            <div className="lg:pl-8 border-t lg:border-t-0 lg:border-l border-neutral-branco/10 flex flex-col gap-6">
+              <h3 className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-[#fbf9f6]/45">
+                {t('about_exp_title')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-x-12">
                 {/* Sub-column 1: 01, 02, 03 */}
                 <div className="flex flex-col gap-8">
-                  {experiences.slice(0, 3).map((exp) => (
+                  {experiences.slice(0, 3).map((exp, idx) => (
                     <div key={exp.number} className="flex gap-4 items-start">
-                      <div className="w-8 h-6 flex items-center justify-center bg-[#B3A0E6]/25 text-neutral-carvao font-mono text-[10px] font-bold rounded-[30%_70%_70%_30%_/_50%_60%_40%_50%] flex-shrink-0">
+                      <div className="w-8 h-6 flex items-center justify-center bg-[#B3A0E6]/25 text-[#fbf9f6] font-mono text-[10px] font-bold rounded-[30%_70%_70%_30%_/_50%_60%_40%_50%] flex-shrink-0">
                         {exp.number}
                       </div>
                       <div className="flex flex-col gap-1">
-                        <span className="font-mono text-[9px] text-neutral-carvao/45 font-bold tracking-wider">{exp.period}</span>
-                        <h4 className="font-sans font-bold text-sm text-neutral-carvao">{exp.role}</h4>
-                        {exp.company && <span className="font-sans text-xs font-semibold text-[#8b7ec8]">{exp.company}</span>}
-                        <p className="font-sans text-xs text-neutral-carvao/65 leading-relaxed mt-1">{exp.details}</p>
+                        <span className="font-mono text-[9px] text-[#fbf9f6]/45 font-bold tracking-wider">{exp.period === "2024 - PRESENT" ? t('about_exp_01_period') : exp.period}</span>
+                        <h4 className="font-sans font-bold text-sm text-[#fbf9f6]">{t('about_exp_0' + (idx + 1) + '_role')}</h4>
+                        {exp.company && <span className="font-sans text-xs font-semibold text-[#B6A9ED]">{exp.company}</span>}
+                        <p className="font-sans text-xs text-[#fbf9f6]/65 leading-relaxed mt-1">{t('about_exp_0' + (idx + 1) + '_details')}</p>
                       </div>
                     </div>
                   ))}
@@ -328,29 +353,33 @@ export function AboutMe() {
                 {/* Sub-column 2: 04, 05, badge */}
                 <div className="flex flex-col gap-8 justify-between">
                   <div className="flex flex-col gap-8">
-                    {experiences.slice(3).map((exp) => (
+                    {experiences.slice(3).map((exp, idx) => (
                       <div key={exp.number} className="flex gap-4 items-start">
-                        <div className="w-8 h-6 flex items-center justify-center bg-[#B3A0E6]/25 text-neutral-carvao font-mono text-[10px] font-bold rounded-[30%_70%_70%_30%_/_50%_60%_40%_50%] flex-shrink-0">
+                        <div className="w-8 h-6 flex items-center justify-center bg-[#B3A0E6]/25 text-[#fbf9f6] font-mono text-[10px] font-bold rounded-[30%_70%_70%_30%_/_50%_60%_40%_50%] flex-shrink-0">
                           {exp.number}
                         </div>
                         <div className="flex flex-col gap-1">
-                          <span className="font-mono text-[9px] text-neutral-carvao/45 font-bold tracking-wider">{exp.period}</span>
-                          <h4 className="font-sans font-bold text-sm text-neutral-carvao">{exp.role}</h4>
-                          {exp.company && <span className="font-sans text-xs font-semibold text-[#8b7ec8]">{exp.company}</span>}
-                          <p className="font-sans text-xs text-neutral-carvao/65 leading-relaxed mt-1">{exp.details}</p>
+                          <span className="font-mono text-[9px] text-[#fbf9f6]/45 font-bold tracking-wider">{exp.period}</span>
+                          <h4 className="font-sans font-bold text-sm text-[#fbf9f6]">{t('about_exp_0' + (idx + 4) + '_role')}</h4>
+                          {exp.company && <span className="font-sans text-xs font-semibold text-[#B6A9ED]">{exp.company}</span>}
+                          <p className="font-sans text-xs text-[#fbf9f6]/65 leading-relaxed mt-1">{t('about_exp_0' + (idx + 4) + '_details')}</p>
                         </div>
                       </div>
                     ))}
                   </div>
 
                   {/* Always learning Badge */}
-                  <div className="bg-[#B3A0E6]/5 border border-neutral-carvao/10 p-4 rounded-sm flex items-center gap-3 relative overflow-hidden mt-4 shadow-sm">
-                    <svg className="w-6 h-6 text-[#8b7ec8] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                  <div className="bg-[#B3A0E6]/10 border border-neutral-branco/10 p-4 rounded-sm flex items-center gap-3 relative overflow-hidden mt-4 shadow-sm">
+                    <svg className="w-6 h-6 text-[#B6A9ED] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
                       <circle cx="12" cy="12" r="10" />
                       <path d="M12 2a14.5 14.5 0 000 20M2 12h20M3 6h18M3 18h18" strokeDasharray="2 2" />
                     </svg>
-                    <p className="font-sans text-[11px] font-bold text-neutral-carvao/75 uppercase tracking-wider leading-snug">
-                      Always learning.<br />Always exploring.<br />Always designing.
+                    <p className="font-sans text-[11px] font-bold text-[#fbf9f6]/75 uppercase tracking-wider leading-snug">
+                      {t('about_badge_text').split('. ').map((item, idx) => (
+                        <React.Fragment key={idx}>
+                          {item}.<br />
+                        </React.Fragment>
+                      ))}
                     </p>
                     <svg className="w-6 h-6 text-[var(--color-lime-500)] absolute right-2 bottom-2" viewBox="0 0 24 24" fill="none">
                       <path d="M2 18c4-2 8-4 12-2s4 4 8 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -363,67 +392,15 @@ export function AboutMe() {
           </div>
         </div>
 
-        {/* Row 3: Selected Clients & Collaborators */}
-        <div className="w-full border-b border-neutral-carvao/10 bg-background/50">
-          <div className="px-6 md:px-[16%] py-6 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden">
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <span className="w-2 h-2 rounded-full bg-[var(--color-lime-500)]" />
-              <span className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-neutral-carvao/50">
-                Selected Clients & Collaborators
-              </span>
-            </div>
-
-            {/* Logos List */}
-            <div className="flex flex-wrap items-center justify-center gap-6 md:gap-8 font-sans font-bold text-xs uppercase tracking-wider text-neutral-carvao/60">
-              <div className="flex items-center gap-1.5 hover:text-neutral-carvao transition-colors">
-                <span className="w-1.5 h-1.5 rounded-full bg-neutral-carvao/30" />
-                <span>FOCUSLY</span>
-              </div>
-              <div className="hover:text-neutral-carvao transition-colors">
-                <span>FORMA STUDIO</span>
-              </div>
-              <div className="flex items-center gap-1.5 hover:text-neutral-carvao transition-colors">
-                <svg className="w-3.5 h-3.5 fill-current text-neutral-carvao/40" viewBox="0 0 100 100">
-                  <path d="M46 15 h8 v70 h-8 z" />
-                  <path d="M15 46 h70 v8 h-70 z" />
-                </svg>
-                <span>AURORA</span>
-              </div>
-              <div className="hover:text-neutral-carvao transition-colors">
-                <span>FIELO NOTES</span>
-              </div>
-              <div className="flex items-center gap-1 hover:text-neutral-carvao transition-colors">
-                <svg className="w-3.5 h-3.5 text-neutral-carvao/40" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
-                </svg>
-                <span>LATTICE</span>
-              </div>
-              <div className="hover:text-neutral-carvao transition-colors">
-                <span>CLOVER LABS</span>
-              </div>
-            </div>
-
-            <Link
-              to="/projects"
-              className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#8b7ec8] hover:text-[#B6A9ED] transition-colors flex items-center gap-1 flex-shrink-0 cursor-pointer"
-            >
-              <span>View All Projects</span>
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            </Link>
-          </div>
-        </div>
-
         {/* Row 4: Skills, Process, Tools */}
-        <div className="w-full border-b border-neutral-carvao/10">
-          <div className="px-6 md:px-[16%] grid grid-cols-1 lg:grid-cols-[1fr_2fr_1fr] gap-0">
+        <div id="about-dark-end" className="w-full border-b border-neutral-carvao/10">
+          <div className="px-4 md:px-[calc(16%-24px)] grid grid-cols-1 lg:grid-cols-[1fr_2fr_1fr] gap-0">
             
             {/* Column 1: Skills */}
-            <div className="py-10 lg:pr-8 border-b border-neutral-carvao/10 lg:border-b-0 lg:border-r border-neutral-carvao/10 bg-[#B3A0E6]/5 flex flex-col justify-between gap-8 relative">
+            <div className="py-10 about-full-bleed-skills border-b border-neutral-carvao/10 lg:border-b-0 lg:border-r border-neutral-carvao/10 bg-[#B3A0E6]/5 flex flex-col justify-between gap-8 relative">
               <div className="flex flex-col gap-6">
                 <h3 className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-neutral-carvao/45 pl-2 lg:pl-0">
-                  Skills & Expertise
+                  {t('about_skills_title')}
                 </h3>
                 <div className="flex flex-wrap gap-2 pl-2 lg:pl-0">
                   {[
@@ -436,23 +413,17 @@ export function AboutMe() {
                       key={skill}
                       className="border border-neutral-carvao/25 bg-background/50 text-neutral-carvao hover:bg-neutral-carvao hover:text-background transition-colors duration-300 px-3 py-1 font-mono text-[9px] uppercase tracking-wider rounded-full font-bold select-none cursor-default"
                     >
-                      {skill}
+                      {t('about_skill_' + skill.toLowerCase().replace(/[ -]/g, '_'), skill)}
                     </span>
                   ))}
                 </div>
-              </div>
-              {/* Arrow Badge at the bottom right */}
-              <div className="absolute right-4 bottom-4 w-6 h-6 rounded-full border border-neutral-carvao/20 flex items-center justify-center text-neutral-carvao/40">
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
               </div>
             </div>
 
             {/* Column 2: My Process */}
             <div className="py-10 lg:px-8 border-b border-neutral-carvao/10 lg:border-b-0 lg:border-r border-neutral-carvao/10 flex flex-col gap-6">
               <h3 className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-neutral-carvao/45 pl-2 lg:pl-0">
-                My Process
+                {t('about_process_title')}
               </h3>
               <div className="w-full flex flex-col md:flex-row items-start justify-between gap-6 md:gap-2 pl-2 lg:pl-0 pr-2 lg:pr-0">
                 {processSteps.map((step, idx) => (
@@ -468,11 +439,11 @@ export function AboutMe() {
                       </div>
                       {/* Title */}
                       <h4 className="font-sans font-bold text-xs tracking-wider uppercase text-neutral-carvao mb-1">
-                        {step.title}
+                        {t('approach_step_0' + (idx + 1) + '_title')}
                       </h4>
                       {/* Text */}
                       <p className="font-sans text-[11px] text-neutral-carvao/75 leading-relaxed">
-                        {step.text}
+                        {t('approach_step_0' + (idx + 1) + '_desc')}
                       </p>
                     </div>
                     {idx < processSteps.length - 1 && (
@@ -488,32 +459,26 @@ export function AboutMe() {
             </div>
 
             {/* Column 3: Tools */}
-            <div className="py-10 lg:pl-8 bg-[#E6A045]/5 flex flex-col justify-between gap-8 relative">
+            <div className="py-10 about-full-bleed-tools bg-[#E6A045]/5 flex flex-col justify-between gap-8 relative">
               <div className="flex flex-col gap-6">
                 <h3 className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-neutral-carvao/45">
-                  Tools
+                  {t('about_tools_title')}
                 </h3>
                 <div className="grid grid-cols-2 gap-3 pr-2 lg:pr-0">
                   {[
                     "FIGMA", "ADOBE XD", "PHOTOSHOP", "ILLUSTRATOR", "WEBFLOW", "NOTION"
                   ].map((tool) => (
                     <div 
-                      key={tool}
+                       key={tool}
                       className="border border-neutral-carvao/25 bg-background/50 hover:bg-neutral-carvao hover:text-background transition-colors duration-300 p-2.5 rounded-sm font-mono text-[9px] uppercase tracking-wider font-bold flex items-center justify-between shadow-sm cursor-default"
                     >
                       <span>{tool}</span>
-                      <svg className="w-3 h-3 text-neutral-carvao/30 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <svg className="w-3.5 h-3.5 text-neutral-carvao/30 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                       </svg>
                     </div>
                   ))}
                 </div>
-              </div>
-              {/* Arrow Badge at the bottom right */}
-              <div className="absolute right-4 bottom-4 w-6 h-6 rounded-full border border-neutral-carvao/20 flex items-center justify-center text-neutral-carvao/40">
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
               </div>
             </div>
 
@@ -522,12 +487,12 @@ export function AboutMe() {
 
         {/* Row 5: Principles, Interests, CTA */}
         <div className="w-full">
-          <div className="px-6 md:px-[16%] grid grid-cols-1 lg:grid-cols-[1.2fr_1.8fr_1.5fr] gap-0">
+          <div className="px-4 md:px-[calc(16%-24px)] grid grid-cols-1 lg:grid-cols-[1.2fr_1.8fr_1.5fr] gap-0">
             
             {/* Column 1: Principles */}
             <div className="py-12 lg:pr-8 border-b border-neutral-carvao/10 lg:border-b-0 lg:border-r border-neutral-carvao/10 flex flex-col gap-6">
               <h3 className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-neutral-carvao/45">
-                Principles I Design By
+                {t('about_principles_title')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-6 items-center">
                 <div className="flex flex-col gap-4">
@@ -542,7 +507,7 @@ export function AboutMe() {
                         {pr.num}
                       </div>
                       <span className="font-sans font-bold text-xs uppercase tracking-wide text-neutral-carvao">
-                        {pr.text}
+                        {t('about_principle_' + pr.num)}
                       </span>
                     </div>
                   ))}
@@ -562,7 +527,7 @@ export function AboutMe() {
             {/* Column 2: Interests & Inspiration */}
             <div className="py-12 lg:px-8 border-b border-neutral-carvao/10 lg:border-b-0 lg:border-r border-neutral-carvao/10 flex flex-col gap-6">
               <h3 className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-neutral-carvao/45 pl-2 lg:pl-0">
-                Interests & Inspiration
+                {t('about_interests_title')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1fr] gap-6 pl-2 lg:pl-0 items-center">
                 {/* Interests Grid list */}
@@ -595,13 +560,13 @@ export function AboutMe() {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                       </svg>
                     )}
-                  ].map((item) => (
+                  ].map((item, idx) => (
                     <div key={item.label} className="flex flex-col gap-1 items-start">
                       <div className="w-8 h-8 rounded-sm border border-neutral-carvao/10 bg-background/50 flex items-center justify-center">
                         {item.icon}
                       </div>
                       <span className="font-mono text-[9px] font-bold uppercase tracking-wider text-neutral-carvao/75">
-                        {item.label}
+                        {t('about_interest_0' + (idx + 1))}
                       </span>
                     </div>
                   ))}
@@ -623,17 +588,17 @@ export function AboutMe() {
             </div>
 
             {/* Column 3: CTA */}
-            <div className="py-12 lg:pl-8 bg-[#B3A0E6]/5 border-b border-neutral-carvao/10 lg:border-b-0 flex flex-col justify-between gap-8 relative">
+            <div className="py-12 about-full-bleed-tools bg-[#B3A0E6]/5 border-b border-neutral-carvao/10 lg:border-b-0 flex flex-col justify-between gap-8 relative">
               <div className="flex flex-col gap-6">
                 <h3 className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-neutral-carvao/45">
-                  Let's Create Something Great
+                  {t('about_cta_title')}
                 </h3>
                 <div className="flex flex-col gap-3">
-                  <h4 className="font-sans font-extrabold text-lg leading-tight uppercase text-neutral-carvao">
-                    Let's Create Something Great.
+                  <h4 className="font-sans font-extrabold text-subtitle-sm leading-tight uppercase text-neutral-carvao">
+                    {t('about_cta_title')}.
                   </h4>
-                  <p className="font-sans text-xs text-neutral-carvao/70 leading-relaxed pr-8">
-                    I'm open to new opportunities, exciting collaborations and meaningful projects.
+                  <p className="font-sans text-body-sm text-neutral-carvao/70 leading-relaxed pr-8">
+                    {t('about_cta_desc')}
                   </p>
                 </div>
               </div>
@@ -644,7 +609,7 @@ export function AboutMe() {
                     as="a"
                     href="mailto:davidsalviano52@gmail.com"
                   >
-                    Let's connect
+                    {t('about_cta_connect')}
                   </LimeActionButton>
                 </div>
                 <a 
@@ -658,7 +623,7 @@ export function AboutMe() {
               {/* Rotating Stamp "AVAILABLE FOR NEW PROJECTS" on top right */}
               <div className="absolute right-4 top-4 z-20 scale-75 transform translate-x-2 -translate-y-2">
                 <RotatingStamp 
-                  text="AVAILABLE FOR NEW PROJECTS • AVAILABLE FOR NEW PROJECTS •" 
+                  text={t('about_available_stamp')} 
                   icon={ArrowUpRight}
                 />
               </div>
