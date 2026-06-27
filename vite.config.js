@@ -22,7 +22,7 @@ function serveExternalProjects() {
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/portfolio/',
+  base: '/portfolio-2026/',
   plugins: [react(), tailwindcss(), serveExternalProjects()],
 })
 
