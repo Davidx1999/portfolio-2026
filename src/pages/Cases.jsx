@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight, Star } from 'lucide-react';
-import { ALL_WORK } from '../data/allWork';
+import { useProjects } from '../hooks/useProjects';
+import { LoadingGrid, ErrorBanner } from '../components/LoadingSkeleton';
 import { LimeActionButton, RotatingStamp, MagneticTextLink } from '../components/Buttons';
 import { useLanguage } from '../context/LanguageContext';
 import formaStudioImg from '../assets/forma_studio.png';
@@ -17,11 +18,12 @@ const getProjectLink = (id) => {
 };
 
 export function Cases() {
+  const { allWork, loading, error, refetch } = useProjects();
   const { t } = useLanguage();
   const [activeFilter, setActiveFilter] = useState("ALL");
 
   // Filter logic
-  const filteredWork = ALL_WORK.filter((item) => {
+  const filteredWork = allWork.filter((item) => {
     if (activeFilter === "ALL") return true;
     if (activeFilter === "CASE STUDIES") return item.workType === "cases";
     if (activeFilter === "PROJECTS") return item.workType !== "cases";
@@ -36,8 +38,8 @@ export function Cases() {
   // Split featured 7 and remaining for the ALL bento grid
   const bentoIds = ["mapear", "vincenzo", "ui-ux-study", "aula-f75", "cenpe-platform"];
   
-  const bentoItems = bentoIds.map(id => ALL_WORK.find(w => w.id === id)).filter(Boolean);
-  const remainingItems = ALL_WORK.filter(w => !bentoIds.includes(w.id));
+  const bentoItems = bentoIds.map(id => allWork.find(w => w.id === id)).filter(Boolean);
+  const remainingItems = allWork.filter(w => !bentoIds.includes(w.id));
 
   // Find specific bento items for rendering
   const focuslyItem = bentoItems.find(w => w.id === "mapear");
@@ -239,8 +241,12 @@ export function Cases() {
 
           {/* Gallery Content Area */}
           <div className="px-4 md:px-[calc(16%-24px)] pb-16 w-full">
-            <AnimatePresence mode="wait">
-              {activeFilter === "ALL" ? (
+            {error && <ErrorBanner message={error?.message} onRetry={refetch} />}
+            {loading ? (
+              <LoadingGrid count={6} />
+            ) : (
+              <AnimatePresence mode="wait">
+                {activeFilter === "ALL" ? (
                 // Mockup Specific Bento Grid layout
                 <motion.div
                   key="bento"
@@ -714,6 +720,7 @@ export function Cases() {
                 </motion.div>
               )}
             </AnimatePresence>
+            )}
           </div>
         </div>
 

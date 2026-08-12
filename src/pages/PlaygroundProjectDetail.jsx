@@ -2,11 +2,21 @@ import React from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MoveLeft, ArrowRight } from 'lucide-react';
-import { PLAYGROUND_PROJECTS } from '../data/playground';
+import { useProjects } from '../hooks/useProjects';
+import { ProjectSkeletonCard } from '../components/LoadingSkeleton';
 
 export function PlaygroundProjectDetail() {
   const { projectId } = useParams();
-  const project = PLAYGROUND_PROJECTS.find(p => p.id === projectId);
+  const { playgroundProjects, loading } = useProjects();
+  const project = playgroundProjects.find(p => p.id === projectId);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen pt-36 px-6 md:px-[16%] bg-[var(--color-background)]">
+        <ProjectSkeletonCard />
+      </div>
+    );
+  }
 
   if (!project) {
     return <Navigate to="/projects" replace />;

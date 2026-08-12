@@ -1,12 +1,15 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Trophy, Star, Terminal } from 'lucide-react';
+import { useProjects } from '../hooks/useProjects';
 
 import mapearImg from '../assets/mapear.jpg';
 import aulaf75Img from '../assets/aulaf75.png';
 import vincenzoImg from '../assets/vincenzo.jpg';
 
 export function BentoProjects() {
+  const { projects } = useProjects();
+
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -20,27 +23,29 @@ export function BentoProjects() {
     show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100 } }
   };
 
+  const mapearProject = projects.find(p => p.id === 'mapear') || {
+    id: 'mapear',
+    category: 'Web App',
+    title: 'Mapear Platform',
+    description: 'Advanced mapping platform to optimize real-time geographic data visualization and routing with high precision.',
+    image: mapearImg,
+    rating: '4.9',
+    badge: 'Enterprise',
+  };
+
+  const aulaF75Project = projects.find(p => p.id === 'aula-f75') || {
+    id: 'aula-f75',
+    category: 'E-learning',
+    title: 'Aula F75',
+    description: 'Redesign of the online learning experience, elevating engagement through gamification and immersive interface.',
+    image: aulaf75Img,
+    rating: '5.0',
+    badge: 'Guest Favorite',
+  };
+
   const featuredProjects = [
-    {
-      id: 'mapear',
-      category: 'Web App',
-      title: 'Mapear Platform',
-      description: 'Advanced mapping platform to optimize real-time geographic data visualization and routing with high precision.',
-      image: mapearImg,
-      rating: '4.9',
-      badge: 'Enterprise',
-      link: '/mapear'
-    },
-    {
-      id: 'aula-f75',
-      category: 'E-learning',
-      title: 'Aula F75',
-      description: 'Redesign of the online learning experience, elevating engagement through gamification and immersive interface.',
-      image: aulaf75Img,
-      rating: '5.0',
-      badge: 'Guest Favorite',
-      link: '/aula-f75'
-    }
+    { ...mapearProject, link: '/mapear' },
+    { ...aulaF75Project, link: '/aula-f75' }
   ];
 
   return (

@@ -2,15 +2,17 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Trophy, Star } from 'lucide-react';
-import { PLAYGROUND_PROJECTS } from '../data/playground';
+import { useProjects } from '../hooks/useProjects';
+import { LoadingGrid, ErrorBanner } from '../components/LoadingSkeleton';
 import { LimeActionButton, RotatingStamp } from '../components/Buttons';
 
 export function Projects() {
+  const { playgroundProjects, loading, error, refetch } = useProjects();
   const [activeFilter, setActiveFilter] = useState("ALL EXPERIMENTS");
 
   const filteredProjects = activeFilter === "ALL EXPERIMENTS"
-    ? PLAYGROUND_PROJECTS
-    : PLAYGROUND_PROJECTS.filter(p => p.category === activeFilter);
+    ? playgroundProjects
+    : playgroundProjects.filter(p => p.category === activeFilter);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -343,44 +345,49 @@ export function Projects() {
 
           {/* Playground Bento Grid */}
           <div className="px-4 md:px-[calc(16%-24px)] pb-16 w-full">
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true, margin: "-100px" }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
-            >
-              {filteredProjects.map((p) => (
-                <Link
-                  key={p.id}
-                  to={`/project/${p.id}`}
-                  className="group relative h-48 border border-neutral-carvao/10 rounded-[2px] bg-background overflow-hidden shadow-sm flex hover:shadow-md transition-all duration-300 cursor-pointer"
-                >
-                  {/* Left Side Info (45%) */}
-                  <div className="w-[45%] p-5 flex flex-col justify-between relative z-10">
-                    <div className="flex flex-col gap-1.5">
-                      <span className="font-mono text-[8px] uppercase tracking-widest text-[#8b7ec8] font-bold">
-                        {p.category}
-                      </span>
-                      <h3 className="font-sans font-bold text-title-h3 text-neutral-carvao uppercase tracking-tight leading-none group-hover:text-[var(--color-primary)] transition-colors">
-                        {p.title}
-                      </h3>
-                      <p className="font-sans text-body-sm text-neutral-carvao/60 mt-2 leading-relaxed line-clamp-3">
-                        {p.description}
-                      </p>
+            {error && <ErrorBanner message={error?.message} onRetry={refetch} />}
+            {loading ? (
+              <LoadingGrid count={6} />
+            ) : (
+              <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, margin: "-100px" }}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
+              >
+                {filteredProjects.map((p) => (
+                  <Link
+                    key={p.id}
+                    to={`/project/${p.id}`}
+                    className="group relative h-48 border border-neutral-carvao/10 rounded-[2px] bg-background overflow-hidden shadow-sm flex hover:shadow-md transition-all duration-300 cursor-pointer"
+                  >
+                    {/* Left Side Info (45%) */}
+                    <div className="w-[45%] p-5 flex flex-col justify-between relative z-10">
+                      <div className="flex flex-col gap-1.5">
+                        <span className="font-mono text-[8px] uppercase tracking-widest text-[#8b7ec8] font-bold">
+                          {p.category}
+                        </span>
+                        <h3 className="font-sans font-bold text-title-h3 text-neutral-carvao uppercase tracking-tight leading-none group-hover:text-[var(--color-primary)] transition-colors">
+                          {p.title}
+                        </h3>
+                        <p className="font-sans text-body-sm text-neutral-carvao/60 mt-2 leading-relaxed line-clamp-3">
+                          {p.description}
+                        </p>
+                      </div>
+                      {/* View project button indicator */}
+                      <div className="w-5 h-5 rounded-full border border-neutral-carvao/10 bg-background flex items-center justify-center text-neutral-carvao group-hover:bg-[var(--color-lime-500)] transition-colors duration-300">
+                        <ArrowRight size={10} className="transform transition-transform duration-300 group-hover:translate-x-0.5" />
+                      </div>
                     </div>
-                    {/* View project button indicator */}
-                    <div className="w-5 h-5 rounded-full border border-neutral-carvao/10 bg-background flex items-center justify-center text-neutral-carvao group-hover:bg-[var(--color-lime-500)] transition-colors duration-300">
-                      <ArrowRight size={10} className="transform transition-transform duration-300 group-hover:translate-x-0.5" />
-                    </div>
-                  </div>
 
-                  {/* Right Side Visual (55%) */}
-                  {renderCardVisual(p)}
-                </Link>
-              ))}
-            </motion.div>
-            {filteredProjects.length === 0 && (
+                    {/* Right Side Visual (55%) */}
+                    {renderCardVisual(p)}
+                  </Link>
+                ))}
+              </motion.div>
+            )}
+            {!loading && filteredProjects.length === 0 && (
               <div className="py-16 text-center font-sans text-sm text-neutral-carvao/50 border-t border-neutral-carvao/10 mt-8">
                 No experiments in this category yet.
               </div>

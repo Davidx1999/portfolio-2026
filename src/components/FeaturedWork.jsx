@@ -1,12 +1,14 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, ChevronRight, ArrowRight } from 'lucide-react';
+import { useProjects } from '../hooks/useProjects';
 import { TextButton, AsymmetricDrawerButton, LimeActionButton, MagneticTextLink } from './Buttons';
 
 import focuslyImg from '../assets/focusly.png';
 import formaStudioImg from '../assets/forma_studio.png';
 
 export function FeaturedWork() {
+  const { projects: sanityProjectsList } = useProjects();
   const [isDesktop, setIsDesktop] = useState(false);
   const sectionRef = useRef(null);
 
@@ -18,42 +20,44 @@ export function FeaturedWork() {
     return () => media.removeEventListener("change", listener);
   }, []);
 
+  const getP = (id) => sanityProjectsList.find(p => p.id === id);
+
   const projects = [
     {
       number: "01",
-      title: "MAPEAR PLATFORM",
+      title: getP('mapear')?.title?.toUpperCase() || "MAPEAR PLATFORM",
       subtitle: "Geographic Routing System",
-      description: "Advanced mapping platform to optimize real-time geographic data visualization and routing with high precision. Connecting data layers, routing, and user interface for complex geotech needs.",
-      tags: ["Web App", "Geotech"],
-      image: `${import.meta.env.BASE_URL}assets/projects_cape/fgvmapear_cape.png`,
+      description: getP('mapear')?.description || "Advanced mapping platform to optimize real-time geographic data visualization and routing with high precision. Connecting data layers, routing, and user interface for complex geotech needs.",
+      tags: getP('mapear')?.tags?.length ? getP('mapear').tags : ["Web App", "Geotech"],
+      image: getP('mapear')?.image || `${import.meta.env.BASE_URL}assets/projects_cape/fgvmapear_cape.png`,
       link: "/mapear"
     },
     {
       number: "02",
-      title: "AULA F75",
+      title: getP('aula-f75')?.title?.toUpperCase() || "AULA F75",
       subtitle: "E-learning Experience",
-      description: "Redesign of the online learning experience, elevating engagement through gamification and an immersive interface. Empowering students with modern learning paths.",
-      tags: ["E-learning", "Gamification"],
-      image: `${import.meta.env.BASE_URL}assets/projects_cape/aulaf75_cape.png`,
+      description: getP('aula-f75')?.description || "Redesign of the online learning experience, elevating engagement through gamification and an immersive interface. Empowering students with modern learning paths.",
+      tags: getP('aula-f75')?.tags?.length ? getP('aula-f75').tags : ["E-learning", "Gamification"],
+      image: getP('aula-f75')?.image || `${import.meta.env.BASE_URL}assets/projects_cape/aulaf75_cape.png`,
       link: "/project/aula-f75"
     },
     {
       number: "03",
-      title: "VINCENZO DATA",
+      title: getP('vincenzo')?.title?.toUpperCase() || "VINCENZO DATA",
       subtitle: "80s Terminal & Matrix Sim",
-      description: "High-exclusivity interactive portfolio with 80s terminal simulation, matrix visualization for Big Data, and cymatics patterns.",
-      tags: ["Interactive System", "Retro CLI"],
-      image: `${import.meta.env.BASE_URL}assets/projects_cape/vincenzo_cape.png`,
+      description: getP('vincenzo')?.description || "High-exclusivity interactive portfolio with 80s terminal simulation, matrix visualization for Big Data, and cymatics patterns.",
+      tags: getP('vincenzo')?.tags?.length ? getP('vincenzo').tags : ["Interactive System", "Retro CLI"],
+      image: getP('vincenzo')?.image || `${import.meta.env.BASE_URL}assets/projects_cape/vincenzo_cape.png`,
       link: "/project/vincenzo"
     },
     {
       number: "04",
-      title: "FORMA STUDIO",
+      title: getP('cenpe-platform')?.title?.toUpperCase() || "FORMA STUDIO",
       subtitle: "Design Agency Website",
-      description: "Minimal, editorial website for a creative studio showcasing work with strong identity. Clean typography, grid layouts, and smooth animations.",
-      tags: ["Web Design", "Development"],
-      image: formaStudioImg,
-      link: "/project/forma-studio"
+      description: getP('cenpe-platform')?.description || "Minimal, editorial website for a creative studio showcasing work with strong identity. Clean typography, grid layouts, and smooth animations.",
+      tags: getP('cenpe-platform')?.tags?.length ? getP('cenpe-platform').tags : ["Web Design", "Development"],
+      image: getP('cenpe-platform')?.image || formaStudioImg,
+      link: "/project/cenpe-platform"
     }
   ];
 
