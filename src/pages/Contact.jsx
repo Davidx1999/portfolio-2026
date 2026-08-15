@@ -1,33 +1,80 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowRight, ArrowUpRight, CheckCircle2 } from 'lucide-react';
-import { LimeActionButton, RotatingStamp } from '../components/Buttons';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
+import {
+  ArrowDown,
+  ArrowUpRight,
+  Check,
+  Copy,
+  Mail,
+  MessageCircle,
+  Upload,
+  AlertCircle,
+  Clock,
+  MapPin,
+  Sparkles,
+} from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { useLetsTalk } from '../hooks/useLetsTalk';
+import { useHeaderMetrics } from '../hooks/useHeaderMetrics';
+
+const LinkedInIcon = ({ size = 16, className = "" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={className}
+    aria-hidden="true"
+  >
+    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+  </svg>
+);
+
+const InstagramIcon = ({ size = 16, className = "" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    aria-hidden="true"
+  >
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+  </svg>
+);
+
+const EASING = [0.22, 1, 0.36, 1];
 
 export function Contact() {
   const { language, t } = useLanguage();
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    projectType: '',
-    budgetRange: '',
-    message: ''
-  });
-  const [status, setStatus] = useState('');
-  const [fortalezaTime, setFortalezaTime] = useState('');
+  const { talkData } = useLetsTalk();
+  const { safeOffset } = useHeaderMetrics();
+  const prefersReducedMotion = useReducedMotion();
 
+  // 1. Fortaleza Live Clock (Client-only safe hydration)
+  const [fortalezaTime, setFortalezaTime] = useState('');
   useEffect(() => {
     const updateTime = () => {
-      const options = {
-        timeZone: 'America/Fortaleza',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
-      };
-      const locale = language === 'pt' ? 'pt-BR' : language === 'es' ? 'es-ES' : 'en-US';
-      const formatter = new Intl.DateTimeFormat(locale, options);
-      setFortalezaTime(formatter.format(new Date()));
+      try {
+        const formatter = new Intl.DateTimeFormat('pt-BR', {
+          timeZone: 'America/Fortaleza',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false,
+        });
+        setFortalezaTime(formatter.format(new Date()));
+      } catch (err) {
+        // Fallback
+        const now = new Date();
+        setFortalezaTime(now.toTimeString().slice(0, 8));
+      }
     };
 
     updateTime();
@@ -35,382 +82,799 @@ export function Contact() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleChange = (e) => {
+  // 2. Email Copy Interaction
+  const [copiedEmail, setCopiedEmail] = useState(false);
+  const handleCopyEmail = (e) => {
+    e.preventDefault();
+    const emailToCopy = talkData.email || 'davidsalviano52@gmail.com';
+    navigator.clipboard.writeText(emailToCopy).then(() => {
+      setCopiedEmail(true);
+      setTimeout(() => setCopiedEmail(false), 2400);
+    });
+  };
+
+  // 3. Form State & Selections
+  const [selectedServices, setSelectedServices] = useState([]);
+  const [selectedFormat, setSelectedFormat] = useState('');
+  const [selectedTimeline, setSelectedTimeline] = useState('');
+  const [selectedBudget, setSelectedBudget] = useState('');
+
+  const [formData, setFormData] = useState({
+    description: '',
+    name: '',
+    email: '',
+    company: '',
+    deadline: '',
+    referenceLink: '',
+    honeypot: '',
+  });
+
+  const [attachmentName, setAttachmentName] = useState('');
+  const [attachmentError, setAttachmentError] = useState('');
+
+  const [submissionState, setSubmissionState] = useState({
+    status: 'idle', // 'idle' | 'submitting' | 'success' | 'error'
+    message: '',
+  });
+
+  const handleServiceToggle = (service) => {
+    setSelectedServices((prev) =>
+      prev.includes(service) ? prev.filter((s) => s !== service) : [...prev, service]
+    );
+  };
+
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setStatus('sending');
-    // Simulate API call
-    setTimeout(() => {
-      setStatus('success');
-      setFormData({
-        name: '',
-        email: '',
-        projectType: '',
-        budgetRange: '',
-        message: ''
-      });
-    }, 1500);
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 }
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    setAttachmentError('');
+    if (!file) {
+      setAttachmentName('');
+      return;
     }
+    if (file.size > 5 * 1024 * 1024) {
+      setAttachmentError(
+        language === 'en' ? 'File exceeds maximum limit of 5MB.' : 'O arquivo excede o limite máximo de 5MB.'
+      );
+      setAttachmentName('');
+      e.target.value = '';
+      return;
+    }
+    setAttachmentName(file.name);
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 90, damping: 15 } }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Honeypot validation against spam bots
+    if (formData.honeypot) {
+      return;
+    }
+
+    if (!formData.name.trim() || !formData.email.trim() || !formData.description.trim()) {
+      setSubmissionState({
+        status: 'error',
+        message:
+          language === 'en'
+            ? 'Please fill in the required fields (Name, Email, and Project Description).'
+            : 'Por favor, preencha os campos obrigatórios (Nome, Email e Descrição do Projeto).',
+      });
+      return;
+    }
+
+    setSubmissionState({ status: 'submitting', message: '' });
+
+    // Format structured summary
+    const servicesList = selectedServices.length > 0 ? selectedServices.join(', ') : 'Não especificado';
+    const formatValue = selectedFormat || 'Não especificado';
+    const timelineValue = selectedTimeline || 'Não especificado';
+    const budgetValue = selectedBudget || 'Não especificado';
+
+    const emailSubject = encodeURIComponent(
+      `Novo Projeto // ${formData.name} ${formData.company ? `(${formData.company})` : ''}`
+    );
+
+    const emailBody = encodeURIComponent(
+`Olá David,
+
+Gostaria de conversar sobre um projeto. Aqui estão os detalhes:
+
+--------------------------------------------------
+1. SERVIÇOS DE INTERESSE:
+${servicesList}
+
+2. FORMATO PREFERIDO:
+${formatValue}
+
+3. PREVISÃO DE INÍCIO:
+${timelineValue}
+
+4. FAIXA DE INVESTIMENTO ESTIMADA:
+${budgetValue}
+--------------------------------------------------
+
+DESCRIÇÃO DO PROJETO / DESAFIO:
+${formData.description}
+
+INFORMAÇÕES DE CONTATO:
+- Nome: ${formData.name}
+- Email: ${formData.email}
+- Empresa: ${formData.company || 'N/A'}
+- Prazo desejado: ${formData.deadline || 'N/A'}
+- Link de referência: ${formData.referenceLink || 'N/A'}
+${attachmentName ? `- Anexo informado: ${attachmentName}` : ''}
+
+--------------------------------------------------
+Enviado através do portfólio oficial (davidsalviano.com)
+`
+    );
+
+    // If an external endpoint is configured via VITE_CONTACT_FORM_ENDPOINT, POST JSON to it.
+    const customEndpoint = import.meta.env.VITE_CONTACT_FORM_ENDPOINT;
+
+    if (customEndpoint) {
+      try {
+        const response = await fetch(customEndpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({
+            ...formData,
+            selectedServices,
+            selectedFormat,
+            selectedTimeline,
+            selectedBudget,
+            attachmentName,
+          }),
+        });
+
+        if (response.ok) {
+          setSubmissionState({
+            status: 'success',
+            message:
+              language === 'en'
+                ? talkData.confirmationMessage_en || 'Message received successfully. I’ll be in touch shortly.'
+                : talkData.confirmationMessage || 'Mensagem recebida com sucesso. Entrarei em contato em breve.',
+          });
+          return;
+        }
+      } catch (err) {
+        console.warn('Endpoint submission failed, using direct email fallback:', err);
+      }
+    }
+
+    // Direct mailto fallback with immediate user guidance
+    const mailtoUrl = `mailto:${talkData.email || 'davidsalviano52@gmail.com'}?subject=${emailSubject}&body=${emailBody}`;
+    window.location.href = mailtoUrl;
+
+    setTimeout(() => {
+      setSubmissionState({
+        status: 'success',
+        message:
+          language === 'en'
+            ? 'Your project brief was formatted and opened in your email client. If it did not open automatically, you can also copy my direct email below.'
+            : 'Seu briefing foi estruturado e aberto no seu aplicativo de email. Caso não tenha aberto automaticamente, você também pode copiar meu email direto ao lado.',
+      });
+    }, 600);
+  };
+
+  // Content Selection based on language
+  const heroEyebrow = language === 'en' ? talkData.heroEyebrow_en : talkData.heroEyebrow;
+  const heroTitle = language === 'en' ? talkData.heroTitle_en : talkData.heroTitle;
+  const heroDescription = language === 'en' ? talkData.heroDescription_en : talkData.heroDescription;
+  const availabilityText = language === 'en' ? talkData.availabilityText_en : talkData.availabilityText;
+  const availabilitySubtext = language === 'en' ? talkData.availabilitySubtext_en : talkData.availabilitySubtext;
+  const responseTime = language === 'en' ? talkData.responseTime_en : talkData.responseTime;
+  const ctaText = language === 'en' ? talkData.ctaText_en : talkData.ctaText;
+
+  const servicesList = language === 'en' ? talkData.servicesOptions_en : talkData.servicesOptions;
+  const formatsList = language === 'en' ? talkData.collaborationFormats_en : talkData.collaborationFormats;
+  const timelinesList = language === 'en' ? talkData.timelineOptions_en : talkData.timelineOptions;
+  const budgetsList = language === 'en' ? talkData.budgetRanges_en : talkData.budgetRanges;
+
+  const scrollToForm = () => {
+    document.getElementById('talk-form-section')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
-    <div className="min-h-screen pt-[64px] md:pt-[78px] pb-16 bg-[var(--color-background)]">
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="show"
-        className="w-full flex flex-col"
+    <div className="w-full bg-[#10110F] text-[#FAFAF7] select-none min-h-screen">
+      {/* ============================================================ */}
+      {/* 1. HERO COMPACTA (Respeitando Safe Area do Header)           */}
+      {/* ============================================================ */}
+      <section
+        style={{ paddingTop: `calc(${safeOffset || 72}px + 2rem)` }}
+        className="w-full pb-16 lg:pb-24 border-b border-[rgba(244,243,238,0.12)] bg-[#10110F]"
       >
-        {/* Timezone Indicator Banner - logo abaixo do header e antes de contact */}
-        <div className="w-full bg-neutral-carvao text-background py-3 px-4 flex items-center justify-center select-none border-b border-neutral-carvao/10">
-          <div className="flex items-center gap-2 font-mono text-[12px] uppercase tracking-[0.2em] font-semibold text-center">
-            <span className="w-2.5 h-2.5 rounded-full bg-[var(--color-lime-500)] animate-pulse" />
-            <span>Fortaleza, CE • {fortalezaTime || '00:00:00'} (GMT-3)</span>
+        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
+          <div className="max-w-4xl">
+            {/* Eyebrow */}
+            <div className="flex items-center gap-3 mb-4">
+              <span className="w-2 h-2 rounded-full bg-[#C4FF00]" />
+              <span className="font-mono text-xs font-bold uppercase tracking-[0.22em] text-[#C4FF00]">
+                {heroEyebrow || 'NOVOS PROJETOS / CONSULTORIA'}
+              </span>
+            </div>
+
+            {/* Title */}
+            <h1 className="font-serif text-[2.25rem] sm:text-[3.25rem] md:text-[4rem] font-normal leading-[1.06] tracking-tight text-[#FAFAF7] mb-6">
+              {heroTitle}
+            </h1>
+
+            {/* Description */}
+            <p className="font-sans text-base sm:text-lg lg:text-xl text-[#F4F3EE]/80 leading-relaxed max-w-3xl mb-8">
+              {heroDescription}
+            </p>
+
+            {/* Scroll Indicator Button */}
+            <button
+              type="button"
+              onClick={scrollToForm}
+              className="group inline-flex items-center gap-3 font-mono text-xs font-bold uppercase tracking-widest text-[#F4F3EE]/70 hover:text-[#C4FF00] transition-colors cursor-pointer"
+            >
+              <span>{language === 'en' ? 'STRUCTURE YOUR PROJECT' : 'ESTRUTURAR PROJETO'}</span>
+              <ArrowDown size={14} className="transition-transform group-hover:translate-y-1 text-[#C4FF00]" />
+            </button>
           </div>
         </div>
+      </section>
 
-        <div className="w-full border-b border-neutral-carvao/10 px-4 md:px-[calc(16%-24px)] py-6 md:py-10">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-x-12 lg:gap-x-16 items-stretch">
+      {/* ============================================================ */}
+      {/* 2. FAIXA DE HORÁRIO GLOBAL (Fortaleza, CE • GMT-3)          */}
+      {/* ============================================================ */}
+      <div className="w-full bg-[#151613] border-b border-[rgba(244,243,238,0.1)] py-3 px-6 sm:px-10 lg:px-16">
+        <div className="w-full max-w-[1400px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 font-mono text-xs text-[#F4F3EE]/60">
+          <div className="flex items-center gap-2.5">
+            <span className="w-2 h-2 rounded-full bg-[#C4FF00] animate-pulse" />
+            <span className="text-[#FAFAF7] font-semibold tracking-wider">
+              FORTALEZA, CE • {fortalezaTime || '18:00:00'} (GMT-3)
+            </span>
+          </div>
 
-            {/* Row 1 Left: Page Title */}
-            <motion.div variants={itemVariants} className="w-full pb-4 border-b border-neutral-carvao/10 flex flex-col justify-end">
-              <div className="relative flex items-center justify-between">
-                <img
-                  src={`${import.meta.env.BASE_URL}assets/titles/contact.png`}
-                  alt={t('contact_title_alt')}
-                  className="w-full max-w-[240px] md:max-w-[300px] h-auto object-contain select-none"
-                />
-                {/* Rotating Stamp Button */}
-                <div className="hidden sm:block transform scale-90 origin-right">
-                  <RotatingStamp
-                    as="div"
-                    text={t('contact_available_stamp')}
-                    icon={CheckCircle2}
-                  />
-                </div>
-              </div>
-            </motion.div>
+          <div className="flex items-center gap-4 text-[11px] uppercase tracking-widest text-white/40">
+            <span>{language === 'en' ? 'REMOTE & WORLDWIDE' : 'REMOTO & GLOBAL'}</span>
+            <span>·</span>
+            <span>{language === 'en' ? 'ENGLISH & PORTUGUESE' : 'PORTUGUÊS & INGLÊS'}</span>
+          </div>
+        </div>
+      </div>
 
-            {/* Row 1 Right: CTA Text */}
-            <motion.div variants={itemVariants} className="w-full pb-4 flex flex-col justify-end gap-4">
-              <h2 className="text-title-h2 font-extrabold text-neutral-carvao uppercase tracking-tight leading-snug font-sans max-w-xl">
-                {t('contact_h2_main')}{' '}
-                <span className="text-purple-500">{t('contact_h2_meaningful')}</span>{' '}
-                <span className="text-red-500">{t('contact_h2_together')}</span>
-              </h2>
-              <p className="text-body-lg text-neutral-carvao/75 w-full leading-relaxed font-sans">
-                {t('contact_description')}
-              </p>
-            </motion.div>
+      {/* ============================================================ */}
+      {/* 3. SEÇÃO PRINCIPAL OFF-WHITE (Grid de 12 Colunas)            */}
+      {/* ============================================================ */}
+      <section id="talk-form-section" className="w-full bg-[#FAFAF7] text-[#10110F] py-20 lg:py-28">
+        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
 
-            {/* Row 2 Left: Images, Timezone & Socials */}
-            <motion.div variants={itemVariants} className="flex flex-col gap-6 lg:gap-0 lg:justify-between w-full pt-6 lg:h-full">
-              {/* Images Row */}
-              <div className="grid grid-cols-2 gap-0 w-full">
-                {/* Halftone Hands Image */}
-                <div className="bg-[#B3A0E6]/25 relative overflow-hidden aspect-square flex items-center justify-center border border-neutral-carvao/10 rounded-[1px] select-none">
-                  <img
-                    src={`${import.meta.env.BASE_URL}assets/profile/cases_hands.png`}
-                    alt="Hands touching"
-                    className="absolute inset-0 w-full h-full object-cover grayscale mix-blend-multiply opacity-85"
-                  />
-                  <div
-                    className="absolute inset-0 mix-blend-overlay opacity-35 pointer-events-none"
-                    style={{
-                      backgroundImage: `url(${import.meta.env.BASE_URL}assets/Textures/texture.png)`,
-                      backgroundSize: 'cover'
-                    }}
-                  />
-                </div>
-
-                {/* Orange Available Block */}
-                <div className="bg-[#E6A045] p-6 flex flex-col justify-between items-center text-center text-neutral-carvao relative overflow-hidden select-none aspect-square border border-neutral-carvao/10 rounded-[1px]">
-                  <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none scale-150">
-                    <svg className="w-full h-full text-neutral-carvao" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="0.5">
-                      <circle cx="50" cy="50" r="45" stroke="currentColor" />
-                      <ellipse cx="50" cy="50" rx="30" ry="45" stroke="currentColor" />
-                      <ellipse cx="50" cy="50" rx="15" ry="45" stroke="currentColor" />
-                      <line x1="5" y1="50" x2="95" y2="50" stroke="currentColor" />
-                      <line x1="10" y1="25" x2="90" y2="25" stroke="currentColor" />
-                      <line x1="10" y1="75" x2="90" y2="75" stroke="currentColor" />
-                    </svg>
-                  </div>
-                  <div className="relative z-10 w-8 h-8 rounded-full border border-neutral-carvao flex items-center justify-center bg-background/25">
-                    <svg className="w-4 h-4 text-neutral-carvao" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                      <circle cx="12" cy="12" r="10" stroke="currentColor" />
-                      <ellipse cx="12" cy="12" rx="4" ry="10" stroke="currentColor" />
-                      <line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" />
-                    </svg>
-                  </div>
-                  <div className="relative z-10 flex flex-col gap-0.5 items-center">
-                    <span className="font-mono text-[8px] font-bold uppercase tracking-[0.2em] text-neutral-carvao/60">{t('contact_status_tag')}</span>
-                    <span className="font-sans font-extrabold text-[10px] md:text-xs uppercase tracking-wide text-neutral-carvao">
-                      {t('contact_status_value')}
-                    </span>
-                  </div>
-                  <div className="relative z-10 text-neutral-carvao/60">
-                    <svg className="w-8 h-2" viewBox="0 0 24 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                      <path d="M1 3c2-1 4-2 6-1s4 2 6 1 4-2 6-1" stroke="currentColor" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              {/* Asterisk and Socials */}
-              <div className="flex flex-col gap-4 border-t border-neutral-carvao/10 pt-6">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-neutral-carvao/45">
-                    {t('contact_connect_tag')}
-                  </h3>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-end">
-                  <div className="flex flex-col gap-2 w-full">
-                    {[
-                      {
-                        label: "Email",
-                        value: "davidsalviano52@gmail.com",
-                        href: "mailto:davidsalviano52@gmail.com",
-                        icon: (
-                          <svg className="w-3.5 h-3.5 text-[#8b7ec8]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                          </svg>
-                        )
-                      },
-                      {
-                        label: "LinkedIn",
-                        value: "David Salviano",
-                        href: "https://www.linkedin.com/in/david-salviano-12b41b264/",
-                        icon: (
-                          <svg className="w-3.5 h-3.5 text-[#8b7ec8] fill-current" viewBox="0 0 24 24">
-                            <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
-                          </svg>
-                        )
-                      },
-                      {
-                        label: "Instagram",
-                        value: "@davidolix11",
-                        href: "https://instagram.com/davidolix11",
-                        icon: (
-                          <svg className="w-3.5 h-3.5 text-[#8b7ec8]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-                            <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37zM17.5 6.5h.01" />
-                          </svg>
-                        )
-                      }
-                    ].map((link) => (
-                      <a
-                        key={link.label}
-                        href={link.href}
-                        target={link.href.startsWith("http") ? "_blank" : undefined}
-                        rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                        className="flex items-center justify-between py-2.5 px-3 group hover:bg-lilac bg-background/25 border border-neutral-carvao/10 rounded-[1px] transition-colors duration-300"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-6 h-6 rounded-[1px] bg-lilac/15 flex items-center justify-center shadow-sm">
-                            {link.icon}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-mono text-[9px] font-bold uppercase tracking-wider text-neutral-carvao/45">{link.label}:</span>
-                            <span className="font-sans text-xs font-bold text-neutral-carvao">{link.value}</span>
-                          </div>
-                        </div>
-                        <svg className="w-3.5 h-3.5 text-neutral-carvao/40 transform group-hover:translate-x-0.5 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
-                      </a>
-                    ))}
-                  </div>
-
-                  {/* Asterisk Container (96x96px to match the 3 links height perfectly) */}
-                  <div className="w-24 h-24 border border-neutral-carvao/10 rounded-[1px] overflow-hidden bg-neutral-carvao/5 relative select-none hidden md:block">
+            {/* ============================================================ */}
+            {/* LADO ESQUERDO: Painel de Disponibilidade e Contato (5 Cols)   */}
+            {/* ============================================================ */}
+            <aside className="lg:col-span-5 flex flex-col gap-8 lg:sticky lg:top-[calc(var(--header-safe-offset)+1rem)]">
+              
+              {/* Card de Perfil e Disponibilidade */}
+              <div className="border border-[#10110F]/15 bg-white p-6 sm:p-8 rounded-[20px] shadow-sm flex flex-col gap-6">
+                
+                {/* Imagem de Apoio (Sem filtros artificiais) */}
+                {talkData.profileImageUrl && (
+                  <div className="w-full aspect-[4/3] rounded-[14px] overflow-hidden border border-[#10110F]/10 bg-[#10110F]/5">
                     <img
-                      src={`${import.meta.env.BASE_URL}assets/apoio/asterisco.png`}
-                      alt="Asterisk sketch"
+                      src={talkData.profileImageUrl}
+                      alt={talkData.profileImageAlt || 'David Salviano — Product Designer'}
                       className="w-full h-full object-cover"
                     />
-                    <div
-                      className="absolute inset-0 mix-blend-overlay opacity-35 pointer-events-none"
-                      style={{
-                        backgroundImage: `url(${import.meta.env.BASE_URL}assets/Textures/texture.png)`,
-                        backgroundSize: 'cover'
-                      }}
-                    />
                   </div>
+                )}
+
+                {/* Status de Disponibilidade */}
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#10110F] relative flex items-center justify-center">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#C4FF00] absolute animate-ping opacity-75" />
+                      <span className="w-2 rounded-full bg-[#C4FF00]" />
+                    </span>
+                    <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#10110F]">
+                      {availabilityText}
+                    </span>
+                  </div>
+                  <p className="font-sans text-sm text-[#10110F]/70 leading-relaxed">
+                    {availabilitySubtext}
+                  </p>
+                </div>
+
+                {/* Prazo Médio de Resposta */}
+                <div className="pt-4 border-t border-[#10110F]/10 flex items-start gap-3 text-xs text-[#10110F]/65 font-mono">
+                  <Clock size={15} className="text-[#4056F4] shrink-0 mt-0.5" />
+                  <span>{responseTime}</span>
                 </div>
               </div>
 
-            </motion.div>
+              {/* Contatos Diretos com Interações Úteis */}
+              <div className="border border-[#10110F]/15 bg-white p-6 rounded-[20px] shadow-sm flex flex-col gap-4">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#10110F]/45">
+                  {language === 'en' ? 'DIRECT CHANNELS' : 'CANAIS DIRETOS'}
+                </span>
 
-            {/* Row 2 Right: Form Container */}
-            <motion.div variants={itemVariants} className="w-full flex flex-col pt-0 -mt-[2px]">
-              <form onSubmit={handleSubmit} className="border border-neutral-carvao/10 bg-background/40 p-6 md:p-8 rounded-[1px] flex flex-col gap-6 w-full relative">
-                {/* Inputs */}
-                <div className="flex flex-col gap-2">
-                  <label htmlFor="name" className="font-mono text-[9px] font-bold uppercase tracking-wider text-neutral-carvao/60">{t('contact_form_name_label', "Name")}</label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    placeholder={t('contact_form_name_placeholder', "Your name")}
-                    className="w-full h-12 px-4 rounded-[1px] border border-neutral-carvao/20 bg-background focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/40 font-sans text-sm text-neutral-carvao transition-all"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <label htmlFor="email" className="font-mono text-[9px] font-bold uppercase tracking-wider text-neutral-carvao/60">{t('contact_form_email_label', "Email")}</label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    placeholder={t('contact_form_email_placeholder', "your.email@example.com")}
-                    className="w-full h-12 px-4 rounded-[1px] border border-neutral-carvao/20 bg-background focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/40 font-sans text-sm text-neutral-carvao transition-all"
-                  />
-                </div>
-
-                {/* Dropdowns row */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-2">
-                    <label htmlFor="projectType" className="font-mono text-[9px] font-bold uppercase tracking-wider text-neutral-carvao/60">{t('contact_form_type_label', "Project Type")}</label>
-                    <div className="relative">
-                      <select
-                        id="projectType"
-                        name="projectType"
-                        value={formData.projectType}
-                        onChange={handleChange}
-                        required
-                        className="w-full h-12 px-4 pr-10 rounded-[1px] border border-neutral-carvao/20 bg-background focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/40 font-sans text-sm text-neutral-carvao transition-all appearance-none cursor-pointer"
-                      >
-                        <option value="">{t('contact_form_type_placeholder', "Select project type")}</option>
-                        <option value="UI/UX Design">{t('contact_form_type_opt1', "UI/UX Design")}</option>
-                        <option value="Web Development">{t('contact_form_type_opt2', "Web Design & Development")}</option>
-                        <option value="Branding & Identity">{t('contact_form_type_opt3', "Branding & Identity")}</option>
-                        <option value="Other Collaboration">{t('contact_form_type_opt4', "Motion & Interaction")}</option>
-                      </select>
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-neutral-carvao/50">
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </div>
+                {/* Email com Ação de Copiar */}
+                <div className="flex items-center justify-between p-3.5 rounded-[12px] bg-[#FAFAF7] border border-[#10110F]/10 hover:border-[#10110F]/30 transition-colors">
+                  <div className="flex items-center gap-3 overflow-hidden">
+                    <Mail size={16} className="text-[#10110F]/60 shrink-0" />
+                    <div className="flex flex-col overflow-hidden">
+                      <span className="font-mono text-[10px] uppercase text-[#10110F]/45">Email</span>
+                      <span className="font-sans text-xs sm:text-sm font-semibold text-[#10110F] truncate">
+                        {talkData.email}
+                      </span>
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-2">
-                    <label htmlFor="budgetRange" className="font-mono text-[9px] font-bold uppercase tracking-wider text-neutral-carvao/60">{t('contact_form_budget_label', "Budget Range")}</label>
-                    <div className="relative">
-                      <select
-                        id="budgetRange"
-                        name="budgetRange"
-                        value={formData.budgetRange}
-                        onChange={handleChange}
-                        required
-                        className="w-full h-12 px-4 pr-10 rounded-[1px] border border-neutral-carvao/20 bg-background focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/40 font-sans text-sm text-neutral-carvao transition-all appearance-none cursor-pointer"
-                      >
-                        <option value="">{t('contact_form_budget_placeholder', "Select budget range")}</option>
-                        <option value="Under $500">{t('contact_form_budget_under_500', "Under $500")}</option>
-                        <option value="$500 - $750">$500 - $750</option>
-                        <option value="$750 - $1500">$750 - $1.5k</option>
-                        <option value="$1500 - $2500">$1.5k - $2.5k</option>
-                        <option value="$2500 - $5000">$2.5k - $5k</option>
-                        <option value="$5000+">$5k+</option>
-                      </select>
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-neutral-carvao/50">
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <label htmlFor="message" className="font-mono text-[9px] font-bold uppercase tracking-wider text-neutral-carvao/60">{t('contact_form_message_label', "Tell me about your project")}</label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    rows="4"
-                    value={formData.message}
-                    onChange={handleChange}
-                    required
-                    placeholder={t('contact_form_message_placeholder', "Share your goals, challenges, and ideas...")}
-                    className="w-full p-4 rounded-[1px] border border-neutral-carvao/20 bg-background focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/40 font-sans text-sm text-neutral-carvao transition-all resize-none"
-                  ></textarea>
-                </div>
-
-                {/* Form Footer */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mt-2 pt-2">
-                  <div className="flex items-start gap-2 max-w-[320px]">
-                    <svg className="w-4 h-4 text-neutral-carvao/50 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                    <p className="font-sans text-body-sm text-neutral-carvao/60 leading-normal">
-                      {t('contact_form_info_disclaimer', "Your information is safe with me. I'll get back to you within 1-2 business days.")}
-                    </p>
-                  </div>
-
-                  <LimeActionButton
-                    type="submit"
-                    theme="purple"
-                    disabled={status === 'sending' || status === 'success'}
-                    icon={ArrowRight}
+                  <button
+                    type="button"
+                    onClick={handleCopyEmail}
+                    className="p-2 rounded-[8px] hover:bg-[#10110F]/10 text-[#10110F] transition-colors shrink-0 ml-2 focus-visible:outline-2 focus-visible:outline-[#4056F4] cursor-pointer"
+                    aria-label="Copiar email de contato"
+                    title={copiedEmail ? 'Email copiado!' : 'Copiar email'}
                   >
-                    {status === 'sending' ? t('contact_form_sending', 'Sending...') : status === 'success' ? t('contact_form_sent', 'Message Sent!') : t('contact_form_send', 'Send Message')}
-                  </LimeActionButton>
+                    {copiedEmail ? <Check size={16} className="text-green-600" /> : <Copy size={16} />}
+                  </button>
                 </div>
-
-                {/* Success Banner */}
-                {status === 'success' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="absolute inset-0 bg-background/95 flex flex-col items-center justify-center text-center p-6 rounded-[1px] z-20 border border-neutral-carvao/10"
-                  >
-                    <div className="w-12 h-12 rounded-full bg-[var(--color-lime-500)] flex items-center justify-center border border-neutral-carvao mb-4">
-                      <svg className="w-6 h-6 text-neutral-carvao" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    <h4 className="font-sans font-extrabold text-subtitle-sm text-neutral-carvao uppercase tracking-tight mb-2">{t('contact_success_thanks', "Thank you!")}</h4>
-                    <p className="font-sans text-body-sm text-neutral-carvao/75 max-w-xs leading-relaxed mb-4">
-                      {t('contact_success_desc', "Your message has been sent successfully. I'll get in touch with you very soon!")}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => setStatus('')}
-                      className="mt-6 font-mono text-[9px] font-bold uppercase tracking-wider text-[#8b7ec8] underline hover:text-neutral-carvao"
-                    >
-                      {t('contact_success_another', "Send another message")}
-                    </button>
-                  </motion.div>
+                {copiedEmail && (
+                  <span className="font-mono text-[11px] text-green-700 font-bold -mt-2 px-1 block animate-fadeIn">
+                    ✓ {language === 'en' ? 'Email copied to clipboard!' : 'Email copiado para a área de transferência!'}
+                  </span>
                 )}
+
+                {/* LinkedIn */}
+                {talkData.linkedIn && (
+                  <a
+                    href={talkData.linkedIn}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center justify-between p-3.5 rounded-[12px] bg-[#FAFAF7] border border-[#10110F]/10 hover:border-[#10110F]/30 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <LinkedInIcon size={16} className="text-[#10110F]/60" />
+                      <div className="flex flex-col">
+                        <span className="font-mono text-[10px] uppercase text-[#10110F]/45">LinkedIn</span>
+                        <span className="font-sans text-xs sm:text-sm font-semibold text-[#10110F]">
+                          David Salviano
+                        </span>
+                      </div>
+                    </div>
+                    <ArrowUpRight size={16} className="text-[#10110F]/40 group-hover:text-[#10110F] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                  </a>
+                )}
+
+                {/* WhatsApp (Opcional) */}
+                {talkData.whatsapp && (
+                  <a
+                    href={`https://wa.me/${talkData.whatsapp.replace(/[^0-9]/g, '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center justify-between p-3.5 rounded-[12px] bg-[#FAFAF7] border border-[#10110F]/10 hover:border-[#10110F]/30 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <MessageCircle size={16} className="text-[#10110F]/60" />
+                      <div className="flex flex-col">
+                        <span className="font-mono text-[10px] uppercase text-[#10110F]/45">WhatsApp</span>
+                        <span className="font-sans text-xs sm:text-sm font-semibold text-[#10110F]">
+                          {talkData.whatsapp}
+                        </span>
+                      </div>
+                    </div>
+                    <ArrowUpRight size={16} className="text-[#10110F]/40 group-hover:text-[#10110F] transition-transform" />
+                  </a>
+                )}
+
+                {/* Instagram (Secundário) */}
+                {talkData.instagram && (
+                  <a
+                    href={`https://instagram.com/${talkData.instagram.replace('@', '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center justify-between p-3.5 rounded-[12px] bg-[#FAFAF7] border border-[#10110F]/10 hover:border-[#10110F]/30 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <InstagramIcon size={16} className="text-[#10110F]/60" />
+                      <div className="flex flex-col">
+                        <span className="font-mono text-[10px] uppercase text-[#10110F]/45">Instagram</span>
+                        <span className="font-sans text-xs sm:text-sm font-semibold text-[#10110F]">
+                          {talkData.instagram}
+                        </span>
+                      </div>
+                    </div>
+                    <ArrowUpRight size={16} className="text-[#10110F]/40 group-hover:text-[#10110F] transition-transform" />
+                  </a>
+                )}
+              </div>
+            </aside>
+
+            {/* ============================================================ */}
+            {/* LADO DIREITO: Conversa Estruturada (7 Cols)                  */}
+            {/* ============================================================ */}
+            <main className="lg:col-span-7 flex flex-col gap-10">
+              <form onSubmit={handleSubmit} className="flex flex-col gap-10">
+                
+                {/* Honeypot invisível para proteção contra bots */}
+                <input
+                  type="text"
+                  name="honeypot"
+                  value={formData.honeypot}
+                  onChange={handleInputChange}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  className="hidden opacity-0 pointer-events-none absolute"
+                />
+
+                {/* ======================================================== */}
+                {/* PERGUNTA 1: Serviços / Necessidades (Multi-select)       */}
+                {/* ======================================================== */}
+                <fieldset className="flex flex-col gap-3.5 border-b border-[#10110F]/10 pb-8">
+                  <legend className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-[#10110F] mb-1">
+                    01 // {language === 'en' ? 'What do you need help with?' : 'Com o que você precisa de ajuda?'}
+                  </legend>
+                  <p className="font-sans text-xs text-[#10110F]/60 -mt-2 mb-2">
+                    {language === 'en' ? 'Select all that apply:' : 'Selecione uma ou mais opções:'}
+                  </p>
+
+                  <div className="flex flex-wrap gap-2.5">
+                    {servicesList.map((service) => {
+                      const isSelected = selectedServices.includes(service);
+                      return (
+                        <label
+                          key={service}
+                          className={`
+                            group inline-flex items-center gap-2 px-4 py-2.5 rounded-[12px] font-sans text-xs sm:text-sm font-semibold
+                            transition-all duration-200 cursor-pointer select-none border focus-within:ring-2 focus-within:ring-[#4056F4]
+                            ${
+                              isSelected
+                                ? 'bg-[#10110F] text-[#FAFAF7] border-[#10110F] shadow-sm'
+                                : 'bg-white text-[#10110F]/80 border-[#10110F]/15 hover:border-[#10110F]/40 hover:text-[#10110F]'
+                            }
+                          `}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => handleServiceToggle(service)}
+                            className="sr-only"
+                          />
+                          <span
+                            className={`w-2 h-2 rounded-full transition-colors ${
+                              isSelected ? 'bg-[#C4FF00]' : 'bg-[#10110F]/20 group-hover:bg-[#10110F]/40'
+                            }`}
+                          />
+                          <span>{service}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </fieldset>
+
+                {/* ======================================================== */}
+                {/* PERGUNTA 2: Formato de Colaboração (Single Radio)        */}
+                {/* ======================================================== */}
+                <fieldset className="flex flex-col gap-3.5 border-b border-[#10110F]/10 pb-8">
+                  <legend className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-[#10110F] mb-1">
+                    02 // {language === 'en' ? 'Which format makes the most sense right now?' : 'Qual formato faz mais sentido agora?'}
+                  </legend>
+
+                  <div className="flex flex-wrap gap-2.5">
+                    {formatsList.map((format) => {
+                      const isSelected = selectedFormat === format;
+                      return (
+                        <label
+                          key={format}
+                          className={`
+                            group inline-flex items-center gap-2 px-4 py-2.5 rounded-[12px] font-sans text-xs sm:text-sm font-semibold
+                            transition-all duration-200 cursor-pointer select-none border focus-within:ring-2 focus-within:ring-[#4056F4]
+                            ${
+                              isSelected
+                                ? 'bg-[#10110F] text-[#FAFAF7] border-[#10110F] shadow-sm'
+                                : 'bg-white text-[#10110F]/80 border-[#10110F]/15 hover:border-[#10110F]/40 hover:text-[#10110F]'
+                            }
+                          `}
+                        >
+                          <input
+                            type="radio"
+                            name="collaborationFormat"
+                            value={format}
+                            checked={isSelected}
+                            onChange={() => setSelectedFormat(format)}
+                            className="sr-only"
+                          />
+                          <span
+                            className={`w-2 h-2 rounded-full transition-colors ${
+                              isSelected ? 'bg-[#C4FF00]' : 'bg-[#10110F]/20 group-hover:bg-[#10110F]/40'
+                            }`}
+                          />
+                          <span>{format}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </fieldset>
+
+                {/* ======================================================== */}
+                {/* PERGUNTA 3: Previsão de Início (Single Radio)            */}
+                {/* ======================================================== */}
+                <fieldset className="flex flex-col gap-3.5 border-b border-[#10110F]/10 pb-8">
+                  <legend className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-[#10110F] mb-1">
+                    03 // {language === 'en' ? 'When are you looking to start?' : 'Quando pretende começar?'}
+                  </legend>
+
+                  <div className="flex flex-wrap gap-2.5">
+                    {timelinesList.map((timeline) => {
+                      const isSelected = selectedTimeline === timeline;
+                      return (
+                        <label
+                          key={timeline}
+                          className={`
+                            group inline-flex items-center gap-2 px-4 py-2.5 rounded-[12px] font-sans text-xs sm:text-sm font-semibold
+                            transition-all duration-200 cursor-pointer select-none border focus-within:ring-2 focus-within:ring-[#4056F4]
+                            ${
+                              isSelected
+                                ? 'bg-[#10110F] text-[#FAFAF7] border-[#10110F] shadow-sm'
+                                : 'bg-white text-[#10110F]/80 border-[#10110F]/15 hover:border-[#10110F]/40 hover:text-[#10110F]'
+                            }
+                          `}
+                        >
+                          <input
+                            type="radio"
+                            name="timelineOption"
+                            value={timeline}
+                            checked={isSelected}
+                            onChange={() => setSelectedTimeline(timeline)}
+                            className="sr-only"
+                          />
+                          <span
+                            className={`w-2 h-2 rounded-full transition-colors ${
+                              isSelected ? 'bg-[#C4FF00]' : 'bg-[#10110F]/20 group-hover:bg-[#10110F]/40'
+                            }`}
+                          />
+                          <span>{timeline}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </fieldset>
+
+                {/* ======================================================== */}
+                {/* PERGUNTA 4: Faixa de Investimento (Single Radio)         */}
+                {/* ======================================================== */}
+                <fieldset className="flex flex-col gap-3.5 border-b border-[#10110F]/10 pb-8">
+                  <legend className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-[#10110F] mb-1">
+                    04 // {language === 'en' ? 'Do you have an estimated budget range?' : 'Você já possui uma faixa de investimento?'}
+                  </legend>
+
+                  <div className="flex flex-wrap gap-2.5">
+                    {budgetsList.map((budget) => {
+                      const isSelected = selectedBudget === budget;
+                      return (
+                        <label
+                          key={budget}
+                          className={`
+                            group inline-flex items-center gap-2 px-4 py-2.5 rounded-[12px] font-sans text-xs sm:text-sm font-semibold
+                            transition-all duration-200 cursor-pointer select-none border focus-within:ring-2 focus-within:ring-[#4056F4]
+                            ${
+                              isSelected
+                                ? 'bg-[#10110F] text-[#FAFAF7] border-[#10110F] shadow-sm'
+                                : 'bg-white text-[#10110F]/80 border-[#10110F]/15 hover:border-[#10110F]/40 hover:text-[#10110F]'
+                            }
+                          `}
+                        >
+                          <input
+                            type="radio"
+                            name="budgetRange"
+                            value={budget}
+                            checked={isSelected}
+                            onChange={() => setSelectedBudget(budget)}
+                            className="sr-only"
+                          />
+                          <span
+                            className={`w-2 h-2 rounded-full transition-colors ${
+                              isSelected ? 'bg-[#C4FF00]' : 'bg-[#10110F]/20 group-hover:bg-[#10110F]/40'
+                            }`}
+                          />
+                          <span>{budget}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </fieldset>
+
+                {/* ======================================================== */}
+                {/* CAMPOS DETALHADOS DE PROJETO & CONTATO                   */}
+                {/* ======================================================== */}
+                <div className="flex flex-col gap-6">
+                  <span className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-[#10110F]">
+                    05 // {language === 'en' ? 'Tell me about the project' : 'Conte sobre o projeto'}
+                  </span>
+
+                  {/* Descrição do Projeto */}
+                  <div className="flex flex-col gap-2">
+                    <label htmlFor="description" className="font-mono text-[11px] font-bold uppercase text-[#10110F]/70">
+                      {language === 'en' ? 'Project Goals & Context *' : 'Objetivos do Projeto & Contexto *'}
+                    </label>
+                    <textarea
+                      id="description"
+                      name="description"
+                      required
+                      rows={4}
+                      value={formData.description}
+                      onChange={handleInputChange}
+                      placeholder={
+                        language === 'en'
+                          ? 'What are you aiming to build or solve? Share your current state and expectations...'
+                          : 'O que você precisa construir ou resolver? Compartilhe o momento atual e os desafios...'
+                      }
+                      className="w-full p-4 rounded-[14px] border border-[#10110F]/15 bg-white text-[#10110F] font-sans text-sm focus:outline-none focus:ring-2 focus:ring-[#4056F4] focus:border-transparent transition-all resize-y"
+                    />
+                  </div>
+
+                  {/* Nome e Email em 2 Colunas */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div className="flex flex-col gap-2">
+                      <label htmlFor="name" className="font-mono text-[11px] font-bold uppercase text-[#10110F]/70">
+                        {language === 'en' ? 'Your Name *' : 'Seu Nome *'}
+                      </label>
+                      <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        required
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        placeholder={language === 'en' ? 'e.g. Alex Silva' : 'ex: Alex Silva'}
+                        className="w-full h-12 px-4 rounded-[14px] border border-[#10110F]/15 bg-white text-[#10110F] font-sans text-sm focus:outline-none focus:ring-2 focus:ring-[#4056F4] transition-all"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <label htmlFor="email" className="font-mono text-[11px] font-bold uppercase text-[#10110F]/70">
+                        {language === 'en' ? 'Your Email *' : 'Seu Email *'}
+                      </label>
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        required
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        placeholder={language === 'en' ? 'alex@company.com' : 'alex@empresa.com'}
+                        className="w-full h-12 px-4 rounded-[14px] border border-[#10110F]/15 bg-white text-[#10110F] font-sans text-sm focus:outline-none focus:ring-2 focus:ring-[#4056F4] transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Empresa e Prazo Desejado em 2 Colunas */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div className="flex flex-col gap-2">
+                      <label htmlFor="company" className="font-mono text-[11px] font-bold uppercase text-[#10110F]/70">
+                        {language === 'en' ? 'Company / Organization (Optional)' : 'Empresa / Organização (Opcional)'}
+                      </label>
+                      <input
+                        type="text"
+                        id="company"
+                        name="company"
+                        value={formData.company}
+                        onChange={handleInputChange}
+                        placeholder={language === 'en' ? 'Company name' : 'Nome da empresa'}
+                        className="w-full h-12 px-4 rounded-[14px] border border-[#10110F]/15 bg-white text-[#10110F] font-sans text-sm focus:outline-none focus:ring-2 focus:ring-[#4056F4] transition-all"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <label htmlFor="deadline" className="font-mono text-[11px] font-bold uppercase text-[#10110F]/70">
+                        {language === 'en' ? 'Target Deadline (Optional)' : 'Prazo Desejado (Opcional)'}
+                      </label>
+                      <input
+                        type="text"
+                        id="deadline"
+                        name="deadline"
+                        value={formData.deadline}
+                        onChange={handleInputChange}
+                        placeholder={language === 'en' ? 'e.g. End of Q2, 6 weeks' : 'ex: Fim do trimestre, 6 semanas'}
+                        className="w-full h-12 px-4 rounded-[14px] border border-[#10110F]/15 bg-white text-[#10110F] font-sans text-sm focus:outline-none focus:ring-2 focus:ring-[#4056F4] transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Link de Referência */}
+                  <div className="flex flex-col gap-2">
+                    <label htmlFor="referenceLink" className="font-mono text-[11px] font-bold uppercase text-[#10110F]/70">
+                      {language === 'en' ? 'Reference Link or Website (Optional)' : 'Link de Referência ou Site Atual (Opcional)'}
+                    </label>
+                    <input
+                      type="url"
+                      id="referenceLink"
+                      name="referenceLink"
+                      value={formData.referenceLink}
+                      onChange={handleInputChange}
+                      placeholder="https://..."
+                      className="w-full h-12 px-4 rounded-[14px] border border-[#10110F]/15 bg-white text-[#10110F] font-sans text-sm focus:outline-none focus:ring-2 focus:ring-[#4056F4] transition-all"
+                    />
+                  </div>
+
+                  {/* Anexo Opcional */}
+                  <div className="flex flex-col gap-2">
+                    <span className="font-mono text-[11px] font-bold uppercase text-[#10110F]/70">
+                      {language === 'en' ? 'Briefing Document or Attachment (Optional - Max 5MB)' : 'Documento de Briefing ou Anexo (Opcional - Máx 5MB)'}
+                    </span>
+                    <label className="flex items-center gap-3 p-4 rounded-[14px] border border-dashed border-[#10110F]/25 bg-white hover:bg-[#FAFAF7] hover:border-[#10110F]/50 transition-colors cursor-pointer">
+                      <Upload size={18} className="text-[#10110F]/60" />
+                      <span className="font-sans text-xs text-[#10110F]/75">
+                        {attachmentName || (language === 'en' ? 'Upload PDF, image, or deck (Max 5MB)' : 'Selecionar PDF, imagem ou apresentação (Máx 5MB)')}
+                      </span>
+                      <input
+                        type="file"
+                        onChange={handleFileChange}
+                        accept=".pdf,.png,.jpg,.jpeg,.zip,.fig"
+                        className="sr-only"
+                      />
+                    </label>
+                    {attachmentError && (
+                      <span className="font-mono text-xs text-red-600 font-bold">{attachmentError}</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* ======================================================== */}
+                {/* MENSAGENS DE STATUS (Aria-live para Acessibilidade)      */}
+                {/* ======================================================== */}
+                <div aria-live="polite" className="w-full">
+                  {submissionState.status === 'error' && (
+                    <div className="p-4 rounded-[14px] bg-red-50 border border-red-200 flex items-start gap-3 text-red-800 text-xs sm:text-sm font-sans">
+                      <AlertCircle size={18} className="text-red-600 shrink-0 mt-0.5" />
+                      <span>{submissionState.message}</span>
+                    </div>
+                  )}
+
+                  {submissionState.status === 'success' && (
+                    <div className="p-6 rounded-[16px] bg-emerald-50 border border-emerald-200 flex flex-col gap-3 text-emerald-900 font-sans">
+                      <div className="flex items-center gap-2 font-bold text-sm sm:text-base">
+                        <Check size={20} className="text-emerald-700" />
+                        <span>{language === 'en' ? 'Briefing Structured Successfully!' : 'Briefing Estruturado com Sucesso!'}</span>
+                      </div>
+                      <p className="text-xs sm:text-sm text-emerald-800/90 leading-relaxed">
+                        {submissionState.message}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* ======================================================== */}
+                {/* BOTÃO DE SUBMISSÃO (CTA) & TEXTO AUXILIAR                */}
+                {/* ======================================================== */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pt-4 border-t border-[#10110F]/10">
+                  <div className="flex items-center gap-2.5 text-xs text-[#10110F]/65 font-mono">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#10110F]/40" />
+                    <span>{responseTime}</span>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={submissionState.status === 'submitting'}
+                    className="group inline-flex items-center justify-center gap-3 px-8 py-4 font-mono text-xs sm:text-sm font-bold tracking-widest uppercase text-[#10110F] bg-[#C4FF00] hover:bg-[#d8ff1a] active:scale-[0.98] transition-all rounded-[16px] shadow-md focus-visible:outline-2 focus-visible:outline-[#10110F] cursor-pointer disabled:opacity-50"
+                  >
+                    <span>
+                      {submissionState.status === 'submitting'
+                        ? language === 'en'
+                          ? 'FORMATTING...'
+                          : 'ESTRUTURANDO...'
+                        : ctaText || 'ENVIAR PROJETO ↗'}
+                    </span>
+                    <ArrowUpRight size={16} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </button>
+                </div>
+
               </form>
-            </motion.div>
+            </main>
 
           </div>
         </div>
-      </motion.div>
+      </section>
     </div>
   );
 }
+
+export default Contact;

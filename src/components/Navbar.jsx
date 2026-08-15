@@ -1,239 +1,58 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion';
-import { LimeActionButton } from './Buttons';
-import { ArrowUpRight } from 'lucide-react';
+import { motion, useScroll, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
+import { registerHeaderElement } from '../hooks/useHeaderMetrics';
 
-const MotionLink = motion(Link);
+const EASING = [0.22, 1, 0.36, 1];
 
-/* ------------------------------------------------------------------ */
-/*  Magnetic Nav Link — each link subtly follows the cursor on hover   */
-/* ------------------------------------------------------------------ */
-function MagneticNavLink({ to, isActive, children, onClick, index }) {
-  const ref = useRef(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const springX = useSpring(x, { stiffness: 250, damping: 20, mass: 0.15 });
-  const springY = useSpring(y, { stiffness: 250, damping: 20, mass: 0.15 });
-
-  const handleMouse = useCallback((e) => {
-    const rect = ref.current?.getBoundingClientRect();
-    if (!rect) return;
-    x.set((e.clientX - (rect.left + rect.width / 2)) * 0.2);
-    y.set((e.clientY - (rect.top + rect.height / 2)) * 0.2);
-  }, [x, y]);
-
-  const reset = useCallback(() => {
-    x.set(0);
-    y.set(0);
-  }, [x, y]);
-
+function HeaderNavLink({ to, isActive, children, onClick }) {
   return (
-    <motion.div
-      ref={ref}
-      onMouseMove={handleMouse}
-      onMouseLeave={reset}
-      style={{ x: springX, y: springY }}
-      initial={{ opacity: 0, y: -8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.15 + index * 0.06, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      className="relative"
+    <Link
+      to={to}
+      onClick={onClick}
+      className={`
+        relative py-1 font-mono text-[11px] sm:text-xs font-semibold uppercase tracking-[0.18em]
+        transition-colors duration-200 group/navlink focus-visible:outline-2 focus-visible:outline-[#C7F000] focus-visible:outline-offset-4
+        ${isActive ? 'text-[#C7F000]' : 'text-[#F4F3EE]/70 hover:text-[#F4F3EE]'}
+      `}
     >
-      <Link
-        to={to}
-        onClick={onClick}
-        className={`
-          relative py-2 px-1 font-mono text-[11px] sm:text-[13px] font-semibold uppercase tracking-[0.18em]
-          transition-colors duration-300 group/link
-          ${isActive
-            ? 'text-[var(--color-primary)]'
-            : 'text-[var(--color-foreground)]/70 hover:text-[var(--color-foreground)]'
-          }
-        `}
-      >
-        {/* Label */}
-        <span className="relative z-10">{children}</span>
-
-        {/* Active bar indicator */}
-        <span
-          className={`
-            absolute -bottom-[2px] left-1/2 -translate-x-1/2 rounded-full bg-[var(--color-primary)]
-            transition-all duration-500 ease-[cubic-bezier(.16,1,.3,1)]
-            ${isActive ? 'w-[16px] h-[2px] opacity-100' : 'w-0 h-0 opacity-0'}
-          `}
-        />
-
-        {/* Hover underline sweep */}
-        <span
-          className={`
-            absolute bottom-0 left-0 h-[1.5px] bg-[var(--color-foreground)]
-            transition-transform duration-500 ease-[cubic-bezier(.16,1,.3,1)] origin-left
-            ${isActive ? 'scale-x-0' : 'scale-x-0 group-hover/link:scale-x-100'}
-          `}
-          style={{ width: '100%' }}
-        />
-      </Link>
-    </motion.div>
+      <span className="relative z-10">{children}</span>
+      {isActive && (
+        <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#C7F000]" />
+      )}
+    </Link>
   );
 }
 
-/* ------------------------------------------------------------------ */
-/*  Copyright Icon                                                     */
-/* ------------------------------------------------------------------ */
-function CopyrightIcon(props) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      {...props}
-    >
-      <circle cx="12" cy="12" r="10" />
-      <path d="M14.83 14.83a4 4 0 1 1 0-5.66" />
-    </svg>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/*  Globe Icon                                                         */
-/* ------------------------------------------------------------------ */
-function GlobeIcon(props) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      {...props}
-    >
-      <circle cx="12" cy="12" r="10" />
-      <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
-      <path d="M2 12h20" />
-    </svg>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/*  Chevron Down Icon                                                  */
-/* ------------------------------------------------------------------ */
-function ChevronDownIcon(props) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      {...props}
-    >
-      <path d="m6 9 6 6 6-6" />
-    </svg>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/*  Main Navbar                                                        */
-/* ------------------------------------------------------------------ */
-export function Navbar() {
+export function SiteHeader() {
   const { language, setLanguage, t } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
-  const [isPastHero, setIsPastHero] = useState(false);
-  const [isOverDark, setIsOverDark] = useState(false);
-  const ticking = useRef(false);
+  const prefersReducedMotion = useReducedMotion();
+  const headerRef = useRef(null);
 
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Close dropdown on click outside
+  const { scrollY } = useScroll();
+
+  // Register single global header for dynamic metrics contract
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
-      }
+    if (headerRef.current) {
+      const cleanup = registerHeaderElement(headerRef.current);
+      return cleanup;
     }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  /* ---------- scroll logic: crop expansion + dark detection ---------- */
   useEffect(() => {
-    const isHome = location.pathname === '/';
-    const isAbout = location.pathname === '/about';
-
-    if (!isHome && !isAbout) {
-      setIsPastHero(false);
-      setIsOverDark(false);
-      const timer = setTimeout(() => setIsPastHero(true), 250);
-      return () => clearTimeout(timer);
-    }
-
-    const onScroll = () => {
-      if (ticking.current) return;
-      ticking.current = true;
-
-      requestAnimationFrame(() => {
-        const currentY = window.scrollY;
-
-        // Logo crop expand/collapse
-        if (isHome) {
-          setIsPastHero(currentY > 200);
-        } else {
-          setIsPastHero(true);
-        }
-
-        // Detect dark background overlap
-        const navH = 64;
-        if (isHome) {
-          const darkSection = document.getElementById('what-i-do');
-          if (darkSection) {
-            const rect = darkSection.getBoundingClientRect();
-            const featuredWork = document.getElementById('featured-work');
-            const fwTop = featuredWork ? featuredWork.getBoundingClientRect().top : Infinity;
-            setIsOverDark(rect.top < navH && fwTop > navH);
-          } else {
-            setIsOverDark(false);
-          }
-        } else if (isAbout) {
-          const darkStart = document.getElementById('about-dark-start');
-          const darkEnd = document.getElementById('about-dark-end');
-          if (darkStart) {
-            const startTop = darkStart.getBoundingClientRect().top;
-            const endTop = darkEnd ? darkEnd.getBoundingClientRect().top : Infinity;
-            setIsOverDark(startTop < navH && endTop > navH);
-          } else {
-            setIsOverDark(false);
-          }
-        } else {
-          setIsOverDark(false);
-        }
-
-        ticking.current = false;
-      });
-    };
-
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, [location.pathname]);
-
-  /* ---------- navigation data ---------- */
-  const navLinks = [
-    { label: t('nav_cases'), path: '/cases' },
-    { label: t('nav_about'), path: '/about' },
-  ];
+    return scrollY.on('change', (latest) => {
+      setIsScrolled(latest > 40);
+    });
+  }, [scrollY]);
 
   const handleLinkClick = (e, path) => {
+    setIsMobileMenuOpen(false);
     if (path.startsWith('#')) {
       e.preventDefault();
       const targetId = path.substring(1);
@@ -249,154 +68,156 @@ export function Navbar() {
   };
 
   return (
-    <motion.header
-      initial={{ y: 0 }}
-      animate={{ y: 0 }}
-      className="fixed top-0 left-0 right-0 z-[100]"
-      style={{
-        '--color-foreground': isOverDark ? '#fbf9f6' : '#1A1A1A',
-        '--color-background': isOverDark ? '#171717' : '#fbf9f6',
-      }}
-    >
-      <div className="flex items-center justify-between px-4 md:px-[calc(16%-24px)] py-3 md:py-4">
-        {/* Left: Logo */}
-        <Link
-          to="/"
-          className="flex items-center gap-3 tracking-tight group focus:outline-none shrink-0"
-        >
-          <motion.div
-            className="transition-all duration-500 group-hover:scale-[1.03] relative"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <div className={`logo-crop-container ${isPastHero ? 'expanded' : ''}`}>
-              <img
-                src={`${import.meta.env.BASE_URL}assets/logo_fullname.png`}
-                alt="David Salviano"
-                className={`h-full w-auto max-w-none object-left object-contain block transition-[filter] duration-500 ${isOverDark ? 'brightness-0 invert' : ''}`}
-              />
-            </div>
-            <span className="absolute left-full bottom-[1px] ml-[4px] text-[var(--color-foreground)]/60 select-none transition-colors duration-500">
-              <CopyrightIcon className="w-[10px] h-[10px]" />
-            </span>
-          </motion.div>
-        </Link>
-
-        {/* Center / Right: Navigation */}
-        <nav className="flex items-center gap-5 sm:gap-7 md:gap-9">
-          {navLinks.map((link, i) => {
-            const isHash = link.path.startsWith('#');
-            const isActive = isHash
-              ? location.pathname === '/' && location.hash === link.path
-              : location.pathname === link.path;
-
-            return (
-              <MagneticNavLink
-                key={link.label}
-                to={link.path}
-                isActive={isActive}
-                index={i}
-                onClick={(e) => handleLinkClick(e, link.path)}
-              >
-                {link.label}
-              </MagneticNavLink>
-            );
-          })}
-
-          {/* Language Switcher */}
-          <div ref={dropdownRef} className="relative z-50">
-            <button
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className={`
-                flex items-center gap-1.5 py-1 px-1.5 font-mono text-[11px] sm:text-[13px] font-semibold uppercase tracking-[0.18em]
-                transition-all duration-300 focus:outline-none cursor-pointer rounded
-                ${isOverDark 
-                  ? 'text-white/70 hover:text-white hover:bg-white/5' 
-                  : 'text-[#1A1A1A]/70 hover:text-[#1A1A1A] hover:bg-black/5'
-                }
-              `}
-              aria-haspopup="true"
-              aria-expanded={isDropdownOpen}
+    <header ref={headerRef} data-site-header className="fixed top-0 inset-x-0 w-full z-[100] select-none">
+      <div
+        className={`w-full bg-[#10110F]/95 backdrop-blur-md border-b transition-all duration-300 ${
+          isScrolled ? 'border-white/15 shadow-xl shadow-black/40' : 'border-white/10 shadow-md shadow-black/20'
+        }`}
+      >
+        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 h-[54px] flex items-center justify-between">
+          {/* ============================================================ */}
+          {/* ESQUERDA: Monograma DS + Links de Navegação                  */}
+          {/* ============================================================ */}
+          <div className="flex items-center gap-6 sm:gap-8 h-full">
+            {/* Logo / Monograma */}
+            <Link
+              to="/"
+              className="flex items-center gap-2 group focus-visible:outline-2 focus-visible:outline-[#C7F000] focus-visible:outline-offset-4"
+              aria-label="David Salviano - Home"
             >
-              <GlobeIcon className="w-3.5 h-3.5 sm:w-4 h-4 opacity-75" />
-              <span>{language}</span>
-              <ChevronDownIcon 
-                className={`w-3 h-3 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} 
-              />
-            </button>
+              <span className="font-serif font-black text-xl sm:text-2xl tracking-tighter text-[#F4F3EE] group-hover:text-[#C7F000] transition-colors duration-200">
+                DS
+              </span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#8B7EC8] transition-transform duration-300 group-hover:scale-125" />
+            </Link>
 
-            <AnimatePresence>
-              {isDropdownOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: 8, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 8, scale: 0.95 }}
-                  transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                  className={`
-                    absolute right-0 mt-2 py-1.5 w-32 rounded-lg border shadow-xl
-                    ${isOverDark
-                      ? 'bg-[#1E1E1E] border-white/10 text-white'
-                      : 'bg-white border-black/10 text-[#1A1A1A]'
-                    }
-                  `}
-                >
-                  {[
-                    { code: 'pt', label: 'Português' },
-                    { code: 'en', label: 'English' },
-                    { code: 'es', label: 'Español' },
-                  ].map((lang) => (
-                    <button
-                      key={lang.code}
-                      onClick={() => {
-                        setLanguage(lang.code);
-                        setIsDropdownOpen(false);
-                      }}
-                      className={`
-                        w-full text-left px-4 py-2 font-mono text-[10px] sm:text-xs font-semibold tracking-wider transition-colors duration-200 cursor-pointer
-                        ${language === lang.code
-                          ? 'text-[var(--color-primary)]'
-                          : isOverDark
-                            ? 'hover:bg-white/5 text-white/70 hover:text-white'
-                            : 'hover:bg-black/5 text-[#1A1A1A]/70 hover:text-[#1A1A1A]'
-                        }
-                      `}
-                    >
-                      {lang.label}
-                    </button>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <div className="hidden sm:block w-[1px] h-4 bg-white/15" />
+
+            {/* Links Desktop */}
+            <nav className="hidden sm:flex items-center gap-6 md:gap-8">
+              <HeaderNavLink
+                to="/work"
+                isActive={location.pathname === '/work' || location.pathname === '/cases' || location.pathname.startsWith('/project')}
+                onClick={(e) => handleLinkClick(e, '/work')}
+              >
+                {t('nav_cases', 'PROJETOS')}
+              </HeaderNavLink>
+              <HeaderNavLink
+                to="/about"
+                isActive={location.pathname === '/about'}
+                onClick={(e) => handleLinkClick(e, '/about')}
+              >
+                {t('nav_about', 'SOBRE')}
+              </HeaderNavLink>
+            </nav>
           </div>
 
-          {/* CTA separator — subtle vertical line */}
-          <motion.span
-            className="hidden sm:block w-[1px] h-5 bg-[var(--color-foreground)]/12"
-            initial={{ opacity: 0, scaleY: 0 }}
-            animate={{ opacity: 1, scaleY: 1 }}
-            transition={{ delay: 0.5, duration: 0.4 }}
-          />
+          {/* ============================================================ */}
+          {/* CENTRO: Badge de Posicionamento                              */}
+          {/* ============================================================ */}
+          <div className="hidden lg:block pointer-events-none">
+            <span className="font-mono text-[10px] tracking-[0.22em] text-[#F4F3EE]/45 uppercase">
+              {t('header_badge', 'PRODUCT DESIGNER — BRASIL')}
+            </span>
+          </div>
 
-          {/* CTA button */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.4, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            style={{
-              '--color-foreground': '#1A1A1A',
-              '--color-background': '#fbf9f6',
-            }}
-          >
-            <LimeActionButton
-              as={MotionLink}
+          {/* ============================================================ */}
+          {/* DIREITA: Seletor de Idioma + CTA de Contato                  */}
+          {/* ============================================================ */}
+          <div className="flex items-center gap-4 sm:gap-6">
+            {/* Seletor de Idioma */}
+            <div className="flex items-center gap-1 font-mono text-[11px] tracking-widest uppercase text-[#F4F3EE]/50">
+              <button
+                type="button"
+                onClick={() => setLanguage('pt')}
+                className={`px-1.5 py-0.5 transition-colors cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-[#C7F000] ${
+                  language === 'pt' ? 'text-[#C7F000] font-bold' : 'hover:text-[#F4F3EE]'
+                }`}
+                aria-label="Mudar idioma para Português"
+              >
+                PT
+              </button>
+              <span className="text-white/20">/</span>
+              <button
+                type="button"
+                onClick={() => setLanguage('en')}
+                className={`px-1.5 py-0.5 transition-colors cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-[#C7F000] ${
+                  language === 'en' ? 'text-[#C7F000] font-bold' : 'hover:text-[#F4F3EE]'
+                }`}
+                aria-label="Switch language to English"
+              >
+                EN
+              </button>
+            </div>
+
+            <div className="hidden sm:block w-[1px] h-4 bg-white/15" />
+
+            {/* CTA de Contato Verde Ácido com Border Radius mantido */}
+            <Link
               to="/contact"
+              className="group inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2 font-mono text-xs font-bold tracking-widest uppercase text-[#10110F] bg-[#C7F000] hover:bg-[#d8ff1a] active:scale-[0.98] transition-all rounded-[16px] shadow-sm focus-visible:outline-2 focus-visible:outline-[#C7F000] focus-visible:outline-offset-2 cursor-pointer"
             >
-              {t('nav_connect')}
-            </LimeActionButton>
-          </motion.div>
-        </nav>
+              <span>{t('header_contact', 'FALE COMIGO ↗')}</span>
+            </Link>
+
+            {/* Mobile Menu Toggle */}
+            <button
+              type="button"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="sm:hidden p-1.5 text-white/80 hover:text-white focus-visible:outline-2 focus-visible:outline-[#C7F000]"
+              aria-label="Abrir menu de navegação"
+              aria-expanded={isMobileMenuOpen}
+            >
+              <div className={`hamb-menu style-spin ${isMobileMenuOpen ? 'open' : ''}`}>
+                <span className="bar" />
+                <span className="bar" />
+                <span className="bar" />
+              </div>
+            </button>
+          </div>
+        </div>
       </div>
-    </motion.header>
+
+      {/* ============================================================ */}
+      {/* Mobile Drawer Menu                                           */}
+      {/* ============================================================ */}
+      {isMobileMenuOpen && (
+        <motion.div
+          initial={{ opacity: 0, y: -10, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -10, scale: 0.98 }}
+          transition={{ duration: 0.35, ease: EASING }}
+          className="pointer-events-auto sm:hidden mx-3 mt-2 bg-[#10110F] border border-white/10 rounded-[20px] p-6 flex flex-col gap-4 shadow-2xl z-[110]"
+        >
+          <div className="font-mono text-[10px] tracking-[0.2em] text-[#F4F3EE]/40 uppercase">
+            {t('header_badge', 'PRODUCT DESIGNER — BRASIL')}
+          </div>
+          <Link
+            to="/work"
+            onClick={(e) => handleLinkClick(e, '/work')}
+            className="font-mono text-sm font-semibold tracking-wider text-[#F4F3EE] hover:text-[#C7F000] py-2 border-b border-white/[0.08]"
+          >
+            {t('nav_cases', 'PROJETOS')}
+          </Link>
+          <Link
+            to="/about"
+            onClick={(e) => handleLinkClick(e, '/about')}
+            className="font-mono text-sm font-semibold tracking-wider text-[#F4F3EE] hover:text-[#C7F000] py-2 border-b border-white/[0.08]"
+          >
+            {t('nav_about', 'SOBRE')}
+          </Link>
+          <Link
+            to="/contact"
+            onClick={(e) => handleLinkClick(e, '/contact')}
+            className="inline-flex items-center justify-center gap-2 mt-2 px-5 py-3 font-mono text-xs font-bold tracking-widest uppercase text-[#10110F] bg-[#C7F000] hover:bg-[#d8ff1a] transition-colors rounded-[16px]"
+          >
+            <span>{t('header_contact', 'FALE COMIGO ↗')}</span>
+          </Link>
+        </motion.div>
+      )}
+    </header>
   );
 }
+
+export const Navbar = SiteHeader;
+export default SiteHeader;

@@ -631,13 +631,6 @@ export function ProjectCase() {
                     } transition-all duration-700`} 
                   />
                 )}
-                <div 
-                  className="absolute inset-0 pointer-events-none opacity-[0.05] mix-blend-overlay bg-repeat z-10"
-                  style={{ 
-                    backgroundImage: `url('${import.meta.env.BASE_URL}assets/Textures/texture.png')`, 
-                    backgroundSize: '120px 120px' 
-                  }}
-                />
               </>
             ) : (
               <span className="text-neutral-carvao/40 font-mono tracking-widest text-xs uppercase relative z-10 flex items-center gap-3">

@@ -148,15 +148,6 @@ export function FeaturedWork() {
                     alt={project.title}
                     className="w-full h-full object-cover grayscale group-hover/card:grayscale-0 transition-all duration-700 ease-out group-hover/card:scale-105"
                   />
-                  {/* Halftone Texture Overlay */}
-                  <div
-                    className="absolute inset-0 pointer-events-none mix-blend-overlay opacity-60 transition-opacity duration-700 group-hover/card:opacity-30"
-                    style={{
-                      backgroundImage: `url(${import.meta.env.BASE_URL}assets/Textures/texture.png)`,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center'
-                    }}
-                  />
                 </div>
 
                 {/* Column 3: Text Content (Width set to col-span-6) */}

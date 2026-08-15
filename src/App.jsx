@@ -3,24 +3,13 @@ import { Routes, Route, useLocation, Navigate, useParams } from 'react-router-do
 import { AnimatePresence } from 'framer-motion';
 import { Navbar } from './components/Navbar';
 import { Home } from './pages/Home';
-import { Cases } from './pages/Cases';
-import { Mapear } from './pages/Mapear';
-import { AulaF75 } from './pages/AulaF75';
-import { Vincenzo } from './pages/Vincenzo';
+import { Work } from './pages/Work';
 import { AboutMe } from './pages/AboutMe';
-import { ProjectCase } from './pages/ProjectCase';
 import { Contact } from './pages/Contact';
+import { CaseStudyPage } from './pages/CaseStudyPage';
 import { LoadingScreen } from './components/LoadingScreen';
 import { PageTransition } from './components/PageTransition';
 import { MouseFollower } from './components/MouseFollower';
-
-function NavigateToProject() {
-  const { projectId } = useParams();
-  if (projectId === 'mapear') {
-    return <Navigate to="/mapear" replace />;
-  }
-  return <Navigate to={`/project/${projectId}`} replace />;
-}
 
 function App() {
   const location = useLocation();
@@ -68,7 +57,7 @@ function App() {
   }, [location.pathname, isLoading]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className="w-full min-h-[100dvh] font-sans overflow-x-clip text-foreground paper-texture relative">
+    <div className="w-full min-h-[100dvh] font-sans overflow-x-clip text-foreground relative bg-[#10110F]">
       <MouseFollower />
 
       <Navbar />
@@ -76,21 +65,32 @@ function App() {
       <AnimatePresence mode="wait">
         <Routes location={renderedLocation} key={renderedLocation.pathname}>
           <Route path="/" element={<Home />} />
-          <Route path="/cases" element={<Cases />} />
+          <Route path="/work" element={<Work />} />
+          <Route path="/cases" element={<Work />} />
           <Route path="/about" element={<AboutMe />} />
-          <Route path="/projects" element={<Navigate to="/cases" replace />} />
-          <Route path="/projects/:projectId" element={<NavigateToProject />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/mapear" element={<Mapear />} />
-          <Route path="/aula-f75" element={<AulaF75 />} />
-          <Route path="/vincenzo" element={<Vincenzo />} />
-          <Route path="/project/:projectId" element={<ProjectCase />} />
+          <Route path="/talk" element={<Navigate to="/contact" replace />} />
+          <Route path="/lets-talk" element={<Navigate to="/contact" replace />} />
+          <Route path="/projects" element={<Navigate to="/work" replace />} />
+          
+          {/* Unified Dynamic Case Study Routes */}
+          <Route path="/cases/:slug" element={<CaseStudyPage />} />
+          <Route path="/work/:slug" element={<CaseStudyPage />} />
+          <Route path="/project/:slug" element={<CaseStudyPage />} />
+          <Route path="/projects/:slug" element={<CaseStudyPage />} />
+
+          {/* Legacy Slug Shortcuts */}
+          <Route path="/mapear" element={<Navigate to="/cases/mapear" replace />} />
+          <Route path="/aula-f75" element={<Navigate to="/cases/aula-f75" replace />} />
+          <Route path="/vincenzo" element={<Navigate to="/cases/vincenzo" replace />} />
         </Routes>
       </AnimatePresence>
 
-      <footer className="w-full border-t border-neutral-carvao/10 py-12 px-4 md:px-[calc(16%-24px)] text-center md:text-left flex flex-col md:flex-row justify-between items-center text-neutral-carvao/50 font-mono text-sm z-10 relative">
-        <span>© 2026 David Salviano.</span>
-        <span className="uppercase mt-4 md:mt-0 tracking-[0.2em] text-xs">Accessing the Gates of Art</span>
+      <footer className="w-full bg-[#10110F] text-[#FAFAF7] border-t border-[rgba(244,243,238,0.16)] py-12 z-10 relative">
+        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 flex flex-col md:flex-row justify-between items-center text-[#F4F3EE]/50 font-mono text-sm text-center md:text-left">
+          <span>© 2026 David Salviano.</span>
+          <span className="uppercase mt-4 md:mt-0 tracking-[0.2em] text-xs text-[#F4F3EE]/60">Accessing the Gates of Art</span>
+        </div>
       </footer>
 
       {/* Initial Loading Overlay */}

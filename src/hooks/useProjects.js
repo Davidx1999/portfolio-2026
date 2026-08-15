@@ -21,14 +21,25 @@ export function useProjects() {
 
       // Format main projects
       if (Array.isArray(sanityProjects) && sanityProjects.length > 0) {
-        const formattedProjects = sanityProjects.map((p) => ({
-          ...p,
-          id: typeof p.id === 'object' && p.id?.current ? p.id.current : (p.id || p._id),
-          image: p.image ? urlFor(p.image) : (staticProjects.find(sp => sp.id === (p.id?.current || p.id))?.image || null),
-          imageHover: p.imageHover ? urlFor(p.imageHover) : (staticProjects.find(sp => sp.id === (p.id?.current || p.id))?.imageHover || null),
-          tags: Array.isArray(p.tags) ? p.tags : [],
-          process: Array.isArray(p.process) ? p.process : [],
-        }));
+        const formattedProjects = sanityProjects.map((p) => {
+          const staticMatch = staticProjects.find(sp => sp.id === (p.id?.current || p.id));
+          return {
+            ...staticMatch,
+            ...p,
+            id: typeof p.id === 'object' && p.id?.current ? p.id.current : (p.id || p._id),
+            image: p.image ? urlFor(p.image) : (staticMatch?.image || null),
+            processImage: p.processImage ? urlFor(p.processImage) : (staticMatch?.processImage || staticMatch?.imageHover || null),
+            finalImage: p.finalImage ? urlFor(p.finalImage) : (staticMatch?.finalImage || p.image ? urlFor(p.image) : staticMatch?.image || null),
+            coverImage: p.coverImage ? urlFor(p.coverImage) : (staticMatch?.coverImage || null),
+            imageHover: p.imageHover ? urlFor(p.imageHover) : (staticMatch?.imageHover || null),
+            role: p.role || staticMatch?.role || 'Product Designer',
+            period: p.period || staticMatch?.period || p.year || '2024',
+            context: p.context || staticMatch?.context || p.category || 'Digital Product',
+            alt: p.alt || staticMatch?.alt || p.title || 'Project showcase',
+            tags: Array.isArray(p.tags) && p.tags.length > 0 ? p.tags : (staticMatch?.tags || []),
+            process: Array.isArray(p.process) && p.process.length > 0 ? p.process : (staticMatch?.process || []),
+          };
+        });
         setProjects(formattedProjects);
       } else {
         setProjects(staticProjects);

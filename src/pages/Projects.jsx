@@ -191,14 +191,6 @@ export function Projects() {
                   } transition-all duration-750 ease-out scale-100 group-hover/card:scale-[1.02]`}
                 />
               )}
-              {/* Repeating paper texture overlay */}
-              <div 
-                className="absolute inset-0 pointer-events-none opacity-[0.06] mix-blend-overlay bg-repeat z-10"
-                style={{ 
-                  backgroundImage: `url('${import.meta.env.BASE_URL}assets/Textures/texture.png')`, 
-                  backgroundSize: '120px 120px' 
-                }}
-              />
             </div>
           );
         }

@@ -4,18 +4,18 @@ export function AulaF75() {
   return (
     <CaseStudyTemplate 
       title="Aula F75" 
-      subtitle="Interactive on-demand page for premium mechanical keyboards. Featuring high-performance video and simulated 3D rendering."
-      tags={['Product Design', '2024', 'E-learning', 'Hardware']} 
+      subtitle="Estudo independente de aplicação de vibe coding, vídeo no scroll e experiência interativa de hardware."
+      tags={['Estudo Independente', 'Vibe Coding', 'Vídeo no Scroll', '2024']} 
       image={`${import.meta.env.BASE_URL}assets/projects_cape/aulaf75_cape.png`}
       liveLink="https://davidx1999.github.io/f75-site-test-2/#features"
-      challenge="The challenge was to translate the tactile feel of a high-end mechanical keyboard into a digital experience. We needed to showcase the product's features with high-fidelity visuals without sacrificing performance."
-      solution="We leveraged high-performance video backgrounds and simulated 3D rendering techniques to create an immersive 'unboxing' feel. The interface was designed to be as responsive and 'clicky' as the keyboard itself."
+      challenge="O objetivo deste estudo independente foi explorar a aplicação de vibe coding e a sincronização precisa de vídeo de alta fidelidade no scroll da página, traduzindo a tatilidade e a acústica de hardware mecânico para a web moderna."
+      solution="Construção de uma interface interativa com vídeo indexado a quadros por rolagem, microinterações táteis e feedback sonoro imersivo mantendo 60fps constantes."
       process={
         <ul className="list-disc pl-5 space-y-3 mb-6">
-          <li>3D modeling and lighting simulation for product shots.</li>
-          <li>Video optimization for seamless background integration.</li>
-          <li>Interactive gamification elements to showcase key switch tech.</li>
-          <li>Mobile-first optimization for global accessibility.</li>
+          <li>Prototipagem rápida e interativa com vibe coding.</li>
+          <li>Otimização e decodificação de vídeo para rolagem contínua a 60fps.</li>
+          <li>Microinterações táteis e simulação acústica com Framer Motion.</li>
+          <li>Validação responsiva e ergonomia visual em dispositivos móveis e desktop.</li>
         </ul>
       }
     />

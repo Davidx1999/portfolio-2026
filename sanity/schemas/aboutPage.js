@@ -1,0 +1,101 @@
+export default {
+  name: 'aboutPage',
+  title: 'Página Sobre',
+  type: 'document',
+  fields: [
+    {
+      name: 'heroEyebrow',
+      title: 'Hero Eyebrow (PT)',
+      type: 'string',
+      initialValue: 'SOBRE / DAVID SALVIANO',
+    },
+    {
+      name: 'heroEyebrow_en',
+      title: 'Hero Eyebrow (EN)',
+      type: 'string',
+      initialValue: 'ABOUT / DAVID SALVIANO',
+    },
+    {
+      name: 'heroTitle',
+      title: 'Hero Title (PT)',
+      type: 'text',
+      rows: 3,
+      initialValue: 'Sou David Salviano, Product Designer em Fortaleza. Desenho a estrutura por trás de produtos digitais complexos.',
+    },
+    {
+      name: 'heroTitle_en',
+      title: 'Hero Title (EN)',
+      type: 'text',
+      rows: 3,
+      initialValue: 'I’m David Salviano, a Product Designer based in Fortaleza. I design the structure behind complex digital products.',
+    },
+    {
+      name: 'heroDescription',
+      title: 'Hero Description (PT)',
+      type: 'text',
+      rows: 3,
+      initialValue: 'Há mais de quatro anos trabalho entre estratégia, arquitetura, interface e Design Systems — transformando decisões complexas em experiências que equipes conseguem construir e pessoas conseguem usar.',
+    },
+    {
+      name: 'heroDescription_en',
+      title: 'Hero Description (EN)',
+      type: 'text',
+      rows: 3,
+      initialValue: 'For more than four years, I’ve worked across strategy, architecture, interface and Design Systems — turning complex decisions into experiences teams can build and people can use.',
+    },
+    {
+      name: 'portrait',
+      title: 'Fotografia Pessoal (Real)',
+      type: 'image',
+      options: {
+        hotspot: true,
+      },
+    },
+    {
+      name: 'portraitAlt',
+      title: 'Alt Text da Foto (PT)',
+      type: 'string',
+      initialValue: 'David Salviano — Product Designer',
+    },
+    {
+      name: 'portraitAlt_en',
+      title: 'Alt Text da Foto (EN)',
+      type: 'string',
+      initialValue: 'David Salviano — Product Designer',
+    },
+    {
+      name: 'location',
+      title: 'Localização',
+      type: 'string',
+      initialValue: 'Fortaleza, Brasil',
+    },
+    {
+      name: 'resumeFile',
+      title: 'Currículo (PDF)',
+      type: 'file',
+    },
+    {
+      name: 'resumeUrl',
+      title: 'Link Externo do Currículo (Opcional)',
+      type: 'url',
+    },
+    {
+      name: 'lattesUrl',
+      title: 'Link do Currículo Lattes (Opcional)',
+      type: 'url',
+    },
+    {
+      name: 'testimonial',
+      title: 'Depoimento Real (Opcional)',
+      type: 'object',
+      fields: [
+        { name: 'published', title: 'Publicado / Autorizado', type: 'boolean', initialValue: false },
+        { name: 'quote_pt', title: 'Texto do Depoimento (PT)', type: 'text', rows: 3 },
+        { name: 'quote_en', title: 'Texto do Depoimento (EN)', type: 'text', rows: 3 },
+        { name: 'author', title: 'Nome do Autor', type: 'string' },
+        { name: 'role', title: 'Cargo / Função', type: 'string' },
+        { name: 'organization', title: 'Organização / Empresa', type: 'string' },
+      ],
+    },
+  ],
+};

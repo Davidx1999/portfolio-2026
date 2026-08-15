@@ -90,16 +90,6 @@ export function FocuslyCase() {
 
             {/* Right Column: Phone Mockup Frame */}
             <div className="relative w-full aspect-[4/5] max-w-sm md:max-w-md mx-auto flex items-center justify-center bg-[#B3A0E6]/10 border border-neutral-carvao/10 rounded-[2px] p-6 shadow-md overflow-hidden select-none">
-              {/* Halftone texture blend */}
-              <div 
-                className="absolute inset-0 pointer-events-none mix-blend-overlay opacity-40" 
-                style={{
-                  backgroundImage: `url(${import.meta.env.BASE_URL}assets/Textures/texture.png)`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center'
-                }}
-              />
-              
               <img
                 src={`${import.meta.env.BASE_URL}assets/profile/focusly_mobile_hero.png`}
                 alt="Focusly app mockup"

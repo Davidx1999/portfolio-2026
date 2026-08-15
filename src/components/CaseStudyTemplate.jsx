@@ -91,16 +91,7 @@ export function CaseStudyTemplate({ title, subtitle, tags, liveLink, image, chal
           className="w-full h-[50vh] md:h-[70vh] rounded-2xl bg-white border border-neutral-carvao/10 flex flex-col items-center justify-center mb-20 overflow-hidden relative group shadow-sm"
         >
           {image ? (
-            <>
-              <img src={image} alt={title} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-all duration-700" />
-              <div 
-                className="absolute inset-0 pointer-events-none opacity-[0.05] mix-blend-overlay bg-repeat z-10"
-                style={{ 
-                  backgroundImage: `url('${import.meta.env.BASE_URL}assets/Textures/texture.png')`, 
-                  backgroundSize: '120px 120px' 
-                }}
-              />
-            </>
+            <img src={image} alt={title} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-all duration-700" />
           ) : (
             <>
               <div className="absolute inset-0 bg-gradient-to-tr from-neutral-carvao/5 to-transparent opacity-50 mix-blend-overlay"></div>
