@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
+import { CurtainLink } from '../../context/RouteCurtainContext';
 import { ReconstructMedia } from '../ReconstructMedia';
 
 export function FeaturedProjectItem({
@@ -78,8 +78,9 @@ export function FeaturedProjectItem({
         </div>
 
         {/* Card Central com Reconstrução Modular */}
-        <Link
+        <CurtainLink
           to={link}
+          curtainTitle={title}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
           className={`relative block transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] rounded-[20px] shadow-2xl overflow-hidden border border-white/20 group cursor-pointer ${
@@ -114,7 +115,7 @@ export function FeaturedProjectItem({
               <ArrowUpRight size={20} />
             </div>
           </div>
-        </Link>
+        </CurtainLink>
       </motion.div>
     </div>
   );

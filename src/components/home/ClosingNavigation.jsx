@@ -1,8 +1,8 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { CurtainLink } from '../../context/RouteCurtainContext';
 
 export function ClosingNavigation() {
   const { t } = useLanguage();
@@ -44,13 +44,13 @@ export function ClosingNavigation() {
             {t('closing_headline', 'Vamos construir algo que funcione — e que seja lembrado.')}
           </h2>
           
-          <Link
+          <CurtainLink
             to="/contact"
             className="group inline-flex items-center gap-3 px-8 py-4 font-mono text-xs font-bold tracking-widest uppercase text-[#111210] bg-[#FAFAF7] hover:bg-[#4056F4] hover:text-white active:scale-[0.98] transition-all duration-300 rounded-[1px] shadow-md focus-visible:outline-2 focus-visible:outline-[#4056F4]"
           >
             <span>{t('closing_cta', 'VAMOS CONVERSAR')}</span>
             <ArrowUpRight size={16} className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-          </Link>
+          </CurtainLink>
         </div>
 
         {/* ============================================================ */}
@@ -58,7 +58,7 @@ export function ClosingNavigation() {
         {/* ============================================================ */}
         <div className="grid grid-cols-1 md:grid-cols-3 border-t border-white/15">
           {pathways.map((item, idx) => (
-            <Link
+            <CurtainLink
               key={idx}
               to={item.link}
               className={`group flex flex-col justify-between p-8 sm:p-10 border-b md:border-b-0 border-white/15 ${
@@ -87,7 +87,7 @@ export function ClosingNavigation() {
                 <span>ACESSAR</span>
                 <span>→</span>
               </div>
-            </Link>
+            </CurtainLink>
           ))}
         </div>
 

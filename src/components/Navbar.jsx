@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { motion, useScroll, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
+import { CurtainLink } from '../context/RouteCurtainContext';
 import { registerHeaderElement } from '../hooks/useHeaderMetrics';
 
 const EASING = [0.22, 1, 0.36, 1];
 
 function HeaderNavLink({ to, isActive, children, onClick }) {
   return (
-    <Link
+    <CurtainLink
       to={to}
       onClick={onClick}
       className={`
@@ -21,14 +22,13 @@ function HeaderNavLink({ to, isActive, children, onClick }) {
       {isActive && (
         <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#C7F000]" />
       )}
-    </Link>
+    </CurtainLink>
   );
 }
 
 export function SiteHeader() {
   const { language, setLanguage, t } = useLanguage();
   const location = useLocation();
-  const navigate = useNavigate();
   const prefersReducedMotion = useReducedMotion();
   const headerRef = useRef(null);
 
@@ -51,20 +51,9 @@ export function SiteHeader() {
     });
   }, [scrollY]);
 
-  const handleLinkClick = (e, path) => {
+  // Close mobile drawer on navigation
+  const handleLinkClick = () => {
     setIsMobileMenuOpen(false);
-    if (path.startsWith('#')) {
-      e.preventDefault();
-      const targetId = path.substring(1);
-      if (location.pathname === '/') {
-        document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth' });
-      } else {
-        navigate('/');
-        setTimeout(() => {
-          document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth' });
-        }, 150);
-      }
-    }
   };
 
   return (
@@ -80,8 +69,9 @@ export function SiteHeader() {
           {/* ============================================================ */}
           <div className="flex items-center gap-6 sm:gap-8 h-full">
             {/* Logo / Monograma */}
-            <Link
+            <CurtainLink
               to="/"
+              onClick={handleLinkClick}
               className="flex items-center gap-2 group focus-visible:outline-2 focus-visible:outline-[#C7F000] focus-visible:outline-offset-4"
               aria-label="David Salviano - Home"
             >
@@ -89,7 +79,7 @@ export function SiteHeader() {
                 DS
               </span>
               <span className="w-1.5 h-1.5 rounded-full bg-[#8B7EC8] transition-transform duration-300 group-hover:scale-125" />
-            </Link>
+            </CurtainLink>
 
             <div className="hidden sm:block w-[1px] h-4 bg-white/15" />
 
@@ -98,14 +88,14 @@ export function SiteHeader() {
               <HeaderNavLink
                 to="/work"
                 isActive={location.pathname === '/work' || location.pathname === '/cases' || location.pathname.startsWith('/project')}
-                onClick={(e) => handleLinkClick(e, '/work')}
+                onClick={handleLinkClick}
               >
                 {t('nav_cases', 'PROJETOS')}
               </HeaderNavLink>
               <HeaderNavLink
                 to="/about"
                 isActive={location.pathname === '/about'}
-                onClick={(e) => handleLinkClick(e, '/about')}
+                onClick={handleLinkClick}
               >
                 {t('nav_about', 'SOBRE')}
               </HeaderNavLink>
@@ -152,13 +142,14 @@ export function SiteHeader() {
 
             <div className="hidden sm:block w-[1px] h-4 bg-white/15" />
 
-            {/* CTA de Contato Verde Ácido com Border Radius mantido */}
-            <Link
+            {/* CTA de Contato Verde Ácido */}
+            <CurtainLink
               to="/contact"
+              onClick={handleLinkClick}
               className="group inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2 font-mono text-xs font-bold tracking-widest uppercase text-[#10110F] bg-[#C7F000] hover:bg-[#d8ff1a] active:scale-[0.98] transition-all rounded-[16px] shadow-sm focus-visible:outline-2 focus-visible:outline-[#C7F000] focus-visible:outline-offset-2 cursor-pointer"
             >
               <span>{t('header_contact', 'FALE COMIGO ↗')}</span>
-            </Link>
+            </CurtainLink>
 
             {/* Mobile Menu Toggle */}
             <button
@@ -192,27 +183,27 @@ export function SiteHeader() {
           <div className="font-mono text-[10px] tracking-[0.2em] text-[#F4F3EE]/40 uppercase">
             {t('header_badge', 'PRODUCT DESIGNER — BRASIL')}
           </div>
-          <Link
+          <CurtainLink
             to="/work"
-            onClick={(e) => handleLinkClick(e, '/work')}
+            onClick={handleLinkClick}
             className="font-mono text-sm font-semibold tracking-wider text-[#F4F3EE] hover:text-[#C7F000] py-2 border-b border-white/[0.08]"
           >
             {t('nav_cases', 'PROJETOS')}
-          </Link>
-          <Link
+          </CurtainLink>
+          <CurtainLink
             to="/about"
-            onClick={(e) => handleLinkClick(e, '/about')}
+            onClick={handleLinkClick}
             className="font-mono text-sm font-semibold tracking-wider text-[#F4F3EE] hover:text-[#C7F000] py-2 border-b border-white/[0.08]"
           >
             {t('nav_about', 'SOBRE')}
-          </Link>
-          <Link
+          </CurtainLink>
+          <CurtainLink
             to="/contact"
-            onClick={(e) => handleLinkClick(e, '/contact')}
+            onClick={handleLinkClick}
             className="inline-flex items-center justify-center gap-2 mt-2 px-5 py-3 font-mono text-xs font-bold tracking-widest uppercase text-[#10110F] bg-[#C7F000] hover:bg-[#d8ff1a] transition-colors rounded-[16px]"
           >
             <span>{t('header_contact', 'FALE COMIGO ↗')}</span>
-          </Link>
+          </CurtainLink>
         </motion.div>
       )}
     </header>

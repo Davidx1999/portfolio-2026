@@ -7,6 +7,12 @@
 
   --color-background: #fbf9f6;
   --color-foreground: #1A1A1A;
+  --color-background-dark: #10110F;
+  --color-accent: #C4FF00;
+  --color-curtain-bg: #B6A9ED;
+  --color-curtain-text: #10110F;
+  --curtain-background-lilac: #B6A9ED;
+  --curtain-title-black: #10110F;
 
   --color-primary: #8B7EC8;
   --color-secondary: #B6A9ED;
@@ -380,6 +386,7 @@ hr {
   --header-height: 54px;
   --header-gap: 18px;
   --header-safe-offset: 72px;
+  --z-route-curtain: 200;
 }
 
 /* By default, safe sections respect the header safe offset */

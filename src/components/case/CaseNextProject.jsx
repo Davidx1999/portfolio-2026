@@ -1,8 +1,8 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { CurtainLink } from '../../context/RouteCurtainContext';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -41,8 +41,9 @@ export function CaseNextProject({ nextCase }) {
           </span>
         </div>
 
-        <Link
+        <CurtainLink
           to={`/cases/${nextCase.slug}`}
+          curtainTitle={title}
           className="group block relative w-full rounded-[22px] overflow-hidden border border-[rgba(244,243,238,0.18)] bg-[#151613] hover:border-[#C4FF00]/60 transition-all duration-500 shadow-2xl p-8 sm:p-12 lg:p-14"
         >
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
@@ -84,7 +85,7 @@ export function CaseNextProject({ nextCase }) {
               </div>
             )}
           </div>
-        </Link>
+        </CurtainLink>
 
       </div>
     </section>

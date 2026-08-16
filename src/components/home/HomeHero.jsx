@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Link } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight, ArrowDown } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { CurtainLink } from '../../context/RouteCurtainContext';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -91,13 +91,13 @@ export function HomeHero() {
               </a>
 
               {/* Ação Secundária */}
-              <Link
+              <CurtainLink
                 to="/contact"
                 className="group inline-flex items-center gap-2 px-6 py-4 font-mono text-xs font-bold tracking-widest uppercase text-[#111210] border border-[rgba(17,18,16,0.2)] hover:border-[#111210] hover:bg-[#111210]/5 transition-all duration-300 rounded-[18px] focus-visible:outline-2 focus-visible:outline-[#111210]"
               >
                 <span>{t('hero_cta_secondary_v2', 'VAMOS CONVERSAR')}</span>
                 <ArrowUpRight size={14} className="text-[#8B8B85] group-hover:text-[#111210] transition-colors" />
-              </Link>
+              </CurtainLink>
             </motion.div>
 
           </div>

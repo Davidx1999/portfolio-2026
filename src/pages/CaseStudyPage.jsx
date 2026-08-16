@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, RefreshCw, Layers } from 'lucide-react';
 import { useCaseStudy } from '../hooks/useCaseStudy';
 import { useLanguage } from '../context/LanguageContext';
+import { CurtainLink } from '../context/RouteCurtainContext';
 import { CaseHero } from '../components/case/CaseHero';
 import { CaseHeroDiagonal } from '../components/case/CaseHeroDiagonal';
 import { CaseThesis } from '../components/case/CaseThesis';
@@ -70,13 +71,13 @@ export function CaseStudyPage() {
               ? 'The requested project could not be found. Explore our complete selected work index.'
               : 'O projeto solicitado não foi localizado. Explore nosso índice completo de trabalhos selecionados.'}
           </p>
-          <Link
+          <CurtainLink
             to="/work"
             className="inline-flex items-center gap-2 px-6 py-3.5 bg-[#C4FF00] hover:bg-[#d4ff1a] text-[#10110F] font-mono text-xs font-bold uppercase tracking-wider rounded-[12px] transition-all"
           >
             <ArrowLeft size={14} />
             <span>{language === 'en' ? 'Back to Selected Work' : 'Voltar para Trabalhos'}</span>
-          </Link>
+          </CurtainLink>
         </div>
 
         <ClosingNavigation />

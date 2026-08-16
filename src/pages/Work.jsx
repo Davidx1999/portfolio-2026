@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { ArrowUpRight, ChevronDown, ArrowDown } from 'lucide-react';
 import { useProjects } from '../hooks/useProjects';
 import { useLanguage } from '../context/LanguageContext';
+import { CurtainLink } from '../context/RouteCurtainContext';
 import { ReconstructMedia } from '../components/ReconstructMedia';
 import { ClosingNavigation } from '../components/home/ClosingNavigation';
 
@@ -272,8 +272,9 @@ export function Work() {
                     onMouseLeave={() => setHoveredCardId(null)}
                     className={`group relative w-full aspect-[4/3] rounded-[18px] overflow-hidden border border-[rgba(244,243,238,0.18)] hover:border-[rgba(196,255,0,0.5)] transition-colors duration-500 bg-[#10110F] ${staggerClass}`}
                   >
-                    <Link
+                    <CurtainLink
                       to={link}
+                      curtainTitle={project.title}
                       className="absolute inset-0 w-full h-full block focus-visible:outline-2 focus-visible:outline-[#C4FF00] focus-visible:outline-offset-2"
                       aria-label={`${project.title} - ${project.category}`}
                     >
@@ -322,7 +323,7 @@ export function Work() {
                           </div>
                         </div>
                       </div>
-                    </Link>
+                    </CurtainLink>
                   </motion.article>
                 );
               })}
@@ -564,12 +565,13 @@ export function Work() {
                                   </span>
 
                                   {link ? (
-                                    <Link
+                                    <CurtainLink
                                       to={link}
+                                      curtainTitle={project.title}
                                       className="inline-flex items-center gap-2 px-6 py-3 font-mono text-xs font-bold tracking-widest uppercase text-[#10110F] bg-[#C4FF00] hover:bg-[#d8ff1a] transition-all rounded-[12px]"
                                     >
                                       <span>{t('work_action_view_case', 'Ver case')} ↗</span>
-                                    </Link>
+                                    </CurtainLink>
                                   ) : (
                                     <span className="inline-flex items-center gap-2 px-6 py-3 font-mono text-xs font-bold tracking-widest uppercase text-[#F4F3EE]/40 bg-white/5 border border-white/10 rounded-[12px] cursor-not-allowed">
                                       {t('work_coming_soon', 'Em breve')}
