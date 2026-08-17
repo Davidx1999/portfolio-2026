@@ -155,6 +155,7 @@
    * FONTS
    * --------------------------------------------- */
 
+  --font-display: 'Libre Baskerville', Georgia, serif;
   --font-serif: 'Libre Baskerville', Georgia, serif;
   --font-sans: 'Geist', system-ui, -apple-system, sans-serif;
   --font-mono: 'Geist Mono', monospace;
@@ -213,10 +214,6 @@
   opacity: var(--ring-opacity, 0);
   pointer-events: none;
   z-index: -1;
-}
-
-.font-signature {
-  font-family: 'Caveat', cursive;
 }
 
 hr {
@@ -382,6 +379,11 @@ hr {
  * GLOBAL HEADER CONTRACT
  * --------------------------------------------- */
 :root {
+  --font-display: "Libre Baskerville", Georgia, serif;
+  --font-serif: "Libre Baskerville", Georgia, serif;
+  --font-sans: "Geist", sans-serif;
+  --font-mono: "Geist Mono", monospace;
+
   --header-top: 0px;
   --header-height: 54px;
   --header-gap: 18px;

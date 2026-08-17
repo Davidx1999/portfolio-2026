@@ -1,144 +1,124 @@
-import React, { useRef } from 'react';
-import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
+import React, { useMemo } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
 
-export function OverlappingGallery() {
+const EASING = [0.22, 1, 0.36, 1];
+
+const DEFAULT_ARTIFACTS = [
+  {
+    id: 'art-1',
+    title: 'Educação & Mapeamento',
+    label: 'SaaS Platform',
+    image: `${import.meta.env.BASE_URL}assets/projects_cape/fgvmapear_card.png`,
+    gridClass: 'col-span-12 md:col-span-5 md:col-start-1 md:row-start-1 h-[280px] sm:h-[320px] lg:h-[360px]',
+  },
+  {
+    id: 'art-2',
+    title: 'Design System & Tokens',
+    label: 'UI Architecture',
+    image: `${import.meta.env.BASE_URL}assets/projects_cape/aulaf75_card.png`,
+    gridClass: 'col-span-12 md:col-span-6 md:col-start-7 md:row-start-1 h-[280px] sm:h-[320px] lg:h-[360px]',
+  },
+  {
+    id: 'art-3',
+    title: 'Fluxos & Arquitetura',
+    label: 'Core Ecosystem',
+    image: `${import.meta.env.BASE_URL}assets/projects_cape/fgv_aspect_wide.png`,
+    gridClass: 'col-span-12 md:col-span-8 md:col-start-3 md:row-start-2 h-[340px] sm:h-[400px] lg:h-[460px]',
+    isDominant: true,
+  },
+  {
+    id: 'art-4',
+    title: 'Interface Tátil & 3D',
+    label: 'Interactive Hardware',
+    image: `${import.meta.env.BASE_URL}assets/projects_cape/aulaf75.png`,
+    gridClass: 'col-span-12 md:col-span-5 md:col-start-1 md:row-start-3 h-[260px] sm:h-[300px] lg:h-[340px]',
+  },
+  {
+    id: 'art-5',
+    title: 'Engenharia de Interfaces',
+    label: 'Data Science & CLI',
+    image: `${import.meta.env.BASE_URL}assets/projects_cape/vincenzo_card.png`,
+    gridClass: 'col-span-12 md:col-span-6 md:col-start-7 md:row-start-3 h-[260px] sm:h-[300px] lg:h-[340px]',
+  },
+];
+
+export function OverlappingGallery({ items }) {
   const { t } = useLanguage();
   const prefersReducedMotion = useReducedMotion();
-  const sectionRef = useRef(null);
 
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ['start end', 'end start'],
-  });
-
-  // Individual fan-out transforms for 5 real production artifacts
-  const card1X = useTransform(scrollYProgress, [0.2, 0.7], ['0%', '-38%']);
-  const card1Y = useTransform(scrollYProgress, [0.2, 0.7], ['0%', '-24%']);
-  const card1Rotate = useTransform(scrollYProgress, [0.2, 0.7], ['0deg', '-8deg']);
-
-  const card2X = useTransform(scrollYProgress, [0.2, 0.7], ['0%', '36%']);
-  const card2Y = useTransform(scrollYProgress, [0.2, 0.7], ['0%', '-28%']);
-  const card2Rotate = useTransform(scrollYProgress, [0.2, 0.7], ['0deg', '6deg']);
-
-  const card3X = useTransform(scrollYProgress, [0.2, 0.7], ['0%', '-32%']);
-  const card3Y = useTransform(scrollYProgress, [0.2, 0.7], ['0%', '30%']);
-  const card3Rotate = useTransform(scrollYProgress, [0.2, 0.7], ['0deg', '4deg']);
-
-  const card4X = useTransform(scrollYProgress, [0.2, 0.7], ['0%', '34%']);
-  const card4Y = useTransform(scrollYProgress, [0.2, 0.7], ['0%', '26%']);
-  const card4Rotate = useTransform(scrollYProgress, [0.2, 0.7], ['0deg', '-5deg']);
-
-  const centerScale = useTransform(scrollYProgress, [0.2, 0.7], [0.85, 1.05]);
-
-  const cards = [
-    {
-      title: 'Educação & Mapeamento',
-      label: 'SaaS Platform',
-      image: `${import.meta.env.BASE_URL}assets/projects_cape/fgvmapear_card.png`,
-      style: {
-        x: prefersReducedMotion ? 0 : card1X,
-        y: prefersReducedMotion ? 0 : card1Y,
-        rotate: prefersReducedMotion ? 0 : card1Rotate,
-      },
-      zIndex: 10,
-    },
-    {
-      title: 'Design System & Componentes',
-      label: 'UI Architecture',
-      image: `${import.meta.env.BASE_URL}assets/projects_cape/aulaf75_card.png`,
-      style: {
-        x: prefersReducedMotion ? 0 : card2X,
-        y: prefersReducedMotion ? 0 : card2Y,
-        rotate: prefersReducedMotion ? 0 : card2Rotate,
-      },
-      zIndex: 20,
-    },
-    {
-      title: 'Interface Tátil & 3D',
-      label: 'Interactive Hardware',
-      image: `${import.meta.env.BASE_URL}assets/projects_cape/aulaf75.png`,
-      style: {
-        x: prefersReducedMotion ? 0 : card3X,
-        y: prefersReducedMotion ? 0 : card3Y,
-        rotate: prefersReducedMotion ? 0 : card3Rotate,
-      },
-      zIndex: 15,
-    },
-    {
-      title: 'Engenharia de Interfaces',
-      label: 'Data Science & CLI',
-      image: `${import.meta.env.BASE_URL}assets/projects_cape/vincenzo_card.png`,
-      style: {
-        x: prefersReducedMotion ? 0 : card4X,
-        y: prefersReducedMotion ? 0 : card4Y,
-        rotate: prefersReducedMotion ? 0 : card4Rotate,
-      },
-      zIndex: 25,
-    },
-    {
-      title: 'Fluxos & Arquitetura',
-      label: 'Core Ecosystem',
-      image: `${import.meta.env.BASE_URL}assets/projects_cape/fgv_aspect_wide.png`,
-      style: {
-        scale: prefersReducedMotion ? 1 : centerScale,
-      },
-      zIndex: 30,
-      isCenter: true,
-    },
-  ];
+  const artifacts = useMemo(() => {
+    if (Array.isArray(items) && items.length > 0) {
+      return items;
+    }
+    return DEFAULT_ARTIFACTS;
+  }, [items]);
 
   return (
     <section
-      ref={sectionRef}
-      className="relative w-full min-h-[140vh] bg-[#FAFAF7] text-[#111210] py-24 border-b border-[rgba(17,18,16,0.12)] overflow-hidden select-none"
+      id="production-gallery"
+      className="relative isolation-isolate overflow-clip z-10 w-full bg-[#FAFAF7] text-[#111210] py-24 sm:py-32 lg:py-36 border-b border-[rgba(17,18,16,0.12)] select-none"
     >
-      <div className="sticky top-[54px] h-[calc(100svh-54px)] w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 flex flex-col justify-between items-center">
+      <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
         
-        {/* Cabeçalho */}
-        <div className="text-center max-w-xl mx-auto pt-6 z-40">
-          <span className="font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.2em] text-[#8B8B85] block mb-2">
-            {t('gallery_tag', 'PRODUÇÃO REAL')}
+        {/* ============================================================ */}
+        {/* CABEÇALHO EDITORIAL NO FLUXO NORMAL                          */}
+        {/* ============================================================ */}
+        <div className="max-w-2xl mb-14 sm:mb-18 lg:mb-22">
+          <span className="font-mono text-xs font-bold uppercase tracking-[0.22em] text-[#8B8B85] block mb-3 sm:mb-4">
+            {t('gallery_tag', '02 // PRODUÇÃO REAL')}
           </span>
-          <h2 className="font-serif text-2xl sm:text-3xl text-[#111210] font-normal">
+          <h2 className="font-serif text-2xl sm:text-3xl lg:text-[2.25rem] text-[#111210] font-normal leading-[1.2] tracking-tight">
             {t('gallery_headline', 'Da estratégia ao componente final.')}
           </h2>
         </div>
 
-        {/* Palco Central com Pilha Sobreposta em Expansão */}
-        <div className="relative w-full h-[60vh] max-h-[500px] flex items-center justify-center">
-          {cards.map((card, i) => (
+        {/* ============================================================ */}
+        {/* GRID EDITORIAL ABERTA DE 12 COLUNAS                          */}
+        {/* ============================================================ */}
+        <div
+          className="w-full grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-8 lg:gap-10"
+        >
+          {artifacts.map((card, idx) => (
             <motion.div
-              key={i}
-              style={{
-                ...card.style,
-                zIndex: card.zIndex,
+              key={card.id || idx}
+              initial={prefersReducedMotion ? false : { opacity: 0, y: 35, scale: 0.96 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{
+                duration: 0.65,
+                delay: prefersReducedMotion ? 0 : idx * 0.08,
+                ease: EASING,
               }}
-              className={`absolute w-[70vw] sm:w-[48vw] lg:w-[32vw] max-w-[440px] aspect-[16/11] bg-white rounded-[1px] shadow-xl border border-[rgba(17,18,16,0.14)] overflow-hidden transition-shadow hover:shadow-2xl`}
+              className={`${card.gridClass} w-full relative group`}
             >
-              <img
-                src={card.image}
-                alt={card.title}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 to-transparent flex items-center justify-between text-white">
-                <span className="font-sans font-medium text-xs truncate max-w-[70%]">
-                  {card.title}
-                </span>
-                <span className="font-mono text-[9px] uppercase tracking-wider text-white/70">
-                  {card.label}
-                </span>
+              <div className="w-full h-full rounded-[16px] overflow-hidden border border-[rgba(17,18,16,0.12)] bg-[#10110F] shadow-md transition-all duration-300 ease-out hover:scale-[1.015] hover:shadow-xl relative">
+                <img
+                  src={card.image}
+                  alt={card.alt || card.title}
+                  loading="lazy"
+                  className="w-full h-full object-cover select-none pointer-events-none transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                />
+
+                {/* Legenda Discreta Glassmorphic */}
+                <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5 bg-gradient-to-t from-black/85 via-black/35 to-transparent flex items-end justify-between text-white pointer-events-none z-10">
+                  <div className="max-w-[75%]">
+                    <h3 className="font-sans font-semibold text-sm sm:text-base text-white/95 truncate drop-shadow-sm">
+                      {card.title}
+                    </h3>
+                  </div>
+                  <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-wider text-white/75 font-semibold px-2.5 py-1 rounded-[8px] bg-white/10 backdrop-blur-md border border-white/15 shrink-0">
+                    {card.label}
+                  </span>
+                </div>
               </div>
             </motion.div>
           ))}
-        </div>
-
-        {/* Rodapé da seção */}
-        <div className="pb-6 text-center text-[#8B8B85] font-mono text-[11px] uppercase tracking-wider z-40">
-          <span>ROLE PARA EXPANDIR // EXPLORE OS DETALHES</span>
         </div>
 
       </div>
     </section>
   );
 }
+
+export default OverlappingGallery;

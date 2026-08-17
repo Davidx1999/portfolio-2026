@@ -36,6 +36,9 @@ export function useProjects() {
             period: p.period || staticMatch?.period || p.year || '2024',
             context: p.context || staticMatch?.context || p.category || 'Digital Product',
             alt: p.alt || staticMatch?.alt || p.title || 'Project showcase',
+            featured: p.featured ?? staticMatch?.featured ?? false,
+            featuredOnHome: p.featuredOnHome ?? staticMatch?.featuredOnHome ?? p.featured ?? staticMatch?.featured ?? false,
+            featuredOrder: p.featuredOrder ?? staticMatch?.featuredOrder ?? p.orderRank ?? 99,
             tags: Array.isArray(p.tags) && p.tags.length > 0 ? p.tags : (staticMatch?.tags || []),
             process: Array.isArray(p.process) && p.process.length > 0 ? p.process : (staticMatch?.process || []),
           };
@@ -75,10 +78,17 @@ export function useProjects() {
 
   const allWork = [...projects];
 
+  // Up to 3 featured projects for Home scene, sorted by featuredOrder
+  const featuredProjects = projects
+    .filter((p) => p.featuredOnHome || p.featured)
+    .sort((a, b) => (a.featuredOrder || 99) - (b.featuredOrder || 99))
+    .slice(0, 3);
+
   return {
     projects,
     playgroundProjects,
     allWork,
+    featuredProjects,
     loading,
     error,
     refetch: fetchProjects,

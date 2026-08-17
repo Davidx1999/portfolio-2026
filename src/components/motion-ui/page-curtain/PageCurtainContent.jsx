@@ -2,17 +2,14 @@ import React from 'react';
 
 /**
  * PageCurtainContent
- * Ensures page content remains stable and grounded behind the curtain transition
- * without scale distortion, horizontal shifting, or color flash.
+ * Ensures page content remains stable and grounded during curtain transitions
+ * without distortion or unexpected shifts.
  */
-export function PageCurtainContent({ children, className = '', id = 'page-content', ...props }) {
+export function PageCurtainContent({ children, className = '', id = 'page-curtain-content', ...props }) {
   return (
     <div
       id={id}
       className={`page-curtain__content w-full relative z-0 ${className}`}
-      style={{
-        transform: 'none',
-      }}
       {...props}
     >
       {children}

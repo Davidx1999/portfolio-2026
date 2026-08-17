@@ -1,134 +1,129 @@
-import React from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
-import { Compass, Layout, Sparkles, Box } from 'lucide-react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
-
-const EASING = [0.22, 1, 0.36, 1];
 
 export function PrinciplesGrid() {
   const { t } = useLanguage();
   const prefersReducedMotion = useReducedMotion();
+  const sectionRef = useRef(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isInView, setIsInView] = useState(false);
+  const [isTabVisible, setIsTabVisible] = useState(true);
 
-  const capabilities = [
-    {
-      num: '01',
-      title: 'Estratégia',
-      subtitle: 'Definição de Produto',
-      desc: 'Alinhamento direto entre objetivos de negócio, restrições técnicas e necessidades reais de quem usa o produto.',
-      icon: Compass,
-      colSpan: 'lg:col-span-7',
-      bg: 'bg-[#FAFAF7]',
-    },
-    {
-      num: '02',
-      title: 'Arquitetura',
-      subtitle: 'Fluxos & Informação',
-      desc: 'Estruturação de dados densos, mapeamento de jornadas e organização de ecossistemas complexos com clareza.',
-      icon: Layout,
-      colSpan: 'lg:col-span-5',
-      bg: 'bg-[#FAFAF7]',
-    },
-    {
-      num: '03',
-      title: 'Interface',
-      subtitle: 'Design Visual & UX',
-      desc: 'Telas refinadas, hierarquia de leitura precisa, acessibilidade WCAG e microinterações de alto impacto.',
-      icon: Sparkles,
-      colSpan: 'lg:col-span-5',
-      bg: 'bg-[#FAFAF7]',
-    },
-    {
-      num: '04',
-      title: 'Design Systems',
-      subtitle: 'Componentes & Tokens',
-      desc: 'Bibliotecas modulares prontas para escala, documentação detalhada e handoff integrado com engenharia.',
-      icon: Box,
-      colSpan: 'lg:col-span-7',
-      bg: 'bg-[#FAFAF7]',
-      hasVideo: true,
-    },
-  ];
+  // Dynamic capabilities words from locales
+  const words = useMemo(() => [
+    t('cap_strategy', 'ESTRATÉGIA'),
+    t('cap_architecture', 'ARQUITETURA'),
+    t('cap_interfaces', 'INTERFACES'),
+    t('cap_design_systems', 'DESIGN SYSTEMS'),
+  ], [t]);
+
+  // Track tab visibility
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      setIsTabVisible(document.visibilityState === 'visible');
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
+  // Track viewport intersection
+  useEffect(() => {
+    if (!sectionRef.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInView(entry.isIntersecting);
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  // Autoplay carousel timer: ~2000ms interval, pauses if off-screen or tab hidden
+  useEffect(() => {
+    if (prefersReducedMotion || !isInView || !isTabVisible) return;
+
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % words.length);
+    }, 2100);
+
+    return () => clearInterval(timer);
+  }, [prefersReducedMotion, isInView, isTabVisible, words.length]);
+
+  const currentWord = words[currentIndex];
+  const isLongWord = currentWord.length > 11; // e.g. "DESIGN SYSTEMS"
 
   return (
-    <section className="relative z-30 w-full bg-[#F1F0EB] text-[#111210] py-24 lg:py-32 border-b border-[rgba(17,18,16,0.12)]">
-      <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
-        
+    <section
+      ref={sectionRef}
+      id="positioning-capabilities"
+      className="relative w-full bg-[#10110F] text-[#FAFAF7] py-24 sm:py-32 lg:py-40 border-b border-white/10 select-none overflow-hidden"
+    >
+      <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16 flex flex-col justify-between">
+
         {/* ============================================================ */}
-        {/* CABEÇALHO DE PRINCÍPIOS                                      */}
+        {/* 1. INTRODUÇÃO EDITORIAL DISCRETA                             */}
         {/* ============================================================ */}
-        <div className="max-w-3xl mb-16 lg:mb-20">
-          <span className="font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.2em] text-[#8B8B85] block mb-4">
-            {t('principles_tag', 'CAPACIDADES & PRINCÍPIOS')}
+        <div className="max-w-2xl mb-14 sm:mb-20 lg:mb-24">
+          <span className="font-mono text-xs font-bold text-[#8B8B85] uppercase tracking-[0.22em] block mb-4 sm:mb-5">
+            {t('principles_tag', 'POSICIONAMENTO')}
           </span>
-          <h2 className="font-serif text-[2.25rem] sm:text-[2.75rem] lg:text-[3.25rem] font-normal leading-[1.12] tracking-tight text-[#111210]">
-            {t(
-              'principles_headline',
-              'Produtos digitais precisam funcionar antes de impressionar. Os melhores conseguem fazer os dois.'
-            )}
+
+          <h2 className="font-serif text-2xl sm:text-3xl lg:text-[2.25rem] font-normal leading-[1.22] tracking-tight text-[#FAFAF7]/90">
+            <span className="block">{t('positioning_headline_1', 'Produtos digitais precisam funcionar.')}</span>
+            <span className="block text-[#FAFAF7]/60 mt-1">{t('positioning_headline_2', 'Os melhores também impressionam.')}</span>
           </h2>
         </div>
 
         {/* ============================================================ */}
-        {/* GRID MODULAR ASSIMÉTRICA                                     */}
+        {/* 2. BLOCO TIPOGRÁFICO CINÉTICO: DUAS LINHAS                   */}
         {/* ============================================================ */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
-          {capabilities.map((cap, index) => {
-            const Icon = cap.icon;
-            return (
-              <motion.div
-                key={cap.num}
-                initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-60px' }}
-                transition={{ duration: 0.6, delay: index * 0.1, ease: EASING }}
-                className={`${cap.colSpan} ${cap.bg} p-8 lg:p-10 border border-[rgba(17,18,16,0.12)] flex flex-col justify-between rounded-[1px] relative overflow-hidden group hover:border-[rgba(17,18,16,0.3)] transition-colors duration-300`}
-              >
-                <div>
-                  {/* Header do Card */}
-                  <div className="flex items-center justify-between mb-8">
-                    <span className="font-mono text-xs font-bold text-[#8B8B85]">
-                      {cap.num} //
-                    </span>
-                    <div className="w-10 h-10 rounded-[1px] bg-[#111210] text-[#FAFAF7] flex items-center justify-center">
-                      <Icon size={18} strokeWidth={1.75} />
-                    </div>
-                  </div>
+        {prefersReducedMotion ? (
+          /* Versão estática acessível para reduced-motion */
+          <div className="flex flex-col items-start text-left gap-2 pt-4 w-full">
+            <p className="font-sans font-bold text-[clamp(2rem,5vw,4.5rem)] uppercase leading-[1.05] tracking-[-0.035em] text-[#FAFAF7] text-left">
+              {t(
+                'kinetic_reduced_line',
+                'EU ENTREGO ESTRATÉGIA, ARQUITETURA, INTERFACES E DESIGN SYSTEMS.'
+              )}
+            </p>
+          </div>
+        ) : (
+          <div className="flex flex-col items-start justify-start w-full text-left">
+            {/* Primeira Linha Fixa */}
+            <div
+              className="w-full text-left font-sans font-bold uppercase tracking-[-0.045em] leading-[0.9] text-[#FAFAF7] select-none text-[clamp(3.5rem,10vw,11rem)]"
+            >
+              {t('kinetic_fixed_line', 'EU ENTREGO')}
+            </div>
 
-                  {/* Títulos */}
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-[#4056F4] font-bold block mb-1">
-                    {cap.subtitle}
-                  </span>
-                  <h3 className="font-serif text-2xl lg:text-3xl text-[#111210] font-normal mb-4">
-                    {cap.title}
-                  </h3>
-
-                  {/* Descrição */}
-                  <p className="font-sans text-xs sm:text-sm text-[#111210]/75 leading-relaxed max-w-md">
-                    {cap.desc}
-                  </p>
-                </div>
-
-                {/* Bloco de Vídeo de Apoio sutil para o Design System */}
-                {cap.hasVideo && (
-                  <div className="mt-8 w-full aspect-[21/9] bg-[#111210] rounded-[1px] overflow-hidden border border-[rgba(17,18,16,0.12)] relative">
-                    <video
-                      autoPlay
-                      loop
-                      muted
-                      playsInline
-                      className="w-full h-full object-cover opacity-85"
-                    >
-                      <source
-                        src={`${import.meta.env.BASE_URL}assets/videos/lines.mp4`}
-                        type="video/mp4"
-                      />
-                    </video>
-                  </div>
-                )}
-              </motion.div>
-            );
-          })}
-        </div>
+            {/* Segunda Linha Variável com Máscara Vertical */}
+            <div className="capability-line-mask relative overflow-hidden w-full h-[clamp(3.8rem,11.5vw,12.5rem)] flex items-center justify-start text-left select-none mt-1 sm:mt-2">
+              <AnimatePresence mode="popLayout" initial={false}>
+                <motion.div
+                  key={`${currentIndex}-${currentWord}`}
+                  initial={{ y: '110%' }}
+                  animate={{ y: '0%' }}
+                  exit={{ y: '-110%' }}
+                  transition={{
+                    duration: 0.72,
+                    ease: [0.77, 0, 0.175, 1], // power3.inOut suave e preciso
+                  }}
+                  className={`capability-word font-sans font-bold uppercase tracking-[-0.045em] leading-[1.05] text-[#C7F000] whitespace-nowrap will-change-transform text-left flex items-center ${
+                    isLongWord
+                      ? 'text-[clamp(2.5rem,8vw,9rem)]'
+                      : 'text-[clamp(3.5rem,10vw,11rem)]'
+                  }`}
+                >
+                  {currentWord}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </div>
+        )}
 
       </div>
     </section>

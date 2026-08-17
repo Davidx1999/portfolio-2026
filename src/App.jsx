@@ -11,10 +11,20 @@ import { LoadingScreen } from './components/LoadingScreen';
 import { MouseFollower } from './components/MouseFollower';
 import { RouteCurtainProvider, useRouteCurtain, CurtainLink } from './context/RouteCurtainContext';
 import { RouteCurtainOverlay } from './components/RouteCurtainOverlay';
+import { CurtainDemo } from './pages/CurtainDemo';
+import { AppReadyProvider, useAppReady } from './context/AppReadyContext';
+import { ErrorBoundary } from './ErrorBoundary';
 
 function AppContent() {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return false;
+    }
+    return true;
+  });
   const { isCurtainActive } = useRouteCurtain();
+  const { setIsAppReady } = useAppReady();
 
   // Lock scroll during initial load OR when curtain transition is active
   useEffect(() => {
@@ -43,6 +53,7 @@ function AppContent() {
           <Route path="/talk" element={<Navigate to="/contact" replace />} />
           <Route path="/lets-talk" element={<Navigate to="/contact" replace />} />
           <Route path="/projects" element={<Navigate to="/work" replace />} />
+          <Route path="/curtain-demo" element={<CurtainDemo />} />
 
           {/* Unified Dynamic Case Study Routes */}
           <Route path="/cases/:slug" element={<CaseStudyPage />} />
@@ -58,7 +69,7 @@ function AppContent() {
       </main>
 
       <footer className="w-full bg-[#10110F] text-[#FAFAF7] border-t border-[rgba(244,243,238,0.16)] py-12 z-10 relative">
-        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 flex flex-col md:flex-row justify-between items-center text-[#F4F3EE]/50 font-mono text-sm text-center md:text-left">
+        <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16 flex flex-col md:flex-row justify-between items-center text-[#F4F3EE]/50 font-mono text-sm text-center md:text-left">
           <CurtainLink
             to="/"
             className="hover:text-[#FAFAF7] transition-colors focus-visible:outline-2 focus-visible:outline-[#C7F000]"
@@ -76,6 +87,7 @@ function AppContent() {
         {isLoading && (
           <LoadingScreen
             key="loading"
+            setIsAppReady={setIsAppReady}
             onComplete={() => {
               setIsLoading(false);
             }}
@@ -91,9 +103,13 @@ function AppContent() {
 
 function App() {
   return (
-    <RouteCurtainProvider>
-      <AppContent />
-    </RouteCurtainProvider>
+    <ErrorBoundary>
+      <AppReadyProvider>
+        <RouteCurtainProvider>
+          <AppContent />
+        </RouteCurtainProvider>
+      </AppReadyProvider>
+    </ErrorBoundary>
   );
 }
 

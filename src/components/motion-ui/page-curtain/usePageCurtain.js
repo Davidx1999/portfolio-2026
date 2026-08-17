@@ -2,25 +2,23 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 
 /**
  * usePageCurtain
- * Hook to manage page curtain transitions, coordinating state, titles, direction, and timing.
+ * Hook controlling page curtain transition states and direction.
  * 
- * Signature:
- * const { page, isPending, go, ref, curtainState, title, direction } = usePageCurtain({
- *   initialPage: 'home',
- *   titles: { home: 'INÍCIO', work: 'PROJETOS', about: 'SOBRE', contact: 'FALE COMIGO' },
- *   pageOrder: ['home', 'work', 'about', 'contact'],
- *   onNavigate: (newPage) => {},
- * });
+ * @param {Object} options
+ * @param {string} [options.initialPage='page1'] - Initial active page
+ * @param {string[]|Function|Object} [options.pageOrder] - Sequence array for auto direction calculation
+ * @param {Object|Function} [options.titles] - Map of page key to label text
+ * @param {Function} [options.onNavigate] - Callback fired at 100% curtain cover to swap page content
  */
 export function usePageCurtain({
-  initialPage = 'home',
+  initialPage = 'page1',
+  pageOrder = ['page1', 'page2'],
   titles = {},
-  pageOrder,
   onNavigate,
 } = {}) {
   const [page, setPage] = useState(initialPage);
   const [direction, setDirection] = useState('forward'); // 'forward' | 'backward'
-  const [curtainState, setCurtainState] = useState('idle'); // 'idle' | 'covering' | 'covered' | 'titleExiting' | 'revealing'
+  const [curtainState, setCurtainState] = useState('idle'); // 'idle' | 'covering' | 'covered' | 'revealing'
   const [title, setTitle] = useState(
     typeof titles === 'function'
       ? titles(initialPage)
@@ -28,28 +26,13 @@ export function usePageCurtain({
   );
 
   const targetPageRef = useRef(null);
-  const containerRef = useRef(null);
   const safetyTimeoutRef = useRef(null);
-  const exitTimerRef = useRef(null);
-  const revealTimerRef = useRef(null);
-
   const isPending = curtainState !== 'idle';
 
   const clearSafetyTimer = () => {
     if (safetyTimeoutRef.current) {
       clearTimeout(safetyTimeoutRef.current);
       safetyTimeoutRef.current = null;
-    }
-  };
-
-  const clearTransitionTimers = () => {
-    if (exitTimerRef.current) {
-      clearTimeout(exitTimerRef.current);
-      exitTimerRef.current = null;
-    }
-    if (revealTimerRef.current) {
-      clearTimeout(revealTimerRef.current);
-      revealTimerRef.current = null;
     }
   };
 
@@ -68,7 +51,10 @@ export function usePageCurtain({
 
   const resolveDirection = useCallback(
     (target) => {
-      const order = pageOrder || (typeof titles === 'object' ? Object.keys(titles) : null);
+      const order = Array.isArray(pageOrder)
+        ? pageOrder
+        : (typeof titles === 'object' ? Object.keys(titles) : null);
+
       if (order && Array.isArray(order)) {
         const currentIndex = order.indexOf(page);
         const targetIndex = order.indexOf(target);
@@ -83,7 +69,7 @@ export function usePageCurtain({
 
   const go = useCallback(
     (target, customTitle, options = {}) => {
-      if (!target || isPending) return;
+      if (!target || isPending || target === page) return;
 
       const nextTitle = customTitle || resolveTitle(target);
       const nextDirection = options.direction || resolveDirection(target);
@@ -91,22 +77,18 @@ export function usePageCurtain({
       targetPageRef.current = target;
       setTitle(nextTitle);
       setDirection(nextDirection);
-      clearTransitionTimers();
       setCurtainState('covering');
 
       clearSafetyTimer();
       safetyTimeoutRef.current = setTimeout(() => {
-        clearTransitionTimers();
         setCurtainState('idle');
       }, 3500);
     },
-    [isPending, resolveTitle, resolveDirection]
+    [isPending, page, resolveTitle, resolveDirection]
   );
 
   const handleCoverComplete = useCallback(() => {
     if (curtainState !== 'covering') return;
-
-    setCurtainState('covered');
 
     if (targetPageRef.current) {
       const next = targetPageRef.current;
@@ -114,27 +96,18 @@ export function usePageCurtain({
       onNavigate?.(next);
     }
 
-    clearTransitionTimers();
-
-    // Trigger reveal after short buffer once route mounted
-    revealTimerRef.current = setTimeout(() => {
-      setCurtainState('revealing');
-    }, 100);
+    setCurtainState('revealing');
   }, [curtainState, onNavigate]);
 
   const handleRevealComplete = useCallback(() => {
-    if (curtainState !== 'revealing') return;
-
-    clearTransitionTimers();
     clearSafetyTimer();
     targetPageRef.current = null;
     setCurtainState('idle');
-  }, [curtainState]);
+  }, []);
 
   useEffect(() => {
     return () => {
       clearSafetyTimer();
-      clearTransitionTimers();
     };
   }, []);
 
@@ -142,10 +115,9 @@ export function usePageCurtain({
     page,
     direction,
     isPending,
-    go,
-    ref: containerRef,
     curtainState,
     title,
+    go,
     handleCoverComplete,
     handleRevealComplete,
   };

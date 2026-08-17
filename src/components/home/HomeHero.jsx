@@ -1,14 +1,62 @@
-import React from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowRight, ArrowUpRight, ArrowDown } from 'lucide-react';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { CurtainLink } from '../../context/RouteCurtainContext';
+import { useAppReady } from '../../context/AppReadyContext';
 
 const EASING = [0.22, 1, 0.36, 1];
+const CLIP_EASING = [0.77, 0, 0.175, 1]; // power3.inOut
+
+// Delay (ms) between text animations settling and video reveal starting.
+// Must be perceptible but not feel like a stall.
+const VIDEO_REVEAL_DELAY = 500;
 
 export function HomeHero() {
   const { t } = useLanguage();
   const prefersReducedMotion = useReducedMotion();
+  const { isAppReady } = useAppReady();
+
+  const videoRef = useRef(null);
+  const [isVideoReady, setIsVideoReady] = useState(false);
+  const [shouldRevealVideo, setShouldRevealVideo] = useState(false);
+
+  // Track when the <video> element has enough data to display a frame
+  const handleVideoReady = useCallback(() => {
+    setIsVideoReady(true);
+  }, []);
+
+  // Attach listeners on mount — handles both fresh-load and cached video
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    // If the video is already loaded (cached), mark ready immediately
+    if (video.readyState >= 2) {
+      setIsVideoReady(true);
+      return;
+    }
+
+    video.addEventListener('loadeddata', handleVideoReady, { once: true });
+    video.addEventListener('canplay', handleVideoReady, { once: true });
+
+    return () => {
+      video.removeEventListener('loadeddata', handleVideoReady);
+      video.removeEventListener('canplay', handleVideoReady);
+    };
+  }, [handleVideoReady]);
+
+  // Coordinate the video reveal: wait for isAppReady + isVideoReady,
+  // then add the intentional delay so the video enters after text is settled.
+  useEffect(() => {
+    if (!isAppReady || !isVideoReady) return;
+
+    const timer = setTimeout(() => {
+      setShouldRevealVideo(true);
+    }, VIDEO_REVEAL_DELAY);
+
+    return () => clearTimeout(timer);
+  }, [isAppReady, isVideoReady]);
 
   const handleScrollToProjects = (e) => {
     e.preventDefault();
@@ -18,26 +66,19 @@ export function HomeHero() {
     }
   };
 
-  const handleScrollToNext = () => {
-    const target = document.getElementById('credibility');
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   return (
-    <section className="relative w-full min-h-[100svh] pt-24 lg:pt-28 pb-16 flex flex-col justify-between bg-[#F1F0EB] text-[#111210] select-none border-b border-[rgba(17,18,16,0.1)]">
-      <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 my-auto">
+    <section className="relative w-full min-h-[100svh] pt-24 lg:pt-28 flex flex-col justify-between bg-[#F1F0EB] text-[#111210] select-none border-b border-[rgba(17,18,16,0.1)]">
+      <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16 my-auto">
         <div className="grid grid-cols-1 lg:grid-cols-[42%_58%] gap-12 lg:gap-16 items-center">
-          
+
           {/* ============================================================ */}
           {/* LADO ESQUERDO: Posicionamento, Headline & Ações              */}
           {/* ============================================================ */}
           <div className="flex flex-col justify-center max-w-xl">
             {/* Label Profissional */}
             <motion.div
-              initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={prefersReducedMotion ? false : { opacity: 0, y: -12 }}
+              animate={isAppReady ? { opacity: 1, y: 0 } : { opacity: 0, y: -12 }}
               transition={{ duration: 0.5, delay: 0.1, ease: EASING }}
               className="mb-4 sm:mb-6"
             >
@@ -48,8 +89,8 @@ export function HomeHero() {
 
             {/* Headline Editorial (Serif de Alto Contraste) */}
             <motion.div
-              initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={prefersReducedMotion ? false : { opacity: 0, y: -18 }}
+              animate={isAppReady ? { opacity: 1, y: 0 } : { opacity: 0, y: -18 }}
               transition={{ duration: 0.6, delay: 0.2, ease: EASING }}
               className="mb-5 sm:mb-6"
             >
@@ -60,8 +101,8 @@ export function HomeHero() {
 
             {/* Descrição Curta (Sans-Serif Limpa) */}
             <motion.div
-              initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={prefersReducedMotion ? false : { opacity: 0, y: -16 }}
+              animate={isAppReady ? { opacity: 1, y: 0 } : { opacity: 0, y: -16 }}
               transition={{ duration: 0.5, delay: 0.32, ease: EASING }}
               className="mb-8 sm:mb-10"
             >
@@ -75,8 +116,8 @@ export function HomeHero() {
 
             {/* CTAs */}
             <motion.div
-              initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={prefersReducedMotion ? false : { opacity: 0, y: -14 }}
+              animate={isAppReady ? { opacity: 1, y: 0 } : { opacity: 0, y: -14 }}
               transition={{ duration: 0.5, delay: 0.42, ease: EASING }}
               className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6"
             >
@@ -103,62 +144,47 @@ export function HomeHero() {
           </div>
 
           {/* ============================================================ */}
-          {/* LADO DIREITO: Container de Vídeo com Bordas Arredondadas     */}
+          {/* LADO DIREITO: Container de Vídeo com Clip-Path Top-Down      */}
           {/* ============================================================ */}
-          <motion.div
-            initial={prefersReducedMotion ? false : { opacity: 0, scale: 1.02 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7, delay: 0.2, ease: EASING }}
-            className="w-full flex items-center justify-center"
-          >
-            <div className="w-full aspect-[4/3] sm:aspect-[16/11] bg-[#10110F] rounded-[24px] overflow-hidden border border-[rgba(17,18,16,0.12)] shadow-xl relative">
-              <video
-                autoPlay
-                loop
-                muted
-                playsInline
-                preload="metadata"
-                poster={`${import.meta.env.BASE_URL}assets/videos/hero_poster.jpg`}
-                aria-hidden="true"
-                className="w-full h-full object-cover object-center scale-[1.06] pointer-events-none select-none"
+          {/* Outer wrapper: transparent, only reserves layout space.
+              No bg-black / bg-[#10110F] — avoids the static black rectangle. */}
+          <div className="w-full flex items-start justify-center">
+            <div className="w-full aspect-[4/3] sm:aspect-[16/11] rounded-[24px] overflow-hidden relative">
+              {/* Inner wrapper: clip-path applied here so the entire visual card
+                  (video + rounded corners) is clipped, not just the <video>.
+                  Starts fully clipped (inset bottom 100%) so nothing shows.
+                  Reveals top-down only when shouldRevealVideo is true. */}
+              <motion.div
+                initial={prefersReducedMotion ? false : { clipPath: 'inset(0% 0% 100% 0%)' }}
+                animate={shouldRevealVideo ? { clipPath: 'inset(0% 0% 0% 0%)' } : { clipPath: 'inset(0% 0% 100% 0%)' }}
+                transition={{ duration: 0.95, ease: CLIP_EASING }}
+                className="w-full h-full rounded-[24px] overflow-hidden relative"
+                style={{ transformOrigin: '50% 0%' }}
               >
-                <source
-                  src={`${import.meta.env.BASE_URL}assets/videos/hero_showcase.webm`}
-                  type="video/webm"
-                />
-                <source
-                  src={`${import.meta.env.BASE_URL}assets/videos/hero_showcase.mp4`}
-                  type="video/mp4"
-                />
-              </video>
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  preload="auto"
+                  poster={`${import.meta.env.BASE_URL}assets/videos/hero_poster.jpg`}
+                  aria-hidden="true"
+                  className="w-full h-full object-cover object-center scale-[1.06] rounded-[24px] pointer-events-none select-none"
+                >
+                  <source
+                    src={`${import.meta.env.BASE_URL}assets/videos/scroll_keyframe.mp4`}
+                    type="video/mp4"
+                  />
+                </video>
+              </motion.div>
             </div>
-          </motion.div>
+          </div>
 
         </div>
-      </div>
-
-      {/* ============================================================ */}
-      {/* INDICADOR DE SCROLL INSPIRADO EM FIDDLE.DIGITAL              */}
-      {/* ============================================================ */}
-      <div className="w-full flex justify-center pt-8 pb-2">
-        <button
-          type="button"
-          onClick={handleScrollToNext}
-          aria-label="Rolar para a próxima seção"
-          className="group p-3 flex flex-col items-center gap-1.5 text-[#111210]/60 hover:text-[#111210] transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-[#111210] rounded-full"
-        >
-          <motion.div
-            animate={prefersReducedMotion ? {} : { y: [0, 8, 0] }}
-            transition={{
-              duration: 2.2,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
-          >
-            <ArrowDown size={22} strokeWidth={1.5} className="group-hover:translate-y-0.5 transition-transform" />
-          </motion.div>
-        </button>
       </div>
     </section>
   );
 }
+
+export default HomeHero;

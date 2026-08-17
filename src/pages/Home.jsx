@@ -3,7 +3,6 @@ import { HomeHero } from '../components/home/HomeHero';
 import { CredibilitySection } from '../components/home/CredibilitySection';
 import { FeaturedWorkSection } from '../components/home/FeaturedWorkSection';
 import { PrinciplesGrid } from '../components/home/PrinciplesGrid';
-import { StatementSection } from '../components/home/StatementSection';
 import { OverlappingGallery } from '../components/home/OverlappingGallery';
 import { TestimonialSection } from '../components/home/TestimonialSection';
 import { ClosingNavigation } from '../components/home/ClosingNavigation';
@@ -18,16 +17,13 @@ export function Home() {
         {/* 2. Credibilidade, Posicionamento e Provas Técnicas */}
         <CredibilitySection />
 
-        {/* 3. Trabalhos Selecionados (2 Viewports, Sticky Title, Pixel Reveal & Parallax) */}
+        {/* 3. Trabalhos Selecionados (Scroll Natural, Sticky Title, Pixel Reveal & Parallax) */}
         <FeaturedWorkSection />
 
-        {/* 4. Princípios e Capacidades em Grid Modular Assimétrica */}
+        {/* 4. Posicionamento e Capacidades (Bloco Tipográfico Cinético) */}
         <PrinciplesGrid />
 
-        {/* 5. Declaração Profissional Tipográfica com Amplo Espaço Negativo */}
-        <StatementSection />
-
-        {/* 6. Galeria de Produção Sobreposta Reversível com o Scroll */}
+        {/* 5. Galeria de Produção Real ("Da estratégia ao componente final") */}
         <OverlappingGallery />
 
         {/* 7. Prova Social (Oculta graciosamente se não houver dados autorizados) */}

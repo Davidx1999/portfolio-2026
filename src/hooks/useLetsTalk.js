@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { sanityClient, urlFor } from '../services/sanityClient';
+import { DEFAULT_BUDGET_OPTIONS } from '../services/currencyLocalization';
 
 const FALLBACK_LETS_TALK = {
   heroEyebrow: 'NOVOS PROJETOS / CONSULTORIA',
@@ -64,21 +65,22 @@ const FALLBACK_LETS_TALK = {
     'Within 3 months',
     'Still exploring',
   ],
+  budgetOptions: DEFAULT_BUDGET_OPTIONS,
   budgetRanges: [
-    'Até R$ 5.000',
-    'R$ 5.000 — R$ 10.000',
-    'R$ 10.000 — R$ 25.000',
-    'R$ 25.000+',
-    'Prefiro conversar primeiro',
+    'Até R$2.500',
+    'R$2.500–5.000',
+    'R$5.000–10.000',
+    'R$10.000–20.000',
+    'Acima de R$20.000',
     'Ainda não defini',
   ],
   budgetRanges_en: [
-    'Under $1,500',
-    '$1,500 — $3,000',
-    '$3,000 — $6,000',
-    '$6,000+',
-    'Let’s discuss first',
-    'Not defined yet',
+    'Under US$1,000',
+    'US$1,000–2,500',
+    'US$2,500–5,000',
+    'US$5,000–10,000',
+    'US$10,000+',
+    'I’m not sure yet',
   ],
   ctaText: 'ENVIAR PROJETO ↗',
   ctaText_en: 'SUBMIT PROJECT ↗',

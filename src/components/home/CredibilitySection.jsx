@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
+import { ThreeColumnGrid } from './ThreeColumnGrid';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -21,7 +22,7 @@ export function CredibilitySection() {
     },
     {
       num: '03',
-      title: 'Experiência em projetos com CEnPE, UFC e financiamento FGV.',
+      title: 'Experiência em projetos com CEnPE, UFC e FGV DGPE.',
       desc: 'Soluções validadas com stakeholders e usuários reais em ambientes de alta exigência institucional e acadêmica.',
     },
   ];
@@ -31,8 +32,8 @@ export function CredibilitySection() {
       id="credibility"
       className="relative w-full bg-[#FAFAF7] text-[#111210] py-24 lg:py-32 border-b border-[rgba(17,18,16,0.1)] select-none"
     >
-      <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
-        
+      <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
+
         {/* ============================================================ */}
         {/* CABEÇALHO EDITORIAL: Método e Continuidade                   */}
         {/* ============================================================ */}
@@ -56,7 +57,7 @@ export function CredibilitySection() {
             <p className="text-sm text-[#8B8B85]">
               {t(
                 'cred_p2',
-                'Esse trabalho inclui colaboração com CEnPE e Universidade Federal do Ceará em um projeto com financiamento da FGV, além da validação contínua de soluções com usuários e stakeholders.'
+                'Esse trabalho inclui colaboração com CEnPE e Universidade Federal do Ceará em um projeto com FGV DGPE, além da validação contínua de soluções com usuários e stakeholders.'
               )}
             </p>
           </div>
@@ -65,31 +66,12 @@ export function CredibilitySection() {
         {/* ============================================================ */}
         {/* TRÊS PROVAS PRINCIPAIS EM COMPOSIÇÃO EDITORIAL               */}
         {/* ============================================================ */}
-        <div className="grid grid-cols-1 md:grid-cols-3 border-t border-[rgba(17,18,16,0.15)] mb-20 lg:mb-24">
-          {proofs.map((proof, index) => (
-            <motion.div
-              key={proof.num}
-              initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-60px' }}
-              transition={{ duration: 0.6, delay: index * 0.12, ease: EASING }}
-              className={`p-8 lg:p-10 flex flex-col justify-between border-b md:border-b-0 border-[rgba(17,18,16,0.15)] ${
-                index < 2 ? 'md:border-r border-[rgba(17,18,16,0.15)]' : ''
-              }`}
-            >
-              <div>
-                <span className="font-mono text-xs font-bold text-[#8B8B85] block mb-8">
-                  {proof.num} //
-                </span>
-                <h3 className="font-serif text-xl sm:text-2xl text-[#111210] font-normal mb-4 leading-snug">
-                  {proof.title}
-                </h3>
-                <p className="font-sans text-xs sm:text-sm text-[#111210]/70 leading-relaxed">
-                  {proof.desc}
-                </p>
-              </div>
-            </motion.div>
-          ))}
+        <div className="mb-20 lg:mb-24">
+          <ThreeColumnGrid
+            variant="informational"
+            theme="light"
+            items={proofs}
+          />
         </div>
 
         {/* ============================================================ */}

@@ -108,7 +108,7 @@ export function Work() {
               initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.05, ease: EASING }}
-              className="font-serif text-[2.25rem] sm:text-[2.75rem] md:text-[3.25rem] lg:text-[3.75rem] xl:text-[4.25rem] font-normal leading-[1.04] tracking-tight text-[#FAFAF7] max-w-[980px] mb-4"
+              className="font-serif text-[2.25rem] sm:text-[2.75rem] md:text-[3.25rem] lg:text-[3.75rem] xl:text-[4.25rem] font-normal leading-[1.08] tracking-tight text-[#FAFAF7] max-w-[980px] mb-4"
             >
               {t(
                 'work_intro_title',

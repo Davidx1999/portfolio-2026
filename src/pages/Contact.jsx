@@ -16,6 +16,14 @@ import {
 import { useLanguage } from '../context/LanguageContext';
 import { useLetsTalk } from '../hooks/useLetsTalk';
 import { useHeaderMetrics } from '../hooks/useHeaderMetrics';
+import {
+  resolveInitialCurrency,
+  getSavedCurrency,
+  setSavedCurrency,
+  getUrlCurrency,
+  detectCountryByIp,
+  getLocalizedBudgetOptions,
+} from '../services/currencyLocalization';
 
 const LinkedInIcon = ({ size = 16, className = "" }) => (
   <svg
@@ -93,7 +101,57 @@ export function Contact() {
     });
   };
 
-  // 3. Form State & Selections
+  // 3. Currency Localization & Market Selection
+  const [currencyInfo, setCurrencyInfo] = useState(() => resolveInitialCurrency(language));
+  const [detectedCountry, setDetectedCountry] = useState(null);
+
+  // Sync currency with language change ONLY IF user hasn't set manual choice or URL param
+  useEffect(() => {
+    const saved = getSavedCurrency();
+    const urlCurr = getUrlCurrency();
+    if (!saved && !urlCurr) {
+      setCurrencyInfo(resolveInitialCurrency(language));
+    }
+  }, [language]);
+
+  // Non-blocking, safe IP country check on mount
+  useEffect(() => {
+    let isMounted = true;
+    const saved = getSavedCurrency();
+    const urlCurr = getUrlCurrency();
+
+    detectCountryByIp().then((countryCode) => {
+      if (!isMounted || !countryCode) return;
+      setDetectedCountry(countryCode);
+
+      // Only suggest currency if no manual or URL choice was provided
+      if (!saved && !urlCurr) {
+        if (countryCode === 'BR') {
+          setCurrencyInfo({ currency: 'BRL', market: 'BR', source: 'ip' });
+        } else {
+          setCurrencyInfo({ currency: 'USD', market: 'INTL', source: 'ip' });
+        }
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const handleCurrencyChange = (newCurrency) => {
+    if (newCurrency === currencyInfo.currency) return;
+    setSavedCurrency(newCurrency);
+    setCurrencyInfo({
+      currency: newCurrency,
+      market: newCurrency === 'BRL' ? 'BR' : 'INTL',
+      source: 'manual',
+    });
+    // Reset selected budget to avoid carrying mismatched market string
+    setSelectedBudget('');
+  };
+
+  // 4. Form State & Selections
   const [selectedServices, setSelectedServices] = useState([]);
   const [selectedFormat, setSelectedFormat] = useState('');
   const [selectedTimeline, setSelectedTimeline] = useState('');
@@ -193,7 +251,8 @@ ${formatValue}
 ${timelineValue}
 
 4. FAIXA DE INVESTIMENTO ESTIMADA:
-${budgetValue}
+${budgetValue} (Moeda: ${currencyInfo.currency} | Mercado: ${currencyInfo.market})
+${currencyInfo.source ? `- Origem da definição de moeda: ${currencyInfo.source}${detectedCountry ? ` (País sugerido: ${detectedCountry})` : ''}` : ''}
 --------------------------------------------------
 
 DESCRIÇÃO DO PROJETO / DESAFIO:
@@ -225,7 +284,11 @@ Enviado através do portfólio oficial (davidsalviano.com)
             selectedServices,
             selectedFormat,
             selectedTimeline,
-            selectedBudget,
+            selectedBudget: budgetValue,
+            selectedMarket: currencyInfo.market,
+            selectedCurrency: currencyInfo.currency,
+            detectedCountry: detectedCountry || undefined,
+            detectionSource: currencyInfo.source,
             attachmentName,
           }),
         });
@@ -260,7 +323,7 @@ Enviado através do portfólio oficial (davidsalviano.com)
     }, 600);
   };
 
-  // Content Selection based on language
+  // Content Selection based on language & currency
   const heroEyebrow = language === 'en' ? talkData.heroEyebrow_en : talkData.heroEyebrow;
   const heroTitle = language === 'en' ? talkData.heroTitle_en : talkData.heroTitle;
   const heroDescription = language === 'en' ? talkData.heroDescription_en : talkData.heroDescription;
@@ -272,7 +335,13 @@ Enviado através do portfólio oficial (davidsalviano.com)
   const servicesList = language === 'en' ? talkData.servicesOptions_en : talkData.servicesOptions;
   const formatsList = language === 'en' ? talkData.collaborationFormats_en : talkData.collaborationFormats;
   const timelinesList = language === 'en' ? talkData.timelineOptions_en : talkData.timelineOptions;
-  const budgetsList = language === 'en' ? talkData.budgetRanges_en : talkData.budgetRanges;
+  
+  // Dynamic Budget options resolved by active currency & language (from Sanity budgetOptions or fallback)
+  const budgetsList = getLocalizedBudgetOptions(
+    talkData.budgetOptions,
+    currencyInfo.currency,
+    language
+  );
 
   const scrollToForm = () => {
     document.getElementById('talk-form-section')?.scrollIntoView({ behavior: 'smooth' });
@@ -298,7 +367,7 @@ Enviado através do portfólio oficial (davidsalviano.com)
             </div>
 
             {/* Title */}
-            <h1 className="font-serif text-[2.25rem] sm:text-[3.25rem] md:text-[4rem] font-normal leading-[1.06] tracking-tight text-[#FAFAF7] mb-6">
+            <h1 className="font-serif text-[2.25rem] sm:text-[3.25rem] md:text-[4rem] font-normal leading-[1.08] tracking-tight text-[#FAFAF7] mb-6">
               {heroTitle}
             </h1>
 
@@ -642,9 +711,50 @@ Enviado através do portfólio oficial (davidsalviano.com)
                 {/* PERGUNTA 4: Faixa de Investimento (Single Radio)         */}
                 {/* ======================================================== */}
                 <fieldset className="flex flex-col gap-3.5 border-b border-[#10110F]/10 pb-8">
-                  <legend className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-[#10110F] mb-1">
-                    04 // {language === 'en' ? 'Do you have an estimated budget range?' : 'Você já possui uma faixa de investimento?'}
-                  </legend>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-1">
+                    <legend className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-[#10110F]">
+                      04 // {language === 'en' ? 'Do you have an estimated budget range?' : 'Você já possui uma faixa de investimento?'}
+                    </legend>
+
+                    {/* Discreet Currency Switcher (BRL | USD) */}
+                    <div className="flex items-center gap-1.5 self-start sm:self-auto bg-[#10110F]/5 p-1 rounded-lg border border-[#10110F]/10">
+                      <button
+                        type="button"
+                        onClick={() => handleCurrencyChange('BRL')}
+                        className={`px-2.5 py-1 rounded-[6px] font-mono text-[11px] font-bold tracking-wider transition-all cursor-pointer ${
+                          currencyInfo.currency === 'BRL'
+                            ? 'bg-[#10110F] text-[#FAFAF7] shadow-xs'
+                            : 'text-[#10110F]/60 hover:text-[#10110F]'
+                        }`}
+                        aria-pressed={currencyInfo.currency === 'BRL'}
+                      >
+                        BRL (R$)
+                      </button>
+                      <span className="text-[#10110F]/20 text-xs">|</span>
+                      <button
+                        type="button"
+                        onClick={() => handleCurrencyChange('USD')}
+                        className={`px-2.5 py-1 rounded-[6px] font-mono text-[11px] font-bold tracking-wider transition-all cursor-pointer ${
+                          currencyInfo.currency === 'USD'
+                            ? 'bg-[#10110F] text-[#FAFAF7] shadow-xs'
+                            : 'text-[#10110F]/60 hover:text-[#10110F]'
+                        }`}
+                        aria-pressed={currencyInfo.currency === 'USD'}
+                      >
+                        USD (US$)
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Subtle indication */}
+                  <div className="flex items-center gap-2 -mt-1 mb-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#B6A9ED]" />
+                    <span className="font-mono text-[11px] text-[#10110F]/60">
+                      {language === 'en'
+                        ? `Values displayed in ${currencyInfo.currency}`
+                        : `Valores exibidos em ${currencyInfo.currency}`}
+                    </span>
+                  </div>
 
                   <div className="flex flex-wrap gap-2.5">
                     {budgetsList.map((budget) => {

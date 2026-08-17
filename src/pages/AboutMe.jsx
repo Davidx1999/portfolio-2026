@@ -291,7 +291,7 @@ export function AboutMe() {
                 initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.05, ease: EASING }}
-                className="font-serif text-[2.25rem] sm:text-[2.75rem] md:text-[3.25rem] lg:text-[3.6rem] font-normal leading-[1.06] tracking-tight text-[#FAFAF7] mb-5"
+                className="font-serif text-[2.25rem] sm:text-[2.75rem] md:text-[3.25rem] lg:text-[3.6rem] font-normal leading-[1.08] tracking-tight text-[#FAFAF7] mb-5"
               >
                 {aboutData?.heroTitle && language === 'pt'
                   ? aboutData.heroTitle

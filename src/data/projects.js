@@ -1,6 +1,3 @@
-import mapearImg from '../assets/mapear.jpg';
-import aulaf75Img from '../assets/aulaf75.png';
-import vincenzoImg from '../assets/vincenzo.jpg';
 
 export const PROJECTS = [
   {
@@ -20,6 +17,8 @@ export const PROJECTS = [
     imageHover: `${import.meta.env.BASE_URL}assets/projects_cape/fgv_aspect_wide.png`,
     coverImage: `${import.meta.env.BASE_URL}assets/projects_cape/fgvmapear_cape.png`,
     featured: true,
+    featuredOnHome: true,
+    featuredOrder: 1,
     rating: '4.9',
     badge: 'Enterprise FGV',
     challenge: 'Organizar ecossistema denso de dados educacionais, relatórios e geolocalização com escalabilidade multi-módulo.',
@@ -48,6 +47,8 @@ export const PROJECTS = [
     imageHover: `${import.meta.env.BASE_URL}assets/projects_cape/aulaf75.png`,
     coverImage: `${import.meta.env.BASE_URL}assets/projects_cape/aulaf75_cape.png`,
     featured: true,
+    featuredOnHome: true,
+    featuredOrder: 2,
     rating: '5.0',
     badge: 'Estudo de Laboratório',
     liveLink: 'https://davidx1999.github.io/f75-site-test-2/#features',
@@ -58,6 +59,36 @@ export const PROJECTS = [
       'Sincronização precisa de vídeo em alta fidelidade no scroll.',
       'Microinterações e física de teclas com Framer Motion.',
       'Otimização de performance web para taxa de quadros estável.'
+    ]
+  },
+  {
+    id: 'escutha',
+    title: 'Escutha',
+    category: 'Product & Web Design',
+    workType: 'cases',
+    year: '2026',
+    period: '2026',
+    role: 'Product & Web Designer',
+    context: 'Escutha · Presença Digital & Acolhimento',
+    tags: ['Web Redesign', 'Healthcare', 'UX Research', 'Information Architecture'],
+    description: 'Redesign e modernização da presença digital com foco em clareza na comunicação, arquitetura de informação acessível e experiência humanizada.',
+    image: `${import.meta.env.BASE_URL}assets/projects_cape/escutha_cape.png`,
+    finalImage: `${import.meta.env.BASE_URL}assets/projects_cape/escutha_cape.png`,
+    processImage: `${import.meta.env.BASE_URL}assets/projects_cape/escutha_card.png`,
+    imageHover: `${import.meta.env.BASE_URL}assets/projects_cape/escutha_cape.png`,
+    coverImage: `${import.meta.env.BASE_URL}assets/projects_cape/escutha_cape.png`,
+    featured: true,
+    featuredOnHome: true,
+    featuredOrder: 3,
+    rating: '4.95',
+    badge: 'Projeto para Cliente',
+    challenge: 'Garantir que usuários em momentos de sensibilidade emocional encontrem informações de forma rápida, acolhedora e sem barreiras visuais.',
+    solution: 'Interface limpa e empática com tipografia legível, tons suaves de contraste acessível e caminhos diretos de agendamento.',
+    process: [
+      'Diagnóstico de usabilidade e análise de atritos da jornada.',
+      'Reestruturação da arquitetura de informação e hierarquia de conteúdo.',
+      'Design visual de alta fidelidade e prototipagem responsiva.',
+      'Validação de legibilidade e acessibilidade visual WCAG.'
     ]
   },
   {
@@ -98,9 +129,9 @@ export const PROJECTS = [
     context: 'Enterprise Infrastructure',
     tags: ['Design Systems', 'Design Tokens', 'Accessibility', 'Documentation'],
     description: 'Estudo aprofundado e arquitetura de componentes escaláveis com tokens semânticos e documentação de handoff.',
-    image: mapearImg,
-    finalImage: mapearImg,
-    processImage: aulaf75Img,
+    image: `${import.meta.env.BASE_URL}assets/projects_cape/fgv_aspect_wide.png`,
+    finalImage: `${import.meta.env.BASE_URL}assets/projects_cape/fgv_aspect_wide.png`,
+    processImage: `${import.meta.env.BASE_URL}assets/projects_cape/aulaf75_card.png`,
     featured: false,
     challenge: 'Garantir consistência absoluta entre times de design e engenharia com sincronização de tokens.',
     solution: 'Sistema estruturado em tokens semânticos, componentes atômicos e guias de uso no Figma e código.',
@@ -118,13 +149,13 @@ export const PROJECTS = [
     workType: 'cases',
     year: '2024',
     period: '2024',
-    role: 'Senior Product Designer',
+    role: 'PRODUCT DESIGNER',
     context: 'Institutional · FGV',
     tags: ['Product Design', 'Information Architecture', 'User Testing'],
-    description: 'Design de plataforma institucional para centro de empreendedorismo e novos projetos com financiamento FGV.',
-    image: vincenzoImg,
-    finalImage: vincenzoImg,
-    processImage: mapearImg,
+    description: 'Design de plataforma institucional para centro de empreendedorismo e novos projetos com FGV DGPE.',
+    image: `${import.meta.env.BASE_URL}assets/projects_cape/vincenzo_card.png`,
+    finalImage: `${import.meta.env.BASE_URL}assets/projects_cape/vincenzo_card.png`,
+    processImage: `${import.meta.env.BASE_URL}assets/projects_cape/fgvmapear_card.png`,
     featured: false,
     challenge: 'Conectar empreendedores, mentores e investidores em uma única jornada clara e objetiva.',
     solution: 'Plataforma modular com dashboards personalizados por perfil e fluxos de mentoria simplificados.',

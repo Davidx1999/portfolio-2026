@@ -215,30 +215,124 @@ export default {
     },
     {
       name: 'budgetRanges',
-      title: 'Faixas de Investimento (PT)',
+      title: 'Faixas de Investimento Legadas (PT)',
       type: 'array',
       of: [{ type: 'string' }],
       initialValue: [
-        'Até R$ 5.000',
-        'R$ 5.000 — R$ 10.000',
-        'R$ 10.000 — R$ 25.000',
-        'R$ 25.000+',
-        'Prefiro conversar primeiro',
+        'Até R$2.500',
+        'R$2.500–5.000',
+        'R$5.000–10.000',
+        'R$10.000–20.000',
+        'Acima de R$20.000',
         'Ainda não defini',
       ],
     },
     {
       name: 'budgetRanges_en',
-      title: 'Faixas de Investimento (EN)',
+      title: 'Faixas de Investimento Legadas (EN)',
       type: 'array',
       of: [{ type: 'string' }],
       initialValue: [
-        'Under $1,500',
-        '$1,500 — $3,000',
-        '$3,000 — $6,000',
-        '$6,000+',
-        'Let’s discuss first',
-        'Not defined yet',
+        'Under US$1,000',
+        'US$1,000–2,500',
+        'US$2,500–5,000',
+        'US$5,000–10,000',
+        'US$10,000+',
+        'I’m not sure yet',
+      ],
+    },
+    {
+      name: 'budgetOptions',
+      title: 'Opções de Orçamento por Mercado (Novo)',
+      description: 'Faixas de orçamento editáveis separadas por mercado (Brasil vs Internacional)',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          name: 'budgetOption',
+          title: 'Opção de Orçamento',
+          fields: [
+            {
+              name: 'market',
+              title: 'Mercado',
+              type: 'string',
+              options: {
+                list: [
+                  { title: 'Brasil (BR)', value: 'BR' },
+                  { title: 'Internacional (INTL)', value: 'INTL' },
+                ],
+                layout: 'radio',
+              },
+              validation: (Rule) => Rule.required(),
+            },
+            {
+              name: 'currency',
+              title: 'Moeda',
+              type: 'string',
+              options: {
+                list: [
+                  { title: 'BRL (R$)', value: 'BRL' },
+                  { title: 'USD (US$)', value: 'USD' },
+                ],
+                layout: 'radio',
+              },
+              validation: (Rule) => Rule.required(),
+            },
+            {
+              name: 'labelPt',
+              title: 'Rótulo em Português (ex: Até R$2.500)',
+              type: 'string',
+            },
+            {
+              name: 'labelEn',
+              title: 'Rótulo em Inglês (ex: Under US$1,000)',
+              type: 'string',
+            },
+            {
+              name: 'order',
+              title: 'Ordem de Exibição',
+              type: 'number',
+              initialValue: 1,
+            },
+            {
+              name: 'active',
+              title: 'Ativo na Listagem',
+              type: 'boolean',
+              initialValue: true,
+            },
+          ],
+          preview: {
+            select: {
+              market: 'market',
+              currency: 'currency',
+              labelPt: 'labelPt',
+              labelEn: 'labelEn',
+              active: 'active',
+            },
+            prepare({ market, currency, labelPt, labelEn, active }) {
+              return {
+                title: `${labelPt || labelEn || 'Opção de Orçamento'} (${currency || market || ''})`,
+                subtitle: `Mercado: ${market || 'N/A'} • Status: ${active !== false ? 'Ativo' : 'Inativo'}`,
+              };
+            },
+          },
+        },
+      ],
+      initialValue: [
+        // Brasil
+        { market: 'BR', currency: 'BRL', labelPt: 'Até R$2.500', labelEn: 'Up to R$2,500', order: 1, active: true },
+        { market: 'BR', currency: 'BRL', labelPt: 'R$2.500–5.000', labelEn: 'R$2,500–5,000', order: 2, active: true },
+        { market: 'BR', currency: 'BRL', labelPt: 'R$5.000–10.000', labelEn: 'R$5,000–10,000', order: 3, active: true },
+        { market: 'BR', currency: 'BRL', labelPt: 'R$10.000–20.000', labelEn: 'R$10,000–20,000', order: 4, active: true },
+        { market: 'BR', currency: 'BRL', labelPt: 'Acima de R$20.000', labelEn: 'Above R$20,000', order: 5, active: true },
+        { market: 'BR', currency: 'BRL', labelPt: 'Ainda não defini', labelEn: 'Not defined yet', order: 6, active: true },
+        // Internacional
+        { market: 'INTL', currency: 'USD', labelPt: 'Até US$1.000', labelEn: 'Under US$1,000', order: 1, active: true },
+        { market: 'INTL', currency: 'USD', labelPt: 'US$1.000–2.500', labelEn: 'US$1,000–2,500', order: 2, active: true },
+        { market: 'INTL', currency: 'USD', labelPt: 'US$2.500–5.000', labelEn: 'US$2,500–5,000', order: 3, active: true },
+        { market: 'INTL', currency: 'USD', labelPt: 'US$5.000–10.000', labelEn: 'US$5,000–10,000', order: 4, active: true },
+        { market: 'INTL', currency: 'USD', labelPt: 'US$10.000+', labelEn: 'US$10,000+', order: 5, active: true },
+        { market: 'INTL', currency: 'USD', labelPt: 'Ainda não defini', labelEn: 'I’m not sure yet', order: 6, active: true },
       ],
     },
 

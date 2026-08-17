@@ -4,6 +4,7 @@ import { motion, useScroll, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import { CurtainLink } from '../context/RouteCurtainContext';
 import { registerHeaderElement } from '../hooks/useHeaderMetrics';
+import { useAppReady } from '../context/AppReadyContext';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -31,6 +32,7 @@ export function SiteHeader() {
   const location = useLocation();
   const prefersReducedMotion = useReducedMotion();
   const headerRef = useRef(null);
+  const { isAppReady } = useAppReady();
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -57,28 +59,36 @@ export function SiteHeader() {
   };
 
   return (
-    <header ref={headerRef} data-site-header className="fixed top-0 inset-x-0 w-full z-[100] select-none">
+    <motion.header
+      ref={headerRef}
+      data-site-header
+      initial={prefersReducedMotion ? false : { y: -64, opacity: 0 }}
+      animate={isAppReady ? { y: 0, opacity: 1 } : { y: -64, opacity: 0 }}
+      transition={{ duration: 0.75, ease: EASING }}
+      className="fixed top-0 inset-x-0 w-full z-[100] select-none"
+    >
       <div
         className={`w-full bg-[#10110F]/95 backdrop-blur-md border-b transition-all duration-300 ${
           isScrolled ? 'border-white/15 shadow-xl shadow-black/40' : 'border-white/10 shadow-md shadow-black/20'
         }`}
       >
-        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 h-[54px] flex items-center justify-between">
+        <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16 h-[54px] flex items-center justify-between">
           {/* ============================================================ */}
-          {/* ESQUERDA: Monograma DS + Links de Navegação                  */}
+          {/* ESQUERDA: Logo + Links de Navegação                          */}
           {/* ============================================================ */}
           <div className="flex items-center gap-6 sm:gap-8 h-full">
-            {/* Logo / Monograma */}
+            {/* Logo */}
             <CurtainLink
               to="/"
               onClick={handleLinkClick}
-              className="flex items-center gap-2 group focus-visible:outline-2 focus-visible:outline-[#C7F000] focus-visible:outline-offset-4"
+              className="flex items-center group focus-visible:outline-2 focus-visible:outline-[#C7F000] focus-visible:outline-offset-4"
               aria-label="David Salviano - Home"
             >
-              <span className="font-serif font-black text-xl sm:text-2xl tracking-tighter text-[#F4F3EE] group-hover:text-[#C7F000] transition-colors duration-200">
-                DS
-              </span>
-              <span className="w-1.5 h-1.5 rounded-full bg-[#8B7EC8] transition-transform duration-300 group-hover:scale-125" />
+              <img
+                src={`${import.meta.env.BASE_URL}assets/logo alt.svg`}
+                alt="David Salviano"
+                className="h-7 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+              />
             </CurtainLink>
 
             <div className="hidden sm:block w-[1px] h-4 bg-white/15" />
@@ -120,7 +130,7 @@ export function SiteHeader() {
               <button
                 type="button"
                 onClick={() => setLanguage('pt')}
-                className={`px-1.5 py-0.5 transition-colors cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-[#C7F000] ${
+                className={`px-1.5 py-0.5 transition-colors cursor-pointer rounded-[8px] focus-visible:outline-2 focus-visible:outline-[#C7F000] ${
                   language === 'pt' ? 'text-[#C7F000] font-bold' : 'hover:text-[#F4F3EE]'
                 }`}
                 aria-label="Mudar idioma para Português"
@@ -131,7 +141,7 @@ export function SiteHeader() {
               <button
                 type="button"
                 onClick={() => setLanguage('en')}
-                className={`px-1.5 py-0.5 transition-colors cursor-pointer rounded focus-visible:outline-2 focus-visible:outline-[#C7F000] ${
+                className={`px-1.5 py-0.5 transition-colors cursor-pointer rounded-[8px] focus-visible:outline-2 focus-visible:outline-[#C7F000] ${
                   language === 'en' ? 'text-[#C7F000] font-bold' : 'hover:text-[#F4F3EE]'
                 }`}
                 aria-label="Switch language to English"
@@ -206,7 +216,7 @@ export function SiteHeader() {
           </CurtainLink>
         </motion.div>
       )}
-    </header>
+    </motion.header>
   );
 }
 
