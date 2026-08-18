@@ -79,15 +79,15 @@ function AppContent() {
         </Routes>
       </main>
 
-      <footer className="w-full bg-[#10110F] text-[#FAFAF7] border-t border-[rgba(244,243,238,0.16)] py-12 z-10 relative">
-        <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16 flex flex-col md:flex-row justify-between items-center text-[#F4F3EE]/50 font-mono text-sm text-center md:text-left">
+      <footer className="w-full bg-[#10110F] text-[#FAFAF7] border-t border-white/[0.08] py-5 sm:py-6 z-10 relative select-none">
+        <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16 flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-4 text-[#F4F3EE]/40 font-mono text-xs text-center sm:text-left">
           <CurtainLink
             to="/"
             className="hover:text-[#FAFAF7] transition-colors focus-visible:outline-2 focus-visible:outline-[#C7F000]"
           >
             © 2026 David Salviano.
           </CurtainLink>
-          <span className="uppercase mt-4 md:mt-0 tracking-[0.2em] text-xs text-[#F4F3EE]/60">
+          <span className="uppercase tracking-[0.22em] text-[10px] sm:text-[11px] text-[#F4F3EE]/30">
             Accessing the Gates of Art
           </span>
         </div>

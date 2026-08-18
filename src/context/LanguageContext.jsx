@@ -1,8 +1,9 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import pt from '../data/locales/pt';
 import en from '../data/locales/en';
 import es from '../data/locales/es';
+import { detectCountryByIp } from '../services/currencyLocalization';
 
 const LanguageContext = createContext();
 
@@ -14,13 +15,33 @@ export function LanguageProvider({ children }) {
     if (saved && ['pt', 'en', 'es'].includes(saved)) {
       return saved;
     }
-    // Fallback to browser language if available and matches our languages
+    // Fallback inicial por navegador
     const browserLang = navigator.language?.split('-')[0];
-    if (browserLang && ['pt', 'en', 'es'].includes(browserLang)) {
-      return browserLang;
-    }
-    return 'pt'; // Default fallback
+    if (browserLang === 'pt') return 'pt';
+    if (browserLang === 'es') return 'es';
+    if (browserLang === 'en') return 'en';
+    return 'pt';
   });
+
+  // Detecção não-bloqueante por país na primeira visita
+  useEffect(() => {
+    const saved = localStorage.getItem('portfolio_lang');
+    if (saved) return; // Respeita escolha prévia
+
+    let isMounted = true;
+    detectCountryByIp().then((countryCode) => {
+      if (!isMounted || !countryCode) return;
+      if (countryCode === 'BR') {
+        setLanguageState('pt');
+      } else {
+        setLanguageState('en');
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const setLanguage = (lang) => {
     if (['pt', 'en', 'es'].includes(lang)) {

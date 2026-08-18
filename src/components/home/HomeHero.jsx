@@ -118,7 +118,7 @@ export function HomeHero() {
               transition={{ duration: 0.6, delay: 0.2, ease: EASING }}
               className="mb-5 sm:mb-6"
             >
-              <h1 className="font-serif text-[2.25rem] sm:text-[2.75rem] lg:text-[3rem] xl:text-[3.25rem] font-normal leading-[1.12] tracking-tight text-[#111210]">
+              <h1 className="font-serif text-[1.95rem] xs:text-[2.25rem] sm:text-[2.75rem] lg:text-[3rem] xl:text-[3.25rem] font-normal leading-[1.12] tracking-tight text-[#111210]">
                 {t('hero_headline_v2', 'Transformo complexidade em produtos digitais claros e marcantes.')}
               </h1>
             </motion.div>
@@ -128,7 +128,7 @@ export function HomeHero() {
               initial={prefersReducedMotion ? false : { opacity: 0, y: -16 }}
               animate={isAppReady ? { opacity: 1, y: 0 } : { opacity: 0, y: -16 }}
               transition={{ duration: 0.5, delay: 0.32, ease: EASING }}
-              className="mb-8 sm:mb-10"
+              className="mb-7 sm:mb-10"
             >
               <p className="font-sans text-[0.95rem] sm:text-[1.05rem] lg:text-[1.1rem] text-[#111210]/80 leading-relaxed max-w-md">
                 {t(
@@ -143,7 +143,7 @@ export function HomeHero() {
               initial={prefersReducedMotion ? false : { opacity: 0, y: -14 }}
               animate={isAppReady ? { opacity: 1, y: 0 } : { opacity: 0, y: -14 }}
               transition={{ duration: 0.5, delay: 0.42, ease: EASING }}
-              className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6"
+              className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-6"
             >
               {/* CTA Principal em Verde Ácido */}
               <RollingButton

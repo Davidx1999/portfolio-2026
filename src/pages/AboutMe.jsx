@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowUpRight, CheckCircle2, Download, ExternalLink, Sparkles, Layers, ShieldCheck, Cpu, Globe, RefreshCw } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useAbout } from '../hooks/useAbout';
@@ -11,9 +11,12 @@ const EASING = [0.22, 1, 0.36, 1];
 
 export function AboutMe() {
   const { t, language } = useLanguage();
-  const { aboutData } = useAbout();
+  const { aboutData, brandingProjects } = useAbout();
   const prefersReducedMotion = useReducedMotion();
   const [, setHoveredSpectrumStep] = useState(null);
+
+  const resumeDownloadUrl = aboutData?.resumeUrl || null;
+  const lattesUrl = aboutData?.lattesUrl || 'http://lattes.cnpq.br/2300088312341296';
 
   // Trajetória Oficial: 6 Momentos Cronológicos
   const trajectoryMoments = [
@@ -132,40 +135,6 @@ export function AboutMe() {
     { id: 'c3', name: t('about_spectrum_comp_3', 'Ilustração & Narrativa'), desc: t('about_spectrum_comp_3_desc', 'Metáforas visuais, composição e ícones autorais') },
   ];
 
-  // Além da Interface: 3 Peças Reais de Branding
-  const beyondPieces = [
-    {
-      id: 'cenpe-brand',
-      slug: 'cenpe-brand',
-      title: t('about_beyond_cenpe_title', 'Identidade CEnPE'),
-      area: t('about_beyond_cenpe_area', 'Identidade Visual (2022)'),
-      context: t('about_beyond_cenpe_ctx', 'Criação da marca e identidade visual para o Centro de Empreendedorismo da UFC.'),
-      image: `${import.meta.env.BASE_URL}assets/logo_purple.png`,
-      isLogo: true,
-      tag: 'BRANDING · UFC',
-    },
-    {
-      id: 'programe-ce',
-      slug: 'programe-ce',
-      title: t('about_beyond_programe_title', 'Manual Programe_CE'),
-      area: t('about_beyond_programe_area', 'Manual de Marca (2021—2022)'),
-      context: t('about_beyond_programe_ctx', 'Criação do manual de marca e sistema gráfico para iniciativa de educação tecnológica.'),
-      image: `${import.meta.env.BASE_URL}assets/logo_fullname.png`,
-      isLogo: true,
-      tag: 'GUIDELINES · EDTECH',
-    },
-    {
-      id: 'atlanta-home-concierge',
-      slug: 'atlanta-home-concierge',
-      title: t('about_beyond_ahc_title', 'Atlanta Home Concierge'),
-      area: t('about_beyond_ahc_area', 'Marca, Digital & Web (2026)'),
-      context: t('about_beyond_ahc_ctx', 'Manual de marca, produção digital, animação e direção de modernização da presença web.'),
-      image: `${import.meta.env.BASE_URL}assets/apoio/ahc.png`,
-      isLogo: true,
-      tag: 'FREELANCE · 2026',
-    },
-  ];
-
   // 5 Formatos de Colaboração Comercial
   const collaborationModes = [
     {
@@ -228,10 +197,6 @@ export function AboutMe() {
   // Retrato pessoal real
   const portraitImage =
     aboutData?.portraitUrl || `${import.meta.env.BASE_URL}assets/profile/profile3.png`;
-
-  // Links de Currículo
-  const resumeDownloadUrl = aboutData?.resumeUrl || '#';
-  const lattesUrl = aboutData?.lattesUrl || 'http://lattes.cnpq.br/9944747514107119';
 
   return (
     <div className="w-full min-h-screen bg-[#10110F] text-[#FAFAF7] select-none">
@@ -476,34 +441,42 @@ export function AboutMe() {
             </div>
 
             {/* Coluna Direita: Composição Limpa de Artefato Real (~45%) */}
-            <div className="lg:col-span-5 flex justify-center">
-              <div className="relative w-full rounded-[18px] overflow-hidden border border-[rgba(244,243,238,0.2)] bg-[#151613] p-4 sm:p-6 shadow-2xl">
-                <div className="aspect-[16/11] rounded-[12px] overflow-hidden border border-white/10 bg-[#10110F] mb-4">
+            <div className="lg:col-span-5 flex justify-center w-full">
+              <CurtainLink
+                to="/cases/fgv-mapear"
+                className="group relative w-full rounded-[20px] overflow-hidden border border-[rgba(244,243,238,0.16)] bg-[#141512] p-4 sm:p-6 shadow-xl hover:border-[rgba(196,255,0,0.5)] transition-all duration-300 flex flex-col justify-between focus-visible:outline-2 focus-visible:outline-[#C4FF00]"
+              >
+                <div className="aspect-[16/10] w-full rounded-[14px] overflow-hidden border border-white/10 bg-[#10110F] relative mb-4 sm:mb-5">
                   <img
                     src={`${import.meta.env.BASE_URL}assets/projects_cape/fgvmapear_card.png`}
                     alt="Mapear Product Architecture & Interface"
-                    className="w-full h-full object-cover filter saturate-[0.95]"
+                    className="w-full h-full object-cover filter saturate-[0.95] group-hover:scale-[1.03] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
                   />
+                  <div className="absolute top-3 right-3 px-2.5 py-1 bg-[#10110F]/80 backdrop-blur-md border border-white/15 rounded-[6px] font-mono text-[9px] uppercase font-bold tracking-widest text-[#C4FF00]">
+                    ESTUDO PRINCIPAL
+                  </div>
                 </div>
                 
-                <div className="flex items-center justify-between pt-2">
-                  <div>
-                    <span className="font-mono text-[10px] uppercase font-bold tracking-widest text-[#C4FF00] block">
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-mono text-[10px] uppercase font-bold tracking-widest text-[#C4FF00]">
                       MAPEAR // FGV DGPE · CEnPE / UFC
                     </span>
-                    <span className="font-serif text-lg text-white font-normal">
-                      Evolução Contínua de Produto (4+ anos)
+                    <span className="font-mono text-[10px] text-white/40 uppercase">
+                      2022—2026
                     </span>
                   </div>
-                  <Link
-                    to="/mapear"
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white/5 hover:bg-[#C4FF00] hover:text-[#10110F] text-[#FAFAF7] border border-white/15 rounded-[8px] font-mono text-[10px] uppercase tracking-wider transition-all font-bold"
-                  >
-                    <span>Ver Estudo</span>
-                    <ArrowUpRight size={13} />
-                  </Link>
+
+                  <h3 className="font-serif text-lg sm:text-xl text-white font-normal leading-snug group-hover:text-[#C4FF00] transition-colors">
+                    Evolução Contínua de Produto & Sistema (4+ anos)
+                  </h3>
+
+                  <div className="mt-2 pt-3 border-t border-white/[0.08] flex items-center justify-between font-mono text-[11px] font-bold uppercase tracking-wider text-[#FAFAF7]/75 group-hover:text-[#C4FF00] transition-colors">
+                    <span>{language === 'en' ? 'Explore Full Case Study' : 'Ver Estudo Completo'}</span>
+                    <ArrowUpRight size={14} className="group-hover:translate-x-1 group-hover:-translate-y-0.5 transition-transform duration-300" />
+                  </div>
                 </div>
-              </div>
+              </CurtainLink>
             </div>
 
           </div>
@@ -601,22 +574,25 @@ export function AboutMe() {
               </span>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3.5 sm:gap-4">
               {primarySpectrum.map((step, sIdx) => (
                 <div
                   key={step.id}
                   onMouseEnter={() => setHoveredSpectrumStep(step.id)}
                   onMouseLeave={() => setHoveredSpectrumStep(null)}
-                  className="p-5 bg-[#151613] border border-[rgba(244,243,238,0.16)] rounded-[14px] flex flex-col justify-between min-h-[140px] hover:border-[#C4FF00] transition-colors"
+                  className="p-5 sm:p-6 bg-[#141512] border border-[rgba(244,243,238,0.12)] rounded-[16px] flex flex-col justify-between hover:border-[rgba(196,255,0,0.5)] hover:bg-[#181916] transition-all duration-300 group min-h-[160px] shadow-sm"
                 >
-                  <span className="font-mono text-[10px] font-bold text-white/40">
-                    0{sIdx + 1}.
-                  </span>
+                  <div className="flex items-center justify-between mb-4 pb-2.5 border-b border-white/[0.06]">
+                    <span className="font-mono text-xs font-bold text-[#C4FF00] tracking-wider">
+                      0{sIdx + 1}. //
+                    </span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-white/20 group-hover:bg-[#C4FF00] transition-colors" />
+                  </div>
                   <div>
-                    <h4 className="font-serif text-lg text-white font-normal mb-1">
+                    <h4 className="font-serif text-lg sm:text-[1.15rem] text-white font-normal mb-2 leading-snug group-hover:text-[#C4FF00] transition-colors">
                       {step.name}
                     </h4>
-                    <p className="font-sans text-[11px] text-[#F4F3EE]/60 leading-tight line-clamp-2">
+                    <p className="font-sans text-xs text-[#F4F3EE]/70 leading-relaxed">
                       {step.desc}
                     </p>
                   </div>
@@ -634,20 +610,23 @@ export function AboutMe() {
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4">
               {complementarySpectrum.map((step) => (
                 <div
                   key={step.id}
-                  className="p-5 bg-[#151613] border border-[rgba(244,243,238,0.14)] rounded-[14px] flex flex-col justify-between min-h-[120px] hover:border-white/40 transition-colors"
+                  className="p-5 sm:p-6 bg-[#141512] border border-[rgba(244,243,238,0.12)] rounded-[16px] flex flex-col justify-between hover:border-white/40 hover:bg-[#181916] transition-all duration-300 group min-h-[140px] shadow-sm"
                 >
-                  <span className="font-mono text-[10px] font-bold text-white/40">
-                    + COMPLEMENTAR
-                  </span>
+                  <div className="flex items-center justify-between mb-4 pb-2.5 border-b border-white/[0.06]">
+                    <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-white/50">
+                      + COMPLEMENTAR
+                    </span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-white/20 group-hover:bg-white/60 transition-colors" />
+                  </div>
                   <div>
-                    <h4 className="font-serif text-lg text-white font-normal mb-1">
+                    <h4 className="font-serif text-lg sm:text-[1.15rem] text-white font-normal mb-2 leading-snug">
                       {step.name}
                     </h4>
-                    <p className="font-sans text-[11px] text-[#F4F3EE]/60 leading-tight">
+                    <p className="font-sans text-xs text-[#F4F3EE]/70 leading-relaxed">
                       {step.desc}
                     </p>
                   </div>
@@ -660,79 +639,77 @@ export function AboutMe() {
       </section>
 
       {/* ============================================================ */}
-      {/* 6. SEÇÃO “ALÉM DA INTERFACE” (CURADORIA DE ALTO IMPACTO)      */}
+      {/* 6. SEÇÃO “ALÉM DA INTERFACE” (DINÂMICO DO SANITY - MÁX 3)    */}
       {/* ============================================================ */}
-      <section className="w-full py-20 lg:py-28 border-b border-[rgba(244,243,238,0.16)] bg-[#10110F]">
-        <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
-          
-          <div className="max-w-4xl mb-14">
-            <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#C4FF00] block mb-3">
-              {t('about_beyond_eyebrow', 'ALÉM DA INTERFACE')}
-            </span>
-            <h2 className="font-serif text-[2rem] sm:text-[2.6rem] lg:text-[3.25rem] font-normal leading-[1.08] tracking-tight text-[#FAFAF7]">
-              {t(
-                'about_beyond_headline',
-                'Antes de organizar produtos, aprendi a organizar marcas, imagens e movimento.'
-              )}
-            </h2>
-          </div>
+      {brandingProjects && brandingProjects.length > 0 && (
+        <section className="w-full py-20 lg:py-28 border-b border-[rgba(244,243,238,0.16)] bg-[#10110F]">
+          <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
+            
+            <div className="max-w-4xl mb-14">
+              <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#C4FF00] block mb-3">
+                {t('about_beyond_eyebrow', 'ALÉM DA INTERFACE')}
+              </span>
+              <h2 className="font-serif text-[2rem] sm:text-[2.6rem] lg:text-[3.25rem] font-normal leading-[1.08] tracking-tight text-[#FAFAF7]">
+                {t(
+                  'about_beyond_headline',
+                  'Antes de organizar produtos, aprendi a organizar marcas, imagens e movimento.'
+                )}
+              </h2>
+            </div>
 
-          {/* 3 Cases de Branding Clicáveis e Conectados à Work */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            {beyondPieces.map((piece, pIdx) => (
-              <CurtainLink
-                key={pIdx}
-                to={`/cases/${piece.slug}`}
-                className="group bg-[#151613] border border-[rgba(244,243,238,0.16)] rounded-[18px] overflow-hidden flex flex-col justify-between hover:border-[rgba(196,255,0,0.45)] transition-all duration-500 cursor-pointer shadow-lg hover:shadow-2xl"
-              >
-                <div className="aspect-[4/3] w-full overflow-hidden bg-[#10110F] relative flex items-center justify-center p-6 border-b border-white/5">
-                  {piece.isLogo ? (
-                    <div className="w-full h-full flex items-center justify-center p-4">
+            {/* No máximo 3 Cases de Branding vindos do Sanity */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+              {brandingProjects.slice(0, 3).map((piece, pIdx) => (
+                <CurtainLink
+                  key={piece.id || pIdx}
+                  to={`/cases/${piece.slug}`}
+                  className="group bg-[#151613] border border-[rgba(244,243,238,0.16)] rounded-[18px] overflow-hidden flex flex-col justify-between hover:border-[rgba(196,255,0,0.45)] transition-all duration-500 cursor-pointer shadow-lg hover:shadow-2xl focus-visible:outline-2 focus-visible:outline-[#C4FF00]"
+                >
+                  <div className="aspect-[4/3] w-full overflow-hidden bg-[#10110F] relative flex items-center justify-center p-6 border-b border-white/5">
+                    {piece.imageUrl ? (
                       <img
-                        src={piece.image}
+                        src={piece.imageUrl}
                         alt={piece.title}
-                        className="max-w-[75%] max-h-[75%] object-contain filter contrast-125 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105"
+                        className="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
                       />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center font-mono text-xs text-white/30 tracking-widest uppercase">
+                        {piece.title}
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#151613] via-transparent to-transparent opacity-60 pointer-events-none" />
+                    
+                    {/* Tag superior */}
+                    <div className="absolute top-3.5 right-3.5 px-2 py-0.5 bg-[#10110F]/80 backdrop-blur-sm border border-white/10 rounded-[6px] font-mono text-[9px] uppercase tracking-wider text-white/70">
+                      {piece.tag || 'BRANDING'}
                     </div>
-                  ) : (
-                    <img
-                      src={piece.image}
-                      alt={piece.title}
-                      className="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.02]"
-                    />
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#151613] via-transparent to-transparent opacity-60 pointer-events-none" />
-                  
-                  {/* Tag superior */}
-                  <div className="absolute top-3.5 right-3.5 px-2 py-0.5 bg-[#10110F]/80 backdrop-blur-sm border border-white/10 rounded-[6px] font-mono text-[9px] uppercase tracking-wider text-white/70">
-                    {piece.tag}
-                  </div>
-                </div>
-
-                <div className="p-6 flex flex-col justify-between flex-1">
-                  <div>
-                    <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#C4FF00] block mb-1">
-                      {piece.area}
-                    </span>
-                    <h3 className="font-serif text-xl text-white font-normal mb-2 group-hover:text-[#C4FF00] transition-colors">
-                      {piece.title}
-                    </h3>
-                    <p className="font-sans text-xs text-[#F4F3EE]/70 leading-relaxed mb-4">
-                      {piece.context}
-                    </p>
                   </div>
 
-                  <div className="pt-3 border-t border-white/10 flex items-center justify-between font-mono text-[11px] font-bold uppercase tracking-wider text-[#F4F3EE]/70 group-hover:text-[#C4FF00] transition-colors">
-                    <span>{language === 'en' ? 'Explore Case' : 'Ver Estudo'}</span>
-                    <ArrowUpRight size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                  <div className="p-6 flex flex-col justify-between flex-1">
+                    <div>
+                      <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#C4FF00] block mb-1">
+                        {piece.area}
+                      </span>
+                      <h3 className="font-serif text-xl text-white font-normal mb-2 group-hover:text-[#C4FF00] transition-colors">
+                        {piece.title}
+                      </h3>
+                      <p className="font-sans text-xs text-[#F4F3EE]/70 leading-relaxed mb-4">
+                        {language === 'en' && piece.context_en ? piece.context_en : piece.context}
+                      </p>
+                    </div>
+
+                    <div className="pt-3 border-t border-white/10 flex items-center justify-between font-mono text-[11px] font-bold uppercase tracking-wider text-[#F4F3EE]/70 group-hover:text-[#C4FF00] transition-colors">
+                      <span>{language === 'en' ? 'Explore Case' : 'Ver Estudo'}</span>
+                      <ArrowUpRight size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                    </div>
                   </div>
-                </div>
-              </CurtainLink>
-            ))}
+                </CurtainLink>
+              ))}
+            </div>
+
           </div>
-
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ============================================================ */}
       {/* 7. SEÇÃO “EXPERIÊNCIA E FORMAÇÃO” (FICHA PROFISSIONAL OBJETIVA)*/}
@@ -820,22 +797,29 @@ export function AboutMe() {
 
           {/* Currículo Buttons (PDF via Sanity + Lattes Complementar) */}
           <div className="mt-8 flex flex-wrap items-center gap-4">
-            <a
-              href={resumeDownloadUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              download
-              className="group inline-flex items-center gap-2.5 px-6 py-3.5 bg-[#C4FF00] hover:bg-[#d4ff1a] text-[#10110F] rounded-[12px] font-mono text-xs font-bold uppercase tracking-wider transition-all shadow-lg"
-            >
-              <Download size={15} />
-              <RollingText text={t('about_bio_resume_btn', 'Baixar Currículo (PDF)')} />
-            </a>
+            {resumeDownloadUrl ? (
+              <a
+                href={resumeDownloadUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                download
+                className="group inline-flex items-center gap-2.5 px-6 py-3.5 bg-[#C4FF00] hover:bg-[#d4ff1a] text-[#10110F] rounded-[12px] font-mono text-xs font-bold uppercase tracking-wider transition-all shadow-lg focus-visible:outline-2 focus-visible:outline-[#C4FF00]"
+              >
+                <Download size={15} />
+                <RollingText text={t('about_bio_resume_btn', 'Baixar Currículo (PDF)')} />
+              </a>
+            ) : (
+              <span className="inline-flex items-center gap-2.5 px-6 py-3.5 bg-white/5 border border-white/10 text-white/40 rounded-[12px] font-mono text-xs font-bold uppercase tracking-wider cursor-not-allowed">
+                <Download size={15} />
+                <span>{t('about_bio_resume_btn', 'Currículo (Em Breve)')}</span>
+              </span>
+            )}
 
             <a
               href={lattesUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex items-center gap-2 px-5 py-3.5 bg-white/5 hover:bg-white/10 hover:text-[#C4FF00] border border-[rgba(244,243,238,0.2)] rounded-[12px] font-mono text-xs font-bold uppercase tracking-wider text-[#FAFAF7] transition-all"
+              className="group inline-flex items-center gap-2 px-5 py-3.5 bg-white/5 hover:bg-white/10 hover:text-[#C4FF00] border border-[rgba(244,243,238,0.2)] rounded-[12px] font-mono text-xs font-bold uppercase tracking-wider text-[#FAFAF7] transition-all focus-visible:outline-2 focus-visible:outline-[#C4FF00]"
             >
               <RollingText text={t('about_bio_lattes_btn', 'Currículo Lattes ↗')} />
               <ExternalLink size={13} />
@@ -873,32 +857,39 @@ export function AboutMe() {
               return (
                 <div
                   key={idx}
-                  className="p-8 bg-[#151613] border border-[rgba(244,243,238,0.16)] rounded-[18px] flex flex-col justify-between hover:border-[rgba(196,255,0,0.5)] transition-colors min-h-[260px]"
+                  className="p-6 sm:p-8 bg-[#141512] border border-[rgba(244,243,238,0.12)] rounded-[18px] flex flex-col justify-between hover:border-[rgba(196,255,0,0.45)] hover:bg-[#181916] transition-all duration-300 min-h-[260px] shadow-sm"
                 >
                   <div>
-                    <div className="flex items-center justify-between mb-5">
-                      <span className="font-mono text-xs font-bold text-[#C4FF00]">
-                        {item.num} //
-                      </span>
-                      <span className="px-2 py-0.5 bg-white/5 border border-white/10 rounded-[4px] font-mono text-[9px] uppercase tracking-wider text-white/60">
+                    {/* Header do Card: Número + Ícone à esquerda, Tag à direita */}
+                    <div className="flex items-center justify-between mb-5 pb-3.5 border-b border-white/[0.08]">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-[6px] bg-[#C4FF00]/10 border border-[#C4FF00]/20 flex items-center justify-center text-[#C4FF00]">
+                          <IconComp size={15} />
+                        </div>
+                        <span className="font-mono text-xs font-bold text-[#C4FF00] tracking-wider">
+                          {item.num} //
+                        </span>
+                      </div>
+                      <span className="px-2.5 py-0.5 bg-white/[0.04] border border-white/10 rounded-[6px] font-mono text-[9px] uppercase font-bold tracking-widest text-[#F4F3EE]/75">
                         {item.tag}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2.5 mb-3">
-                      <IconComp size={18} className="text-[#C4FF00]" />
-                      <h3 className="font-serif text-xl sm:text-2xl text-white font-normal">
-                        {item.title}
-                      </h3>
-                    </div>
+                    {/* Título sem indentação artificial */}
+                    <h3 className="font-serif text-xl sm:text-[1.35rem] text-white font-normal mb-3 leading-snug">
+                      {item.title}
+                    </h3>
 
-                    <p className="font-sans text-xs sm:text-sm text-[#F4F3EE]/75 leading-relaxed mb-6">
+                    {/* Descrição */}
+                    <p className="font-sans text-xs sm:text-sm text-[#F4F3EE]/70 leading-relaxed mb-6">
                       {item.desc}
                     </p>
                   </div>
 
-                  <div className="pt-4 border-t border-white/10">
-                    <span className="font-mono text-[10px] uppercase font-bold tracking-wider text-[#C4FF00]/90 block">
+                  {/* Rodapé com Ferramentas/Entregáveis */}
+                  <div className="pt-3.5 border-t border-white/[0.08] flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#C4FF00]/70 flex-shrink-0" />
+                    <span className="font-mono text-[10px] sm:text-[11px] uppercase tracking-wider text-[#F4F3EE]/60 block leading-tight">
                       {item.tools}
                     </span>
                   </div>

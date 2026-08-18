@@ -89,7 +89,7 @@ export function ThreeColumnGrid({
             <CurtainLink
               key={item.num || index}
               to={item.link || '#'}
-              className={`group flex flex-col justify-between p-8 sm:p-10 lg:p-12 ${cellBorders} ${hoverBg} transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-[#C7F000]`}
+              className={`group flex flex-col justify-between p-6 sm:p-8 lg:p-12 ${cellBorders} ${hoverBg} transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-[#C7F000]`}
             >
               {innerContent}
             </CurtainLink>
@@ -101,9 +101,9 @@ export function ThreeColumnGrid({
             key={item.num || index}
             initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-40px' }}
+            viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.5, delay: index * 0.1, ease: EASING }}
-            className={`flex flex-col justify-between p-8 sm:p-10 lg:p-12 ${cellBorders}`}
+            className={`flex flex-col justify-between p-6 sm:p-8 lg:p-12 ${cellBorders} ${hoverBg} transition-colors duration-300`}
           >
             {innerContent}
           </motion.div>

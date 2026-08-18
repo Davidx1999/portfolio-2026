@@ -1901,6 +1901,21 @@ export default {
       description: 'Define a sequência de revelação no scroll da Home (ex: 1 para o 1º case, 2 para o 2º, etc.).',
     },
     {
+      name: 'showInAbout',
+      title: 'Exibir em "Além da Interface" no Sobre Mim',
+      type: 'boolean',
+      group: 'publishing',
+      initialValue: false,
+      description: 'Marque para exibir este case entre os projetos de Identidade Visual / Além da Interface na página Sobre Mim (máximo 3).',
+    },
+    {
+      name: 'aboutOrder',
+      title: 'Ordem de Exibição no Sobre Mim (1, 2 ou 3)',
+      type: 'number',
+      group: 'publishing',
+      description: 'Define a ordem do card na seção Além da Interface em Sobre Mim.',
+    },
+    {
       name: 'orderRank',
       title: 'Ordem de Exibição Geral (Opcional)',
       type: 'number',

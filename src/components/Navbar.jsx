@@ -133,7 +133,7 @@ export function SiteHeader() {
                   isActive={location.pathname === '/work' || location.pathname === '/cases' || location.pathname.startsWith('/project')}
                   onClick={handleLinkClick}
                 >
-                  {t('nav_cases', 'WORK')}
+                  {t('nav_cases', language === 'en' ? 'WORK' : 'PROJETOS')}
                 </HeaderNavLink>
                 <HeaderNavLink
                   to="/about"
@@ -240,7 +240,7 @@ export function SiteHeader() {
                 onClick={handleLinkClick}
                 className="min-h-[48px] py-2 flex items-center justify-between border-b border-white/[0.08] font-serif text-3xl sm:text-4xl text-[#FAFAF7] hover:text-[#C7F000] transition-colors group"
               >
-                <span>{t('nav_cases', 'Work')}</span>
+                <span>{t('nav_cases', language === 'en' ? 'Work' : 'Projetos')}</span>
                 <span className="font-mono text-xs text-white/30 group-hover:text-[#C7F000] tracking-widest font-sans">02</span>
               </CurtainLink>
 

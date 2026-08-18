@@ -53,21 +53,30 @@ export function PrinciplesGrid() {
     return () => clearInterval(timer);
   }, [prefersReducedMotion, isInView, isTabVisible, words.length]);
 
-  const currentWord = words[currentIndex];
-  const isLongWord = currentWord.length > 11; // e.g. "DESIGN SYSTEMS"
+  const currentWord = words[currentIndex] || '';
+  const wordLength = currentWord.length;
+  const wordTypographyClass = useMemo(() => {
+    if (wordLength >= 13) {
+      return 'text-[clamp(1.75rem,6.8vw,8.5rem)]';
+    }
+    if (wordLength >= 10) {
+      return 'text-[clamp(2.15rem,8vw,10rem)]';
+    }
+    return 'text-[clamp(2.6rem,9vw,11rem)]';
+  }, [wordLength]);
 
   return (
     <section
       ref={sectionRef}
       id="positioning-capabilities"
-      className="relative w-full bg-[#10110F] text-[#FAFAF7] py-24 sm:py-32 lg:py-40 border-b border-white/10 select-none overflow-hidden"
+      className="relative w-full bg-[#10110F] text-[#FAFAF7] py-20 sm:py-32 lg:py-40 border-b border-white/10 select-none overflow-hidden"
     >
       <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16 flex flex-col justify-between">
 
         {/* ============================================================ */}
         {/* 1. INTRODUÇÃO EDITORIAL DISCRETA                             */}
         {/* ============================================================ */}
-        <div className="max-w-2xl mb-14 sm:mb-20 lg:mb-24">
+        <div className="max-w-2xl mb-12 sm:mb-20 lg:mb-24">
           <span className="font-mono text-xs font-bold text-[#8B8B85] uppercase tracking-[0.22em] block mb-4 sm:mb-5">
             {t('principles_tag', 'POSICIONAMENTO')}
           </span>
@@ -84,7 +93,7 @@ export function PrinciplesGrid() {
         {prefersReducedMotion ? (
           /* Versão estática acessível para reduced-motion */
           <div className="flex flex-col items-start text-left gap-2 pt-4 w-full">
-            <p className="font-sans font-bold text-[clamp(2rem,5vw,4.5rem)] uppercase leading-[1.05] tracking-[-0.035em] text-[#FAFAF7] text-left">
+            <p className="font-sans font-bold text-[clamp(1.75rem,5vw,4.5rem)] uppercase leading-[1.05] tracking-[-0.035em] text-[#FAFAF7] text-left">
               {t(
                 'kinetic_reduced_line',
                 'EU ENTREGO ESTRATÉGIA, ARQUITETURA, INTERFACES E DESIGN SYSTEMS.'
@@ -95,13 +104,13 @@ export function PrinciplesGrid() {
           <div className="flex flex-col items-start justify-start w-full text-left">
             {/* Primeira Linha Fixa */}
             <div
-              className="w-full text-left font-sans font-bold uppercase tracking-[-0.045em] leading-[0.9] text-[#FAFAF7] select-none text-[clamp(3.5rem,10vw,11rem)]"
+              className="w-full text-left font-sans font-bold uppercase tracking-[-0.035em] sm:tracking-[-0.045em] leading-[0.92] text-[#FAFAF7] select-none text-[clamp(2.4rem,8.5vw,11rem)]"
             >
               {t('kinetic_fixed_line', 'EU ENTREGO')}
             </div>
 
             {/* Segunda Linha Variável com Máscara Vertical */}
-            <div className="capability-line-mask relative overflow-hidden w-full h-[clamp(3.8rem,11.5vw,12.5rem)] flex items-center justify-start text-left select-none mt-1 sm:mt-2">
+            <div className="capability-line-mask relative overflow-hidden w-full h-[clamp(3.2rem,10.5vw,12.5rem)] flex items-center justify-start text-left select-none mt-1 sm:mt-2">
               <AnimatePresence mode="popLayout" initial={false}>
                 <motion.div
                   key={`${currentIndex}-${currentWord}`}
@@ -112,11 +121,7 @@ export function PrinciplesGrid() {
                     duration: 0.72,
                     ease: [0.77, 0, 0.175, 1], // power3.inOut suave e preciso
                   }}
-                  className={`capability-word font-sans font-bold uppercase tracking-[-0.045em] leading-[1.05] text-[#C7F000] whitespace-nowrap will-change-transform text-left flex items-center ${
-                    isLongWord
-                      ? 'text-[clamp(2.5rem,8vw,9rem)]'
-                      : 'text-[clamp(3.5rem,10vw,11rem)]'
-                  }`}
+                  className={`capability-word font-sans font-bold uppercase tracking-[-0.035em] sm:tracking-[-0.045em] leading-[1.05] text-[#C7F000] whitespace-nowrap will-change-transform text-left flex items-center ${wordTypographyClass}`}
                 >
                   {currentWord}
                 </motion.div>
@@ -129,3 +134,5 @@ export function PrinciplesGrid() {
     </section>
   );
 }
+
+export default PrinciplesGrid;

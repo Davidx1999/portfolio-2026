@@ -186,6 +186,7 @@ export default {
   "work_view_visual": "Visual",
   "work_view_index": "Index",
   "work_filter_all": "All",
+  "work_filter_all_label": "All Projects",
   "work_table_project": "Project",
   "work_table_role": "Role & Scope",
   "work_table_context": "Context",

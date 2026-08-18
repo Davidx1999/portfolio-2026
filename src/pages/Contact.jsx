@@ -17,11 +17,6 @@ import { useLetsTalk } from '../hooks/useLetsTalk';
 import { useHeaderMetrics } from '../hooks/useHeaderMetrics';
 import { RollingText } from '../components/RollingText';
 import {
-  resolveInitialCurrency,
-  getSavedCurrency,
-  setSavedCurrency,
-  getUrlCurrency,
-  detectCountryByIp,
   getLocalizedBudgetOptions,
 } from '../services/currencyLocalization';
 
@@ -98,60 +93,21 @@ export function Contact() {
     });
   };
 
-  // 3. Currency Localization & Market Selection
-  const [manualCurrency, setManualCurrency] = useState(() => {
-    const saved = getSavedCurrency();
-    const urlCurr = getUrlCurrency();
-    if (saved) return { currency: saved, market: saved === 'BRL' ? 'BR' : 'INTL', source: 'localStorage' };
-    if (urlCurr) return { currency: urlCurr, market: urlCurr === 'BRL' ? 'BR' : 'INTL', source: 'url' };
-    return null;
-  });
-
-  const currencyInfo = manualCurrency || resolveInitialCurrency(language);
-  const [detectedCountry, setDetectedCountry] = useState(null);
-
-  // Non-blocking, safe IP country check on mount
-  useEffect(() => {
-    let isMounted = true;
-    const saved = getSavedCurrency();
-    const urlCurr = getUrlCurrency();
-
-    detectCountryByIp().then((countryCode) => {
-      if (!isMounted || !countryCode) return;
-      setDetectedCountry(countryCode);
-
-      // Only suggest currency if no manual or URL choice was provided
-      if (!saved && !urlCurr) {
-        if (countryCode === 'BR') {
-          setManualCurrency({ currency: 'BRL', market: 'BR', source: 'ip' });
-        } else {
-          setManualCurrency({ currency: 'USD', market: 'INTL', source: 'ip' });
-        }
-      }
-    });
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  const handleCurrencyChange = (newCurrency) => {
-    if (newCurrency === currencyInfo.currency) return;
-    setSavedCurrency(newCurrency);
-    setManualCurrency({
-      currency: newCurrency,
-      market: newCurrency === 'BRL' ? 'BR' : 'INTL',
-      source: 'manual',
-    });
-    // Reset selected budget to avoid carrying mismatched market string
-    setSelectedBudget('');
-  };
+  // 3. Currency Localization: PT -> BRL (R$), EN/Outros -> USD (US$)
+  const currencyInfo = language === 'pt'
+    ? { currency: 'BRL', market: 'BR', symbol: 'R$' }
+    : { currency: 'USD', market: 'INTL', symbol: 'US$' };
 
   // 4. Form State & Selections
   const [selectedServices, setSelectedServices] = useState([]);
   const [selectedFormat, setSelectedFormat] = useState('');
   const [selectedTimeline, setSelectedTimeline] = useState('');
   const [selectedBudget, setSelectedBudget] = useState('');
+
+  // Limpa orçamento selecionado ao alternar idioma para evitar valores desencontrados
+  useEffect(() => {
+    setSelectedBudget('');
+  }, [language]);
 
   const [formData, setFormData] = useState({
     description: '',
@@ -248,7 +204,6 @@ ${timelineValue}
 
 4. FAIXA DE INVESTIMENTO ESTIMADA:
 ${budgetValue} (Moeda: ${currencyInfo.currency} | Mercado: ${currencyInfo.market})
-${currencyInfo.source ? `- Origem da definição de moeda: ${currencyInfo.source}${detectedCountry ? ` (País sugerido: ${detectedCountry})` : ''}` : ''}
 --------------------------------------------------
 
 DESCRIÇÃO DO PROJETO / DESAFIO:
@@ -283,8 +238,6 @@ Enviado através do portfólio oficial (davidsalviano.com)
             selectedBudget: budgetValue,
             selectedMarket: currencyInfo.market,
             selectedCurrency: currencyInfo.currency,
-            detectedCountry: detectedCountry || undefined,
-            detectionSource: currencyInfo.source,
             attachmentName,
           }),
         });
@@ -306,7 +259,7 @@ Enviado através do portfólio oficial (davidsalviano.com)
 
     // Direct mailto fallback with immediate user guidance
     const mailtoUrl = `mailto:${talkData.email || 'davidsalviano52@gmail.com'}?subject=${emailSubject}&body=${emailBody}`;
-    window.location.href = mailtoUrl;
+    window.open(mailtoUrl, '_self');
 
     setTimeout(() => {
       setSubmissionState({
@@ -389,18 +342,18 @@ Enviado através do portfólio oficial (davidsalviano.com)
       {/* 2. FAIXA DE HORÁRIO GLOBAL (Fortaleza, CE • GMT-3)          */}
       {/* ============================================================ */}
       <div className="w-full bg-[#151613] border-b border-[rgba(244,243,238,0.1)] py-3 px-6 sm:px-10 lg:px-16">
-        <div className="w-full max-w-[1560px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 font-mono text-xs text-[#F4F3EE]/60">
-          <div className="flex items-center gap-2.5">
+        <div className="w-full max-w-[1560px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left font-mono text-xs text-[#F4F3EE]/60">
+          <div className="flex items-center justify-center sm:justify-start gap-2.5">
             <span className="w-2 h-2 rounded-full bg-[#C4FF00] animate-pulse" />
             <span className="text-[#FAFAF7] font-semibold tracking-wider">
               FORTALEZA, CE • {fortalezaTime || '18:00:00'} (GMT-3)
             </span>
           </div>
 
-          <div className="flex items-center gap-4 text-[11px] uppercase tracking-widest text-white/40">
+          <div className="flex items-center justify-center gap-3 text-[10px] sm:text-[11px] uppercase tracking-widest text-white/40">
             <span>{language === 'en' ? 'REMOTE & WORLDWIDE' : 'REMOTO & GLOBAL'}</span>
             <span>·</span>
-            <span>{language === 'en' ? 'ENGLISH & PORTUGUESE' : 'PORTUGUÊS & INGLÊS'}</span>
+            <span>{language === 'en' ? 'PT / EN / ES' : 'PT / EN / ES'}</span>
           </div>
         </div>
       </div>
@@ -415,58 +368,58 @@ Enviado através do portfólio oficial (davidsalviano.com)
             {/* ============================================================ */}
             {/* LADO ESQUERDO: Painel de Disponibilidade e Contato (5 Cols)   */}
             {/* ============================================================ */}
-            <aside className="lg:col-span-5 flex flex-col gap-8 lg:sticky lg:top-[calc(var(--header-safe-offset)+1rem)]">
+            <aside className="lg:col-span-5 flex flex-col gap-4 sm:gap-5 lg:sticky lg:top-[calc(var(--header-safe-offset)+1rem)]">
               
               {/* Card de Perfil e Disponibilidade */}
-              <div className="border border-[#10110F]/15 bg-white p-6 sm:p-8 rounded-[20px] shadow-sm flex flex-col gap-6">
+              <div className="border border-[#10110F]/12 bg-white p-5 sm:p-6 rounded-[16px] shadow-sm flex flex-col gap-4">
                 
-                {/* Imagem de Apoio (Sem filtros artificiais) */}
+                {/* Imagem de Apoio Compacta e Proporcional */}
                 {talkData.profileImageUrl && (
-                  <div className="w-full aspect-[4/3] rounded-[14px] overflow-hidden border border-[#10110F]/10 bg-[#10110F]/5">
+                  <div className="w-full aspect-[16/8] max-h-[165px] rounded-[10px] overflow-hidden border border-[#10110F]/10 bg-[#10110F]/5">
                     <img
                       src={talkData.profileImageUrl}
                       alt={talkData.profileImageAlt || 'David Salviano — Product Designer'}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover object-center"
                     />
                   </div>
                 )}
 
                 {/* Status de Disponibilidade */}
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#10110F] relative flex items-center justify-center">
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#10110F] relative flex items-center justify-center shrink-0">
                       <span className="w-2.5 h-2.5 rounded-full bg-[#C4FF00] absolute animate-ping opacity-75" />
-                      <span className="w-2 rounded-full bg-[#C4FF00]" />
+                      <span className="w-2 h-2 rounded-full bg-[#C4FF00]" />
                     </span>
                     <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#10110F]">
                       {availabilityText}
                     </span>
                   </div>
-                  <p className="font-sans text-sm text-[#10110F]/70 leading-relaxed">
+                  <p className="font-sans text-xs sm:text-sm text-[#10110F]/70 leading-relaxed">
                     {availabilitySubtext}
                   </p>
                 </div>
 
                 {/* Prazo Médio de Resposta */}
-                <div className="pt-4 border-t border-[#10110F]/10 flex items-start gap-3 text-xs text-[#10110F]/65 font-mono">
-                  <Clock size={15} className="text-[#4056F4] shrink-0 mt-0.5" />
+                <div className="pt-3 border-t border-[#10110F]/10 flex items-center gap-2 text-xs text-[#10110F]/65 font-mono">
+                  <Clock size={14} className="text-[#4056F4] shrink-0" />
                   <span>{responseTime}</span>
                 </div>
               </div>
 
               {/* Contatos Diretos com Interações Úteis */}
-              <div className="border border-[#10110F]/15 bg-white p-6 rounded-[20px] shadow-sm flex flex-col gap-4">
+              <div className="border border-[#10110F]/12 bg-white p-4 sm:p-5 rounded-[16px] shadow-sm flex flex-col gap-3">
                 <span className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#10110F]/45">
                   {language === 'en' ? 'DIRECT CHANNELS' : 'CANAIS DIRETOS'}
                 </span>
 
                 {/* Email com Ação de Copiar */}
-                <div className="flex items-center justify-between p-3.5 rounded-[12px] bg-[#FAFAF7] border border-[#10110F]/10 hover:border-[#10110F]/30 transition-colors">
-                  <div className="flex items-center gap-3 overflow-hidden">
-                    <Mail size={16} className="text-[#10110F]/60 shrink-0" />
+                <div className="flex items-center justify-between p-3 rounded-[10px] bg-[#FAFAF7] border border-[#10110F]/10 hover:border-[#10110F]/30 transition-colors">
+                  <div className="flex items-center gap-2.5 overflow-hidden">
+                    <Mail size={15} className="text-[#10110F]/60 shrink-0" />
                     <div className="flex flex-col overflow-hidden">
-                      <span className="font-mono text-[10px] uppercase text-[#10110F]/45">Email</span>
-                      <span className="font-sans text-xs sm:text-sm font-semibold text-[#10110F] truncate">
+                      <span className="font-mono text-[9px] uppercase text-[#10110F]/45">Email</span>
+                      <span className="font-sans text-xs sm:text-[13px] font-semibold text-[#10110F] truncate">
                         {talkData.email}
                       </span>
                     </div>
@@ -475,15 +428,15 @@ Enviado através do portfólio oficial (davidsalviano.com)
                   <button
                     type="button"
                     onClick={handleCopyEmail}
-                    className="p-2 rounded-[8px] hover:bg-[#10110F]/10 text-[#10110F] transition-colors shrink-0 ml-2 focus-visible:outline-2 focus-visible:outline-[#4056F4] cursor-pointer"
+                    className="p-1.5 rounded-[6px] hover:bg-[#10110F]/10 text-[#10110F] transition-colors shrink-0 ml-2 focus-visible:outline-2 focus-visible:outline-[#4056F4] cursor-pointer"
                     aria-label="Copiar email de contato"
                     title={copiedEmail ? 'Email copiado!' : 'Copiar email'}
                   >
-                    {copiedEmail ? <Check size={16} className="text-green-600" /> : <Copy size={16} />}
+                    {copiedEmail ? <Check size={15} className="text-green-600" /> : <Copy size={15} />}
                   </button>
                 </div>
                 {copiedEmail && (
-                  <span className="font-mono text-[11px] text-green-700 font-bold -mt-2 px-1 block animate-fadeIn">
+                  <span className="font-mono text-[11px] text-green-700 font-bold -mt-1 px-1 block animate-fadeIn">
                     ✓ {language === 'en' ? 'Email copied to clipboard!' : 'Email copiado para a área de transferência!'}
                   </span>
                 )}
@@ -494,18 +447,18 @@ Enviado através do portfólio oficial (davidsalviano.com)
                     href={talkData.linkedIn}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex items-center justify-between p-3.5 rounded-[12px] bg-[#FAFAF7] border border-[#10110F]/10 hover:border-[#10110F]/30 transition-colors"
+                    className="group flex items-center justify-between p-3 rounded-[10px] bg-[#FAFAF7] border border-[#10110F]/10 hover:border-[#10110F]/30 transition-colors"
                   >
-                    <div className="flex items-center gap-3">
-                      <LinkedInIcon size={16} className="text-[#10110F]/60" />
+                    <div className="flex items-center gap-2.5">
+                      <LinkedInIcon size={15} className="text-[#10110F]/60" />
                       <div className="flex flex-col">
-                        <span className="font-mono text-[10px] uppercase text-[#10110F]/45">LinkedIn</span>
-                        <span className="font-sans text-xs sm:text-sm font-semibold text-[#10110F]">
+                        <span className="font-mono text-[9px] uppercase text-[#10110F]/45">LinkedIn</span>
+                        <span className="font-sans text-xs sm:text-[13px] font-semibold text-[#10110F]">
                           David Salviano
                         </span>
                       </div>
                     </div>
-                    <ArrowUpRight size={16} className="text-[#10110F]/40 group-hover:text-[#10110F] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                    <ArrowUpRight size={15} className="text-[#10110F]/40 group-hover:text-[#10110F] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                   </a>
                 )}
 
@@ -515,18 +468,18 @@ Enviado através do portfólio oficial (davidsalviano.com)
                     href={`https://wa.me/${talkData.whatsapp.replace(/[^0-9]/g, '')}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex items-center justify-between p-3.5 rounded-[12px] bg-[#FAFAF7] border border-[#10110F]/10 hover:border-[#10110F]/30 transition-colors"
+                    className="group flex items-center justify-between p-3 rounded-[10px] bg-[#FAFAF7] border border-[#10110F]/10 hover:border-[#10110F]/30 transition-colors"
                   >
-                    <div className="flex items-center gap-3">
-                      <MessageCircle size={16} className="text-[#10110F]/60" />
+                    <div className="flex items-center gap-2.5">
+                      <MessageCircle size={15} className="text-[#10110F]/60" />
                       <div className="flex flex-col">
-                        <span className="font-mono text-[10px] uppercase text-[#10110F]/45">WhatsApp</span>
-                        <span className="font-sans text-xs sm:text-sm font-semibold text-[#10110F]">
+                        <span className="font-mono text-[9px] uppercase text-[#10110F]/45">WhatsApp</span>
+                        <span className="font-sans text-xs sm:text-[13px] font-semibold text-[#10110F]">
                           {talkData.whatsapp}
                         </span>
                       </div>
                     </div>
-                    <ArrowUpRight size={16} className="text-[#10110F]/40 group-hover:text-[#10110F] transition-transform" />
+                    <ArrowUpRight size={15} className="text-[#10110F]/40 group-hover:text-[#10110F] transition-transform" />
                   </a>
                 )}
 
@@ -536,18 +489,18 @@ Enviado através do portfólio oficial (davidsalviano.com)
                     href={`https://instagram.com/${talkData.instagram.replace('@', '')}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex items-center justify-between p-3.5 rounded-[12px] bg-[#FAFAF7] border border-[#10110F]/10 hover:border-[#10110F]/30 transition-colors"
+                    className="group flex items-center justify-between p-3 rounded-[10px] bg-[#FAFAF7] border border-[#10110F]/10 hover:border-[#10110F]/30 transition-colors"
                   >
-                    <div className="flex items-center gap-3">
-                      <InstagramIcon size={16} className="text-[#10110F]/60" />
+                    <div className="flex items-center gap-2.5">
+                      <InstagramIcon size={15} className="text-[#10110F]/60" />
                       <div className="flex flex-col">
-                        <span className="font-mono text-[10px] uppercase text-[#10110F]/45">Instagram</span>
-                        <span className="font-sans text-xs sm:text-sm font-semibold text-[#10110F]">
+                        <span className="font-mono text-[9px] uppercase text-[#10110F]/45">Instagram</span>
+                        <span className="font-sans text-xs sm:text-[13px] font-semibold text-[#10110F]">
                           {talkData.instagram}
                         </span>
                       </div>
                     </div>
-                    <ArrowUpRight size={16} className="text-[#10110F]/40 group-hover:text-[#10110F] transition-transform" />
+                    <ArrowUpRight size={15} className="text-[#10110F]/40 group-hover:text-[#10110F] transition-transform" />
                   </a>
                 )}
               </div>
@@ -712,33 +665,12 @@ Enviado através do portfólio oficial (davidsalviano.com)
                       04 // {language === 'en' ? 'Do you have an estimated budget range?' : 'Você já possui uma faixa de investimento?'}
                     </legend>
 
-                    {/* Discreet Currency Switcher (BRL | USD) */}
-                    <div className="flex items-center gap-1.5 self-start sm:self-auto bg-[#10110F]/5 p-1 rounded-lg border border-[#10110F]/10">
-                      <button
-                        type="button"
-                        onClick={() => handleCurrencyChange('BRL')}
-                        className={`px-2.5 py-1 rounded-[6px] font-mono text-[11px] font-bold tracking-wider transition-all cursor-pointer ${
-                          currencyInfo.currency === 'BRL'
-                            ? 'bg-[#10110F] text-[#FAFAF7] shadow-xs'
-                            : 'text-[#10110F]/60 hover:text-[#10110F]'
-                        }`}
-                        aria-pressed={currencyInfo.currency === 'BRL'}
-                      >
-                        BRL (R$)
-                      </button>
-                      <span className="text-[#10110F]/20 text-xs">|</span>
-                      <button
-                        type="button"
-                        onClick={() => handleCurrencyChange('USD')}
-                        className={`px-2.5 py-1 rounded-[6px] font-mono text-[11px] font-bold tracking-wider transition-all cursor-pointer ${
-                          currencyInfo.currency === 'USD'
-                            ? 'bg-[#10110F] text-[#FAFAF7] shadow-xs'
-                            : 'text-[#10110F]/60 hover:text-[#10110F]'
-                        }`}
-                        aria-pressed={currencyInfo.currency === 'USD'}
-                      >
-                        USD (US$)
-                      </button>
+                    {/* Automatic Currency Badge (R$ for PT, US$ for EN) */}
+                    <div className="flex items-center gap-1.5 self-start sm:self-auto px-2.5 py-1 bg-[#10110F]/5 rounded-[8px] border border-[#10110F]/10">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#10110F]" />
+                      <span className="font-mono text-[11px] font-bold tracking-wider text-[#10110F]">
+                        {currencyInfo.currency} ({currencyInfo.symbol})
+                      </span>
                     </div>
                   </div>
 

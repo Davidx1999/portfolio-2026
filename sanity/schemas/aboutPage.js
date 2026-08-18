@@ -83,6 +83,7 @@ export default {
       name: 'lattesUrl',
       title: 'Link do Currículo Lattes (Opcional)',
       type: 'url',
+      initialValue: 'http://lattes.cnpq.br/2300088312341296',
     },
     {
       name: 'testimonial',
