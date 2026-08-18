@@ -3,6 +3,7 @@ import { structureTool } from 'sanity/structure';
 import { visionTool } from '@sanity/vision';
 import { documentInternationalization } from '@sanity/document-internationalization';
 import { schemaTypes } from './schemas';
+import { createGeneratePtDraftAction } from './actions/generatePtDraftAction';
 
 export const supportedLanguages = [
   { id: 'en', title: 'English (Original / English-First)' },
@@ -27,5 +28,12 @@ export default defineConfig({
 
   schema: {
     types: schemaTypes,
+  },
+
+  document: {
+    actions: (prev, context) => {
+      const generateAction = createGeneratePtDraftAction(context);
+      return [generateAction, ...prev];
+    },
   },
 });
