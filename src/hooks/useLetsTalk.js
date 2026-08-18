@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { sanityClient, urlFor } from '../services/sanityClient';
+import { useLanguage } from '../context/LanguageContext';
 import { DEFAULT_BUDGET_OPTIONS } from '../services/currencyLocalization';
 
 const FALLBACK_LETS_TALK = {
@@ -24,64 +25,44 @@ const FALLBACK_LETS_TALK = {
   instagram: '@davidolix11',
   profileImageUrl: `${import.meta.env.BASE_URL}assets/profile/cases_hands.png`,
   servicesOptions: [
-    'Product Design',
-    'UX/UI',
-    'Design System',
-    'Website ou Landing Page',
-    'Identidade visual',
-    'Outro',
+    'Design de Produto (End-to-End)',
+    'Auditoria & Diagnóstico UX/UI',
+    'Design System & Tokens',
+    'Presença Digital & Web',
+    'Suporte Contínuo a Squads',
   ],
   servicesOptions_en: [
-    'Product Design',
-    'UX/UI',
-    'Design System',
-    'Website or Landing Page',
-    'Brand Identity',
-    'Other',
+    'Product Design (End-to-End)',
+    'UX/UI Audit & Diagnostic',
+    'Design System & Tokens',
+    'Digital Web Presence',
+    'Ongoing Squad Support',
   ],
   collaborationFormats: [
-    'Projeto fechado',
-    'Consultoria',
-    'Apoio recorrente',
-    'Colaboração com time',
-    'Ainda não sei',
+    'Projeto Dedicado',
+    'Consultoria Pontual',
+    'Apoio Integrado a Squads',
+    'Acompanhamento Recorrente',
   ],
   collaborationFormats_en: [
-    'Fixed-scope project',
-    'Consulting',
-    'Ongoing retainer',
-    'Team collaboration',
-    'Not sure yet',
+    'Dedicated Project',
+    'Design Consulting',
+    'Embedded Squad Support',
+    'Ongoing Retainer',
   ],
   timelineOptions: [
-    'Assim que possível',
-    'Neste mês',
-    'Nos próximos 3 meses',
-    'Ainda estou explorando',
+    'Imediato / Este Mês',
+    'Próximos 1–2 Meses',
+    'Próximo Trimestre',
+    'Apenas Sondando',
   ],
   timelineOptions_en: [
-    'As soon as possible',
-    'This month',
-    'Within 3 months',
-    'Still exploring',
+    'Immediate / This Month',
+    'Next 1–2 Months',
+    'Next Quarter',
+    'Flexible / Exploratory',
   ],
   budgetOptions: DEFAULT_BUDGET_OPTIONS,
-  budgetRanges: [
-    'Até R$2.500',
-    'R$2.500–5.000',
-    'R$5.000–10.000',
-    'R$10.000–20.000',
-    'Acima de R$20.000',
-    'Ainda não defini',
-  ],
-  budgetRanges_en: [
-    'Under US$1,000',
-    'US$1,000–2,500',
-    'US$2,500–5,000',
-    'US$5,000–10,000',
-    'US$10,000+',
-    'I’m not sure yet',
-  ],
   ctaText: 'ENVIAR PROJETO ↗',
   ctaText_en: 'SUBMIT PROJECT ↗',
   confirmationMessage: 'Mensagem recebida com sucesso. Entrarei em contato em breve com contexto e próximos passos.',
@@ -89,19 +70,22 @@ const FALLBACK_LETS_TALK = {
 };
 
 export function useLetsTalk() {
+  const { locale, language } = useLanguage();
   const [talkData, setTalkData] = useState(FALLBACK_LETS_TALK);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
+    const targetLocale = locale || (language === 'pt' ? 'pt-BR' : 'en');
 
     async function fetchLetsTalk() {
       try {
         const data = await sanityClient.fetch(
-          `*[_type == "letsTalkPage"][0]{
+          `*[_type == "letsTalkPage" && (language == $targetLocale || (!defined(language) && $targetLocale == "en"))][0]{
             ...,
             "profileImageUrl": profileImage.asset->url
-          }`
+          }`,
+          { targetLocale }
         );
 
         if (data && isMounted) {
@@ -123,7 +107,7 @@ export function useLetsTalk() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [locale, language]);
 
   return { talkData, loading };
 }

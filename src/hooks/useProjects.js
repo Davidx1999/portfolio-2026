@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { sanityClient, urlFor } from '../services/sanityClient';
+import { useLanguage } from '../context/LanguageContext';
 
 /**
  * useProjects
- * Hook orientado exclusivamente ao Sanity.io.
- * Sem fallbacks silenciosos ou dados estáticos mockados.
+ * Hook orientado ao Sanity.io com suporte à localização document-level ($locale).
  */
 export function useProjects() {
+  const { locale, language } = useLanguage();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,8 +17,9 @@ export function useProjects() {
     setError(null);
 
     try {
-      // Busca apenas projetos publicados
-      const query = `*[_type == "project" && published != false] | order(featuredOrder asc, orderRank asc, _createdAt desc){
+      // 1. Busca projetos no locale ativo (ex: 'pt-BR' ou 'en')
+      const targetLocale = locale || (language === 'pt' ? 'pt-BR' : 'en');
+      const query = `*[_type == "project" && published != false && (language == $targetLocale || (!defined(language) && $targetLocale == "en"))] | order(featuredOrder asc, orderRank asc, _createdAt desc){
         ...,
         "coverImageUrl": coverImage.asset->url,
         "imageUrl": image.asset->url,
@@ -26,7 +28,26 @@ export function useProjects() {
         "slug": coalesce(slug.current, id.current, id, _id)
       }`;
 
-      const sanityProjects = await sanityClient.fetch(query);
+      let sanityProjects = await sanityClient.fetch(query, { targetLocale });
+
+      // Se nenhum projeto for retornado no idioma solicitado e não estivermos em 'en', busca a versão 'en' com flag de tradução pendente
+      if ((!Array.isArray(sanityProjects) || sanityProjects.length === 0) && targetLocale !== 'en') {
+        const fallbackQuery = `*[_type == "project" && published != false && (language == "en" || !defined(language))] | order(featuredOrder asc, orderRank asc, _createdAt desc){
+          ...,
+          "coverImageUrl": coverImage.asset->url,
+          "imageUrl": image.asset->url,
+          "processImageUrl": processImage.asset->url,
+          "finalImageUrl": finalImage.asset->url,
+          "slug": coalesce(slug.current, id.current, id, _id)
+        }`;
+        const fallbackProjects = await sanityClient.fetch(fallbackQuery);
+        if (Array.isArray(fallbackProjects) && fallbackProjects.length > 0) {
+          sanityProjects = fallbackProjects.map((p) => ({
+            ...p,
+            translationStatus: 'missing',
+          }));
+        }
+      }
 
       if (Array.isArray(sanityProjects) && sanityProjects.length > 0) {
         const formatted = sanityProjects.map((p) => {
@@ -67,7 +88,7 @@ export function useProjects() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [locale, language]);
 
   useEffect(() => {
     fetchProjects();
@@ -75,7 +96,6 @@ export function useProjects() {
 
   const allWork = projects;
 
-  // Até 3 projetos em destaque para a Home, ordenados por featuredOrder
   const featuredProjects = projects
     .filter((p) => p.featuredOnHome || p.featured)
     .sort((a, b) => (a.featuredOrder || 99) - (b.featuredOrder || 99))

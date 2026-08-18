@@ -55,6 +55,23 @@ export default {
       description: 'Define se a abertura e narrativa seguem modelo completo (ex: Mapear) ou modelo conciso (ex: estudos ágeis e projetos menores).',
     },
     {
+      name: 'translationStatus',
+      title: 'Status de Tradução (Editorial)',
+      type: 'string',
+      group: 'overview',
+      options: {
+        list: [
+          { title: 'Original (EN - Fonte Principal)', value: 'original' },
+          { title: 'Revisado Editorialmente (PT-BR)', value: 'reviewed' },
+          { title: 'Necessita Revisão (Draft Automático / Vercel)', value: 'needs_review' },
+          { title: 'Pendente / Ausente', value: 'missing' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'original',
+      description: 'Indica a maturidade editorial da versão traduzida no Sanity.',
+    },
+    {
       name: 'eyebrow',
       title: 'Eyebrow / Sobretítulo Editorial (Opcional)',
       type: 'string',

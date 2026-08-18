@@ -1,25 +1,29 @@
 import { useState, useEffect } from 'react';
 import { sanityClient, urlFor } from '../services/sanityClient';
+import { useLanguage } from '../context/LanguageContext';
 
 export function useAbout() {
+  const { locale, language } = useLanguage();
   const [aboutData, setAboutData] = useState(null);
   const [brandingProjects, setBrandingProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
+    const targetLocale = locale || (language === 'pt' ? 'pt-BR' : 'en');
 
     async function fetchAbout() {
       try {
         const [data, brandingData] = await Promise.all([
           sanityClient.fetch(
-            `*[_type == "aboutPage"][0]{
+            `*[_type == "aboutPage" && (language == $targetLocale || (!defined(language) && $targetLocale == "en"))][0]{
               ...,
               "resumeFileUrl": resumeFile.asset->url
-            }`
+            }`,
+            { targetLocale }
           ),
           sanityClient.fetch(
-            `*[_type == "project" && published != false && (showInAbout == true || category match "Brand*" || category match "Identidade*")] | order(aboutOrder asc, orderRank asc, _createdAt desc)[0...3]{
+            `*[_type == "project" && published != false && (language == $targetLocale || (!defined(language) && $targetLocale == "en")) && (showInAbout == true || category match "Brand*" || category match "Identidade*")] | order(aboutOrder asc, orderRank asc, _createdAt desc)[0...3]{
               _id,
               title,
               "slug": slug.current,
@@ -33,7 +37,8 @@ export function useAbout() {
               coverImage,
               cardCoverImage,
               tags
-            }`
+            }`,
+            { targetLocale }
           ),
         ]);
 
@@ -77,7 +82,9 @@ export function useAbout() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [locale, language]);
 
   return { aboutData, brandingProjects, loading };
 }
+
+export default useAbout;

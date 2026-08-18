@@ -4,6 +4,21 @@ export default {
   type: 'document',
   fields: [
     {
+      name: 'translationStatus',
+      title: 'Status de Tradução (Editorial)',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Original (EN - Fonte Principal)', value: 'original' },
+          { title: 'Revisado Editorialmente (PT-BR)', value: 'reviewed' },
+          { title: 'Necessita Revisão (Draft Automático / Vercel)', value: 'needs_review' },
+          { title: 'Pendente / Ausente', value: 'missing' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'original',
+    },
+    {
       name: 'heroEyebrow',
       title: 'Hero Eyebrow (PT)',
       type: 'string',

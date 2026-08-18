@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { sanityClient, urlFor } from '../services/sanityClient';
+import { useLanguage } from '../context/LanguageContext';
 
 /**
  * useCaseStudy
- * Hook editorial orientado exclusivamente ao Sanity.io.
- * Sem fallbacks locais fictícios ou dados estáticos de outros projetos.
+ * Hook editorial orientado ao Sanity.io com suporte à localização document-level ($locale).
  */
 export function useCaseStudy(slug) {
+  const { locale, language } = useLanguage();
   const [caseStudy, setCaseStudy] = useState(null);
   const [nextCase, setNextCase] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(1);
@@ -24,9 +25,11 @@ export function useCaseStudy(slug) {
     setLoading(true);
     setError(null);
 
+    const targetLocale = locale || (language === 'pt' ? 'pt-BR' : 'en');
+
     try {
-      // Consulta documento único pelo slug
-      const query = `*[_type == "project" && (slug.current == $slug || id.current == $slug || id == $slug || _id == $slug)][0]{
+      // 1. Tenta buscar o projeto no idioma exato solicitado
+      const query = `*[_type == "project" && (slug.current == $slug || id.current == $slug || id == $slug || _id == $slug) && (language == $targetLocale || (!defined(language) && $targetLocale == "en"))][0]{
         ...,
         "slug": coalesce(slug.current, id.current, id, _id),
         "coverImageUrl": coverImage.asset->url,
@@ -48,8 +51,8 @@ export function useCaseStudy(slug) {
         }
       }`;
 
-      // Consulta todos os projetos publicados para índice e resolução do próximo projeto
-      const allProjectsQuery = `*[_type == "project" && published != false] | order(featuredOrder asc, orderRank asc, _createdAt desc){
+      // 2. Consulta todos os projetos para o índice do carrossel no mesmo idioma
+      const allProjectsQuery = `*[_type == "project" && published != false && (language == $targetLocale || (!defined(language) && $targetLocale == "en"))] | order(featuredOrder asc, orderRank asc, _createdAt desc){
         title,
         "slug": coalesce(slug.current, id.current, id, _id),
         projectType,
@@ -64,10 +67,42 @@ export function useCaseStudy(slug) {
         "image": image.asset->url
       }`;
 
-      const [sanityProject, allSanityProjects] = await Promise.all([
-        sanityClient.fetch(query, { slug }),
-        sanityClient.fetch(allProjectsQuery),
+      let [sanityProject, allSanityProjects] = await Promise.all([
+        sanityClient.fetch(query, { slug, targetLocale }),
+        sanityClient.fetch(allProjectsQuery, { targetLocale }),
       ]);
+
+      // Se não encontrar o documento em pt-BR, busca a versão 'en' e marca como 'missing' para o banner editorial
+      if (!sanityProject && targetLocale !== 'en') {
+        const enQuery = `*[_type == "project" && (slug.current == $slug || id.current == $slug || id == $slug || _id == $slug) && (language == "en" || !defined(language))][0]{
+          ...,
+          "slug": coalesce(slug.current, id.current, id, _id),
+          "coverImageUrl": coverImage.asset->url,
+          "heroMediaImage": heroMedia.image.asset->url,
+          "heroMediaPoster": heroMedia.poster.asset->url,
+          "nextCaseRef": nextCase->{
+            title,
+            "slug": coalesce(slug.current, id.current, id, _id),
+            projectType,
+            caseDepth,
+            eyebrow,
+            heroSummary,
+            heroSummary_en,
+            shortDescription,
+            shortDescription_en,
+            description,
+            "coverImage": coverImage.asset->url,
+            "image": image.asset->url
+          }
+        }`;
+        const enProject = await sanityClient.fetch(enQuery, { slug });
+        if (enProject) {
+          sanityProject = {
+            ...enProject,
+            translationStatus: 'missing',
+          };
+        }
+      }
 
       if (sanityProject) {
         // Resolve blocos modulares dinamicamente
@@ -76,12 +111,10 @@ export function useCaseStudy(slug) {
         const resolvedBlocks = rawBlocks.map((block) => {
           if (!block) return block;
 
-          // Prototype Video Block
           if (block._type === 'prototypeVideo' && block.poster) {
             return { ...block, poster: urlFor(block.poster) };
           }
 
-          // Design Decisions Section
           if (block._type === 'decisionSection' && Array.isArray(block.decisions)) {
             return {
               ...block,
@@ -92,7 +125,6 @@ export function useCaseStudy(slug) {
             };
           }
 
-          // Image Gallery Section
           if (block._type === 'imageGallery' && Array.isArray(block.images)) {
             return {
               ...block,
@@ -103,7 +135,6 @@ export function useCaseStudy(slug) {
             };
           }
 
-          // Artifact Mosaic Scene
           if (block._type === 'artifactMosaicScene' && Array.isArray(block.items)) {
             return {
               ...block,
@@ -114,7 +145,6 @@ export function useCaseStudy(slug) {
             };
           }
 
-          // Lagged Full Viewport
           if (block._type === 'laggedFullViewportMedia') {
             return {
               ...block,
@@ -123,7 +153,6 @@ export function useCaseStudy(slug) {
             };
           }
 
-          // Vertical Media Stack
           if (block._type === 'verticalMediaStack' && Array.isArray(block.items)) {
             return {
               ...block,
@@ -134,12 +163,10 @@ export function useCaseStudy(slug) {
             };
           }
 
-          // Full Media
           if (block._type === 'fullMedia' && block.image) {
             return { ...block, image: urlFor(block.image) };
           }
 
-          // Split Media
           if (block._type === 'splitMedia') {
             return {
               ...block,
@@ -148,12 +175,10 @@ export function useCaseStudy(slug) {
             };
           }
 
-          // Media + Text
           if (block._type === 'mediaText' && block.media) {
             return { ...block, media: urlFor(block.media) };
           }
 
-          // Image Grid
           if (block._type === 'imageGrid' && Array.isArray(block.items)) {
             return {
               ...block,
@@ -164,7 +189,6 @@ export function useCaseStudy(slug) {
             };
           }
 
-          // Before / After
           if (block._type === 'beforeAfter') {
             return {
               ...block,
@@ -173,12 +197,10 @@ export function useCaseStudy(slug) {
             };
           }
 
-          // Artifact Showcase
           if (block._type === 'artifactShowcase' && block.media) {
             return { ...block, media: urlFor(block.media) };
           }
 
-          // Process Steps
           if (block._type === 'processSteps' && Array.isArray(block.steps)) {
             return {
               ...block,
@@ -273,7 +295,7 @@ export function useCaseStudy(slug) {
     } finally {
       setLoading(false);
     }
-  }, [slug]);
+  }, [slug, locale, language]);
 
   useEffect(() => {
     fetchCaseStudy();
