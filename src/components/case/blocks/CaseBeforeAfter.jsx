@@ -12,6 +12,14 @@ export function CaseBeforeAfter({ block }) {
   const [isSideBySide, setIsSideBySide] = useState(false);
   const containerRef = useRef(null);
 
+  const handleMove = useCallback((clientX) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
+    const percent = Math.max(0, Math.min((x / rect.width) * 100, 100));
+    setSliderPosition(percent);
+  }, []);
+
   if (!block || !block.beforeImage || !block.afterImage) return null;
 
   const beforeLabel =
@@ -20,14 +28,6 @@ export function CaseBeforeAfter({ block }) {
     language === 'en' && block.afterLabel_en ? block.afterLabel_en : block.afterLabel || 'Depois';
   const caption = language === 'en' && block.caption_en ? block.caption_en : block.caption;
   const isLight = block.theme === 'light';
-
-  const handleMove = useCallback((clientX) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
-    const percent = Math.max(0, Math.min((x / rect.width) * 100, 100));
-    setSliderPosition(percent);
-  }, []);
 
   const handleTouchMove = (e) => {
     if (e.touches.length > 0) {

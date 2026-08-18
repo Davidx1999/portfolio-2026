@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
+import { motion, useScroll, useTransform, useSpring, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../../context/LanguageContext';
 
 export function CaseLaggedFullViewport({ block }) {
@@ -7,25 +7,30 @@ export function CaseLaggedFullViewport({ block }) {
   const prefersReducedMotion = useReducedMotion();
   const containerRef = useRef(null);
 
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start end', 'end start'],
+  });
+
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 120,
+    damping: 35,
+    mass: 0.5,
+  });
+
+  const isSubtle = block?.lagPreset === 'subtle';
+  const startY = isSubtle ? '6vh' : '10vh';
+  const endY = isSubtle ? '-5vh' : '-8vh';
+
+  const y = useTransform(smoothProgress, [0, 1], [startY, endY]);
+  const scale = useTransform(smoothProgress, [0, 1], [1.06, 1]);
+
   if (!block || (!block.image && !block.videoUrl)) return null;
 
   const headline = language === 'en' && block.headline_en ? block.headline_en : block.headline;
   const caption = language === 'en' && block.caption_en ? block.caption_en : block.caption;
   const isVideo = block.mediaType === 'video' && block.videoUrl;
   const isLight = block.theme === 'light';
-
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start end', 'end start'],
-  });
-
-  const isSubtle = block.lagPreset === 'subtle';
-  const startY = isSubtle ? '6vh' : '10vh';
-  const endY = isSubtle ? '-5vh' : '-8vh';
-
-  const y = useTransform(scrollYProgress, [0, 1], [startY, endY]);
-  const scale = useTransform(scrollYProgress, [0, 1], [1.06, 1]);
-
   const isReduced = prefersReducedMotion;
 
   return (

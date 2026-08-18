@@ -40,6 +40,28 @@ export default {
       hidden: true,
     },
     {
+      name: 'caseDepth',
+      title: 'Profundidade do Case (Depth)',
+      type: 'string',
+      group: 'overview',
+      options: {
+        list: [
+          { title: 'Case Completo (Full Case Study - Estrutura profunda e detalhada)', value: 'full' },
+          { title: 'Case Compacto (Compact Case Study - Síntese visual ágil)', value: 'compact' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'full',
+      description: 'Define se a abertura e narrativa seguem modelo completo (ex: Mapear) ou modelo conciso (ex: estudos ágeis e projetos menores).',
+    },
+    {
+      name: 'eyebrow',
+      title: 'Eyebrow / Sobretítulo Editorial (Opcional)',
+      type: 'string',
+      group: 'overview',
+      description: 'Ex: "01 // SISTEMA & ARQUITETURA", "ESTUDO DE LABORATÓRIO"',
+    },
+    {
       name: 'projectType',
       title: 'Classificação do Projeto',
       type: 'string',
@@ -75,6 +97,13 @@ export default {
       type: 'string',
       group: 'overview',
       description: 'Permita anos únicos ou intervalos flexíveis como 2022—atual.',
+    },
+    {
+      name: 'duration',
+      title: 'Duração do Projeto (ex: 4 meses, 6 semanas, Contínuo)',
+      type: 'string',
+      group: 'overview',
+      description: 'Opcional. Exibido na grade de metadados apenas quando preenchido.',
     },
     {
       name: 'clientOrContext',
@@ -455,6 +484,367 @@ export default {
       group: 'blocks',
       description: 'Monte a narrativa visual do case alternando textos, mídia cinematográfica, diagonais, mosaicos, pilhas verticais e artefatos.',
       of: [
+        // 0. Bloco de Narrativa Sticky Customizável (Sticky Narrative Section)
+        {
+          name: 'stickyNarrative',
+          title: 'Narrativa Sticky Editorial (Visão Geral, Desafios & Tópicos)',
+          type: 'object',
+          fields: [
+            { name: 'eyebrow', title: 'Eyebrow / Tag Superior (PT)', type: 'string' },
+            { name: 'eyebrow_en', title: 'Eyebrow (EN)', type: 'string' },
+            { name: 'sectionTitle', title: 'Título Principal da Seção (PT)', type: 'string', initialValue: 'Contexto & Desafio' },
+            { name: 'sectionTitle_en', title: 'Section Title (EN)', type: 'string', initialValue: 'Context & Challenge' },
+            { name: 'sectionSubtitle', title: 'Subtítulo / Descrição da Coluna Esquerda (PT)', type: 'text', rows: 2 },
+            { name: 'sectionSubtitle_en', title: 'Subtitle (EN)', type: 'text', rows: 2 },
+            {
+              name: 'topics',
+              title: 'Tópicos da Narrativa (Coluna Direita)',
+              type: 'array',
+              of: [
+                {
+                  type: 'object',
+                  fields: [
+                    { name: 'topicKey', title: 'Identificador / Label (ex: [ Contexto ], [ Desafio ])', type: 'string' },
+                    { name: 'topicKey_en', title: 'Identifier Label (EN)', type: 'string' },
+                    { name: 'title', title: 'Título do Tópico (Opcional)', type: 'string' },
+                    { name: 'title_en', title: 'Topic Title (EN)', type: 'string' },
+                    { name: 'content', title: 'Texto do Tópico (PT)', type: 'text', rows: 4, validation: (Rule) => Rule.required() },
+                    { name: 'content_en', title: 'Content (EN)', type: 'text', rows: 4 },
+                    {
+                      name: 'bulletPoints',
+                      title: 'Itens em Lista (Opcional - ex: Responsabilidades)',
+                      type: 'array',
+                      of: [{ type: 'string' }],
+                    },
+                    {
+                      name: 'bulletPoints_en',
+                      title: 'Bullet Points (EN)',
+                      type: 'array',
+                      of: [{ type: 'string' }],
+                    },
+                    {
+                      name: 'highlight',
+                      title: 'Destacar este tópico com cor de acento',
+                      type: 'boolean',
+                      initialValue: false,
+                    },
+                  ],
+                  preview: {
+                    select: { title: 'topicKey', subtitle: 'content' },
+                    prepare({ title, subtitle }) {
+                      return {
+                        title: title || 'Tópico Narrativo',
+                        subtitle: subtitle ? subtitle.slice(0, 50) + '...' : '',
+                      };
+                    },
+                  },
+                },
+              ],
+            },
+            {
+              name: 'theme',
+              title: 'Tema do Bloco',
+              type: 'string',
+              options: {
+                list: [
+                  { title: 'Dark (#10110F)', value: 'dark' },
+                  { title: 'Light (#FAFAF7)', value: 'light' },
+                ],
+              },
+              initialValue: 'dark',
+            },
+          ],
+          preview: {
+            select: { title: 'sectionTitle', subtitle: 'eyebrow' },
+            prepare({ title, subtitle }) {
+              return {
+                title: title || 'Narrativa Sticky Editorial',
+                subtitle: subtitle || 'Sticky Narrative Block',
+              };
+            },
+          },
+        },
+
+        // 0.1 Bloco de Vídeo de Protótipo de Alta Performance (Prototype Video Section)
+        {
+          name: 'prototypeVideo',
+          title: 'Vídeo de Protótipo / Demonstração Interativa',
+          type: 'object',
+          description: 'Vídeo com IntersectionObserver, carregamento sob demanda, poster sem frame preto e respeito a reduced motion.',
+          fields: [
+            { name: 'videoUrl', title: 'URL do Vídeo (MP4 / WebM)', type: 'url' },
+            { name: 'videoFile', title: 'Arquivo de Vídeo (Upload Direto no Sanity)', type: 'file', options: { accept: 'video/*' } },
+            { name: 'poster', title: 'Poster / Imagem de Capa do Vídeo', type: 'image', options: { hotspot: true } },
+            { name: 'title', title: 'Título da Demonstração (Opcional - PT)', type: 'string' },
+            { name: 'title_en', title: 'Title (EN)', type: 'string' },
+            { name: 'shortDescription', title: 'Descrição Curta do Protótipo (PT)', type: 'text', rows: 2 },
+            { name: 'shortDescription_en', title: 'Short Description (EN)', type: 'text', rows: 2 },
+            { name: 'caption', title: 'Legenda Técnica (PT)', type: 'string' },
+            { name: 'caption_en', title: 'Technical Caption (EN)', type: 'string' },
+            {
+              name: 'aspectRatio',
+              title: 'Proporção do Player',
+              type: 'string',
+              options: {
+                list: [
+                  { title: '16/9 (Widescreen Padrão)', value: '16/9' },
+                  { title: '16/10 (Interface Desktop / Dashboard)', value: '16/10' },
+                  { title: '4/3 (Foco Tátil / Tablet)', value: '4/3' },
+                  { title: '21/9 (Cinemático Ultra-Wide)', value: '21/9' },
+                  { title: '9/16 (Vertical / Mobile App)', value: '9/16' },
+                ],
+              },
+              initialValue: '16/9',
+            },
+            { name: 'autoplay', title: 'Autoplay ao entrar na Viewport (Muted)', type: 'boolean', initialValue: true },
+            { name: 'loop', title: 'Repetir em Loop', type: 'boolean', initialValue: true },
+            {
+              name: 'theme',
+              title: 'Tema do Bloco',
+              type: 'string',
+              options: {
+                list: [
+                  { title: 'Dark (#10110F)', value: 'dark' },
+                  { title: 'Light (#FAFAF7)', value: 'light' },
+                ],
+              },
+              initialValue: 'dark',
+            },
+          ],
+          preview: {
+            select: { title: 'title', subtitle: 'caption', media: 'poster' },
+            prepare({ title, subtitle, media }) {
+              return {
+                title: title || subtitle || 'Vídeo de Protótipo',
+                subtitle: 'Prototype Video Section',
+                media,
+              };
+            },
+          },
+        },
+
+        // 0.2 Bloco de Decisões de Design (Decision Section)
+        {
+          name: 'decisionSection',
+          title: 'Decisões de Design & Justificativas (Design Decisions)',
+          type: 'object',
+          description: 'Documentação de problemas enfrentados, decisões tomadas e trade-offs técnicos/visuais.',
+          fields: [
+            { name: 'eyebrow', title: 'Eyebrow (PT)', type: 'string', initialValue: 'DECISÕES DE DESIGN // ARQUITETURA' },
+            { name: 'eyebrow_en', title: 'Eyebrow (EN)', type: 'string', initialValue: 'DESIGN DECISIONS // ARCHITECTURE' },
+            { name: 'title', title: 'Título da Seção (PT)', type: 'string', initialValue: 'Decisões Críticas e Justificativas de Projeto' },
+            { name: 'title_en', title: 'Title (EN)', type: 'string', initialValue: 'Critical Decisions & Trade-Offs' },
+            { name: 'intro', title: 'Texto de Introdução (PT)', type: 'text', rows: 2 },
+            { name: 'intro_en', title: 'Intro (EN)', type: 'text', rows: 2 },
+            {
+              name: 'decisions',
+              title: 'Lista de Decisões',
+              type: 'array',
+              of: [
+                {
+                  type: 'object',
+                  fields: [
+                    { name: 'number', title: 'Número (ex: 01)', type: 'string' },
+                    { name: 'challenge', title: 'O Problema / Fricção Identificada (PT)', type: 'string', validation: (Rule) => Rule.required() },
+                    { name: 'challenge_en', title: 'Problem / Friction (EN)', type: 'string' },
+                    { name: 'decision', title: 'Decisão Tomada (PT)', type: 'text', rows: 3, validation: (Rule) => Rule.required() },
+                    { name: 'decision_en', title: 'Decision Made (EN)', type: 'text', rows: 3 },
+                    { name: 'rationale', title: 'Justificativa Técnica / Racional (PT)', type: 'text', rows: 3 },
+                    { name: 'rationale_en', title: 'Rationale / Impact (EN)', type: 'text', rows: 3 },
+                    { name: 'artifactMedia', title: 'Mídia / Artefato Comprobatório (Opcional)', type: 'image', options: { hotspot: true } },
+                    { name: 'artifactCaption', title: 'Legenda do Artefato (PT)', type: 'string' },
+                    { name: 'artifactCaption_en', title: 'Caption (EN)', type: 'string' },
+                  ],
+                  preview: {
+                    select: { title: 'challenge', subtitle: 'number', media: 'artifactMedia' },
+                    prepare({ title, subtitle, media }) {
+                      return {
+                        title: `${subtitle ? `[${subtitle}] ` : ''}${title || 'Decisão'}`,
+                        subtitle: 'Design Decision Item',
+                        media,
+                      };
+                    },
+                  },
+                },
+              ],
+              validation: (Rule) => Rule.min(1).error('Adicione pelo menos 1 decisão de design.'),
+            },
+            {
+              name: 'theme',
+              title: 'Tema do Bloco',
+              type: 'string',
+              options: {
+                list: [
+                  { title: 'Dark (#10110F)', value: 'dark' },
+                  { title: 'Light (#FAFAF7)', value: 'light' },
+                ],
+              },
+              initialValue: 'dark',
+            },
+          ],
+          preview: {
+            select: { title: 'title', subtitle: 'eyebrow' },
+            prepare({ title, subtitle }) {
+              return {
+                title: title || 'Decisões de Design',
+                subtitle: subtitle || 'Decision Section',
+              };
+            },
+          },
+        },
+
+        // 0.3 Bloco de Resultados Qualitativos Legítimos (Outcome Section)
+        {
+          name: 'outcomeSection',
+          title: 'Resultados Qualitativos & Aprendizados (Outcomes & Learnings)',
+          type: 'object',
+          description: 'Resultados honestos e verificáveis (consistência, tokens, handoff, validações) sem métricas inventadas.',
+          fields: [
+            { name: 'eyebrow', title: 'Eyebrow (PT)', type: 'string', initialValue: 'RESULTADOS // APRENDIZADOS' },
+            { name: 'eyebrow_en', title: 'Eyebrow (EN)', type: 'string', initialValue: 'OUTCOMES // LEARNINGS' },
+            { name: 'title', title: 'Título da Seção (PT)', type: 'string', initialValue: 'Impacto Real e Consistência Sistêmica' },
+            { name: 'title_en', title: 'Title (EN)', type: 'string', initialValue: 'Real Impact & Systemic Consistency' },
+            { name: 'intro', title: 'Introdução / Resumo Geral (PT)', type: 'text', rows: 2 },
+            { name: 'intro_en', title: 'Intro (EN)', type: 'text', rows: 2 },
+            {
+              name: 'outcomes',
+              title: 'Evidências & Aprendizados Qualitativos',
+              type: 'array',
+              of: [
+                {
+                  type: 'object',
+                  fields: [
+                    { name: 'tag', title: 'Tag / Tipo (ex: Consistência, Engenharia, Handoff, Validação)', type: 'string' },
+                    { name: 'title', title: 'Título do Resultado (PT)', type: 'string', validation: (Rule) => Rule.required() },
+                    { name: 'title_en', title: 'Outcome Title (EN)', type: 'string' },
+                    { name: 'description', title: 'Descrição Qualitativa / Verificação (PT)', type: 'text', rows: 3, validation: (Rule) => Rule.required() },
+                    { name: 'description_en', title: 'Description (EN)', type: 'text', rows: 3 },
+                  ],
+                  preview: {
+                    select: { title: 'title', subtitle: 'tag' },
+                    prepare({ title, subtitle }) {
+                      return {
+                        title: title || 'Resultado Qualitativo',
+                        subtitle: subtitle ? `[${subtitle}]` : 'Outcome',
+                      };
+                    },
+                  },
+                },
+              ],
+            },
+            {
+              name: 'theme',
+              title: 'Tema do Bloco',
+              type: 'string',
+              options: {
+                list: [
+                  { title: 'Dark (#10110F)', value: 'dark' },
+                  { title: 'Light (#FAFAF7)', value: 'light' },
+                ],
+              },
+              initialValue: 'dark',
+            },
+          ],
+          preview: {
+            select: { title: 'title', subtitle: 'eyebrow' },
+            prepare({ title, subtitle }) {
+              return {
+                title: title || 'Resultados Qualitativos',
+                subtitle: subtitle || 'Outcome Section',
+              };
+            },
+          },
+        },
+
+        // 0.4 Bloco de Galeria de Imagens (Image Gallery Section)
+        {
+          name: 'imageGallery',
+          title: 'Galeria Editorial de Imagens (Image Gallery)',
+          type: 'object',
+          fields: [
+            { name: 'eyebrow', title: 'Eyebrow (PT)', type: 'string' },
+            { name: 'eyebrow_en', title: 'Eyebrow (EN)', type: 'string' },
+            { name: 'title', title: 'Título da Galeria (Opcional - PT)', type: 'string' },
+            { name: 'title_en', title: 'Title (EN)', type: 'string' },
+            {
+              name: 'columns',
+              title: 'Layout de Colunas',
+              type: 'string',
+              options: {
+                list: [
+                  { title: '2 Colunas Grandes (50% / 50%)', value: '2' },
+                  { title: '3 Colunas Médias (Grid 33%)', value: '3' },
+                  { title: '4 Colunas Compactas (Grid 25%)', value: '4' },
+                ],
+              },
+              initialValue: '2',
+            },
+            {
+              name: 'images',
+              title: 'Imagens da Galeria',
+              type: 'array',
+              of: [
+                {
+                  type: 'object',
+                  fields: [
+                    { name: 'image', title: 'Arquivo de Imagem', type: 'image', options: { hotspot: true }, validation: (Rule) => Rule.required() },
+                    { name: 'alt', title: 'Texto Alternativo (PT)', type: 'string' },
+                    { name: 'alt_en', title: 'Alt Text (EN)', type: 'string' },
+                    { name: 'caption', title: 'Legenda Técnica (PT)', type: 'string' },
+                    { name: 'caption_en', title: 'Caption (EN)', type: 'string' },
+                    {
+                      name: 'aspectRatio',
+                      title: 'Aspect Ratio',
+                      type: 'string',
+                      options: {
+                        list: [
+                          { title: '16/10 (Interface)', value: '16/10' },
+                          { title: '16/9 (Widescreen)', value: '16/9' },
+                          { title: '4/3 (Equilibrado)', value: '4/3' },
+                          { title: '1/1 (Quadrado)', value: '1/1' },
+                          { title: 'Auto (Original)', value: 'auto' },
+                        ],
+                      },
+                      initialValue: '16/10',
+                    },
+                  ],
+                  preview: {
+                    select: { title: 'caption', media: 'image' },
+                    prepare({ title, media }) {
+                      return {
+                        title: title || 'Imagem da Galeria',
+                        media,
+                      };
+                    },
+                  },
+                },
+              ],
+              validation: (Rule) => Rule.min(1).error('Adicione pelo menos 1 imagem.'),
+            },
+            {
+              name: 'theme',
+              title: 'Tema do Bloco',
+              type: 'string',
+              options: {
+                list: [
+                  { title: 'Dark (#10110F)', value: 'dark' },
+                  { title: 'Light (#FAFAF7)', value: 'light' },
+                ],
+              },
+              initialValue: 'dark',
+            },
+          ],
+          preview: {
+            select: { title: 'title', items: 'images' },
+            prepare({ title, items }) {
+              return {
+                title: title || `Galeria de Imagens (${items?.length || 0} fotos)`,
+                subtitle: 'Image Gallery Block',
+              };
+            },
+          },
+        },
+
         // 1. Bloco de Capítulo (Chapter Intro)
         {
           name: 'chapterIntro',
@@ -1523,6 +1913,22 @@ export default {
       to: [{ type: 'project' }],
       group: 'publishing',
       description: 'Se vazio, o sistema selecionará automaticamente o próximo projeto publicado.',
+    },
+    {
+      name: 'nextProjectFallbackAction',
+      title: 'Ação para o Último Projeto no "Continue Explorando"',
+      type: 'string',
+      group: 'publishing',
+      options: {
+        list: [
+          { title: 'Voltar ao Primeiro Projeto (Loop Contínuo)', value: 'firstProject' },
+          { title: 'Ir para a Página de Projetos (/work)', value: 'work' },
+          { title: 'Ir para a Página Sobre Mim (/about)', value: 'about' },
+          { title: 'Ir para Contato / Fale Comigo (/contact)', value: 'contact' },
+        ],
+      },
+      initialValue: 'firstProject',
+      description: 'Define para onde o usuário é direcionado caso este seja o último case do portfólio.',
     },
     {
       name: 'testimonial',

@@ -30,6 +30,11 @@ export function CaseOverview({ caseStudy }) {
       ? caseStudy.responsibilities
       : [];
 
+  // If no content exists for this section, do not render an empty section
+  if (!overview && !challenge && responsibilities.length === 0) {
+    return null;
+  }
+
   return (
     <section id="overview-section" className="w-full py-16 md:py-24 border-b border-[rgba(244,243,238,0.16)] bg-[#10110F] text-[#FAFAF7]">
       <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
@@ -41,7 +46,10 @@ export function CaseOverview({ caseStudy }) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-40px' }}
             transition={{ duration: 0.5, ease: EASING }}
-            className="lg:col-span-4 lg:sticky lg:top-28"
+            className="lg:col-span-4 lg:sticky"
+            style={{
+              top: 'calc(var(--header-safe-offset, 72px) + 24px)',
+            }}
           >
             <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#C4FF00] block mb-3">
               01 // {isIndependent ? (language === 'en' ? 'INTENT & SCOPE' : 'INTENÇÃO & ESCOPO') : (language === 'en' ? 'OVERVIEW & CHALLENGE' : 'VISÃO GERAL & DESAFIO')}

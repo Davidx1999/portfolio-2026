@@ -4,72 +4,36 @@ import { useLanguage } from '../../context/LanguageContext';
 import { FeaturedProjectItem } from './FeaturedProjectItem';
 import { ContextualCursor } from './ContextualCursor';
 
-const STATIC_FALLBACK_CASES = [
-  {
-    id: 'mapear',
-    title: 'Mapear Platform',
-    category: 'SaaS • EdTech',
-    description:
-      'Plataforma de avaliação educacional e geolocalização conectando pesquisa, design system e desenvolvimento.',
-    link: '/cases/mapear',
-    wallpaperSrc: `${import.meta.env.BASE_URL}assets/projects_cape/fgvmapear_cape.png`,
-    mediaThumbSrc: `${import.meta.env.BASE_URL}assets/projects_cape/fgvmapear_card.png`,
-    mediaExpandedSrc: `${import.meta.env.BASE_URL}assets/projects_cape/fgv_aspect_wide.png`,
-  },
-  {
-    id: 'aula-f75',
-    title: 'Aula F75',
-    category: 'E-learning • Hardware',
-    description:
-      'Experiência imersiva e interativa traduzindo a precisão e o design tátil de hardware para a web.',
-    link: '/cases/aula-f75',
-    wallpaperSrc: `${import.meta.env.BASE_URL}assets/projects_cape/aulaf75_cape.png`,
-    mediaThumbSrc: `${import.meta.env.BASE_URL}assets/projects_cape/aulaf75_card.png`,
-    mediaExpandedSrc: `${import.meta.env.BASE_URL}assets/projects_cape/aulaf75.png`,
-  },
-  {
-    id: 'escutha',
-    title: 'Escutha',
-    category: 'Product & Web Design',
-    description:
-      'Redesign e modernização da presença digital com foco em clareza na comunicação, arquitetura de informação acessível e experiência humanizada.',
-    link: '/cases/escutha',
-    wallpaperSrc: `${import.meta.env.BASE_URL}assets/projects_cape/escutha_cape.png`,
-    mediaThumbSrc: `${import.meta.env.BASE_URL}assets/projects_cape/escutha_card.png`,
-    mediaExpandedSrc: `${import.meta.env.BASE_URL}assets/projects_cape/escutha_cape.png`,
-  },
-];
-
 export function FeaturedWorkSection() {
   const { t } = useLanguage();
   const { featuredProjects } = useProjects();
   const [cursorVisible, setCursorVisible] = useState(false);
 
   const displayCases = useMemo(() => {
-    if (Array.isArray(featuredProjects) && featuredProjects.length > 0) {
-      return featuredProjects.map((p, idx) => {
-        const slug = p.slug?.current || p.slug || p.id;
-        const fallback = STATIC_FALLBACK_CASES.find((fb) => fb.id === slug) || STATIC_FALLBACK_CASES[idx] || {};
-
-        return {
-          id: p.id || slug,
-          number: String(idx + 1).padStart(2, '0'),
-          title: p.title || fallback.title || 'Projeto',
-          category: p.category || p.context || fallback.category || 'Digital Product',
-          description: p.description || fallback.description || '',
-          link: `/cases/${slug}`,
-          wallpaperSrc: p.coverImage || fallback.wallpaperSrc || p.image || p.finalImage,
-          mediaThumbSrc: p.processImage || p.image || fallback.mediaThumbSrc || p.coverImage,
-          mediaExpandedSrc: p.finalImage || p.imageHover || fallback.mediaExpandedSrc || p.coverImage || p.image,
-        };
-      });
+    if (!Array.isArray(featuredProjects) || featuredProjects.length === 0) {
+      return [];
     }
 
-    return STATIC_FALLBACK_CASES.map((item, idx) => ({
-      ...item,
-      number: String(idx + 1).padStart(2, '0'),
-    }));
+    return featuredProjects.map((p, idx) => {
+      const slug = p.slug?.current || p.slug || p.id;
+      return {
+        id: p.id || slug,
+        number: String(idx + 1).padStart(2, '0'),
+        title: p.title || 'Untitled Project',
+        category: p.category || p.context || 'Digital Product',
+        description: p.shortDescription || p.heroSummary || p.description || '',
+        link: `/cases/${slug}`,
+        wallpaperSrc: p.coverImage || p.finalImage || p.image,
+        mediaThumbSrc: p.processImage || p.image || p.coverImage,
+        mediaExpandedSrc: p.finalImage || p.image || p.coverImage,
+      };
+    });
   }, [featuredProjects]);
+
+  // Se não houver projetos em destaque no Sanity, oculta graciosamente a seção
+  if (displayCases.length === 0) {
+    return null;
+  }
 
   return (
     <section

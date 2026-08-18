@@ -49,7 +49,7 @@ export function getUrlCurrency() {
       if (normalizedMarket === 'BR' || normalizedMarket === 'BRL') return 'BRL';
       if (normalizedMarket === 'INTL' || normalizedMarket === 'USD') return 'USD';
     }
-  } catch (err) {
+  } catch {
     // Ignore URL parse errors
   }
   return null;
@@ -65,7 +65,7 @@ export function getSavedCurrency() {
     if (saved === 'USD' || saved === 'BRL') {
       return saved;
     }
-  } catch (err) {
+  } catch {
     // Ignore storage errors
   }
   return null;
@@ -80,7 +80,7 @@ export function setSavedCurrency(currency) {
     if (currency === 'USD' || currency === 'BRL') {
       localStorage.setItem(STORAGE_KEY_CURRENCY, currency);
     }
-  } catch (err) {
+  } catch {
     // Ignore storage errors
   }
 }
@@ -157,7 +157,7 @@ export async function detectCountryByIp() {
         return data.country.toUpperCase();
       }
     }
-  } catch (err) {
+  } catch {
     // Network fail, timeout, or adblocker blocked: silent fallback
   } finally {
     clearTimeout(timeoutId);

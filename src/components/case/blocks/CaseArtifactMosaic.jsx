@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
+import { motion, useScroll, useTransform, useSpring, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../../context/LanguageContext';
 import { useHeaderMetrics } from '../../../hooks/useHeaderMetrics';
 
@@ -20,8 +20,9 @@ const DEFAULT_SPATIAL_SLOTS = [
   { row: 1, col: 3, origin: 'bottomRight' },
   { row: 2, col: 2, origin: 'topLeft' },
   { row: 2, col: 4, origin: 'topRight' },
-  { row: 3, col: 1, origin: 'center' },
-  { row: 4, col: 3, origin: 'center' },
+  { row: 3, col: 1, origin: 'topLeft' },
+  { row: 4, col: 2, origin: 'topLeft' },
+  { row: 4, col: 3, origin: 'topRight' },
   { row: 5, col: 4, origin: 'center' },
   { row: 6, col: 1, origin: 'bottomLeft' },
   { row: 6, col: 4, origin: 'bottomRight' },
@@ -34,9 +35,9 @@ const DEFAULT_SPATIAL_SLOTS = [
   { row: 11, col: 3, origin: 'center' },
 ];
 
-function FullBleedMosaicCell({ item, slot, index, isLight }) {
+function FullBleedMosaicCell({ item, slot, index, _isLight }) {
   const { language } = useLanguage();
-  const { triggerLine = 66 } = useHeaderMetrics();
+  const { headerBottom = 54 } = useHeaderMetrics();
   const prefersReducedMotion = useReducedMotion();
   const cellRef = useRef(null);
 
@@ -46,9 +47,9 @@ function FullBleedMosaicCell({ item, slot, index, isLight }) {
     offset: ['start end', 'start 70%'],
   });
 
-  // 2. Exit scroll: starts ONLY when top of image touches triggerLine (headerBottom + 12px)
-  // and finishes scaling to 0.08 over a tight 110px scroll distance.
-  const exitTriggerStart = triggerLine || 66;
+  // 2. Exit scroll: starts EXACTLY when top of image touches the bottom of the header (headerBottom)
+  // and finishes scaling to 0.08 over a 110px scroll distance.
+  const exitTriggerStart = headerBottom || 54;
   const exitTriggerEnd = exitTriggerStart - 110;
 
   const { scrollYProgress: exitProgress } = useScroll({
@@ -56,11 +57,16 @@ function FullBleedMosaicCell({ item, slot, index, isLight }) {
     offset: [`start ${exitTriggerStart}px`, `start ${exitTriggerEnd}px`],
   });
 
-  const entryScale = useTransform(entryProgress, [0, 1], [0.08, 1], { clamp: true });
-  const entryOpacity = useTransform(entryProgress, [0, 0.4], [0.3, 1], { clamp: true });
+  // Spring-smoothed versions for fluid motion
+  const springConfig = { stiffness: 120, damping: 35, mass: 0.5 };
+  const smoothEntry = useSpring(entryProgress, springConfig);
+  const smoothExit = useSpring(exitProgress, springConfig);
 
-  const exitScale = useTransform(exitProgress, [0, 1], [1, 0.08], { clamp: true });
-  const exitOpacity = useTransform(exitProgress, [0, 1], [1, 0.3], { clamp: true });
+  const entryScale = useTransform(smoothEntry, [0, 1], [0.08, 1], { clamp: true });
+  const entryOpacity = useTransform(smoothEntry, [0, 0.4], [0.3, 1], { clamp: true });
+
+  const exitScale = useTransform(smoothExit, [0, 1], [1, 0.08], { clamp: true });
+  const exitOpacity = useTransform(smoothExit, [0, 1], [1, 0.3], { clamp: true });
 
   // Combined transforms: remains scale: 1 and opacity: 1 completely stable in the middle
   const scale = useTransform(() => entryScale.get() * exitScale.get());

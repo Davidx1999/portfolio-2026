@@ -1,16 +1,22 @@
 import { useState, useEffect, useCallback } from 'react';
 import { sanityClient, urlFor } from '../services/sanityClient';
-import { CASE_STUDIES_DATA } from '../data/caseStudiesData';
-import { PROJECTS as staticProjects } from '../data/projects';
 
+/**
+ * useCaseStudy
+ * Hook editorial orientado exclusivamente ao Sanity.io.
+ * Sem fallbacks locais fictícios ou dados estáticos de outros projetos.
+ */
 export function useCaseStudy(slug) {
   const [caseStudy, setCaseStudy] = useState(null);
   const [nextCase, setNextCase] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(1);
+  const [totalProjects, setTotalProjects] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const fetchCaseStudy = useCallback(async () => {
     if (!slug) {
+      setCaseStudy(null);
       setLoading(false);
       return;
     }
@@ -18,14 +24,11 @@ export function useCaseStudy(slug) {
     setLoading(true);
     setError(null);
 
-    const fallbackLocal =
-      CASE_STUDIES_DATA[slug] ||
-      staticProjects.find((p) => p.id === slug || p.slug === slug);
-
     try {
-      // Query single project by slug.current OR legacy id
+      // Consulta documento único pelo slug
       const query = `*[_type == "project" && (slug.current == $slug || id.current == $slug || id == $slug || _id == $slug)][0]{
         ...,
+        "slug": coalesce(slug.current, id.current, id, _id),
         "coverImageUrl": coverImage.asset->url,
         "heroMediaImage": heroMedia.image.asset->url,
         "heroMediaPoster": heroMedia.poster.asset->url,
@@ -33,21 +36,29 @@ export function useCaseStudy(slug) {
           title,
           "slug": coalesce(slug.current, id.current, id, _id),
           projectType,
+          caseDepth,
+          eyebrow,
           heroSummary,
           heroSummary_en,
+          shortDescription,
+          shortDescription_en,
           description,
           "coverImage": coverImage.asset->url,
           "image": image.asset->url
         }
       }`;
 
-      // Query all published projects for automatic next project resolution
-      const allProjectsQuery = `*[_type == "project" && published != false] | order(_createdAt desc){
+      // Consulta todos os projetos publicados para índice e resolução do próximo projeto
+      const allProjectsQuery = `*[_type == "project" && published != false] | order(featuredOrder asc, orderRank asc, _createdAt desc){
         title,
         "slug": coalesce(slug.current, id.current, id, _id),
         projectType,
+        caseDepth,
+        eyebrow,
         heroSummary,
         heroSummary_en,
+        shortDescription,
+        shortDescription_en,
         description,
         "coverImage": coverImage.asset->url,
         "image": image.asset->url
@@ -59,16 +70,40 @@ export function useCaseStudy(slug) {
       ]);
 
       if (sanityProject) {
-        // Resolve images within contentBlocks
-        const rawBlocks =
-          Array.isArray(sanityProject.contentBlocks) && sanityProject.contentBlocks.length > 0
-            ? sanityProject.contentBlocks
-            : fallbackLocal?.contentBlocks || [];
+        // Resolve blocos modulares dinamicamente
+        const rawBlocks = Array.isArray(sanityProject.contentBlocks) ? sanityProject.contentBlocks : [];
 
         const resolvedBlocks = rawBlocks.map((block) => {
-          if (block._type === 'diagonalMediaScene' && block.media) {
-            return { ...block, media: urlFor(block.media) };
+          if (!block) return block;
+
+          // Prototype Video Block
+          if (block._type === 'prototypeVideo' && block.poster) {
+            return { ...block, poster: urlFor(block.poster) };
           }
+
+          // Design Decisions Section
+          if (block._type === 'decisionSection' && Array.isArray(block.decisions)) {
+            return {
+              ...block,
+              decisions: block.decisions.map((dec) => ({
+                ...dec,
+                artifactMedia: dec.artifactMedia ? urlFor(dec.artifactMedia) : null,
+              })),
+            };
+          }
+
+          // Image Gallery Section
+          if (block._type === 'imageGallery' && Array.isArray(block.images)) {
+            return {
+              ...block,
+              images: block.images.map((img) => ({
+                ...img,
+                image: img.image ? urlFor(img.image) : null,
+              })),
+            };
+          }
+
+          // Artifact Mosaic Scene
           if (block._type === 'artifactMosaicScene' && Array.isArray(block.items)) {
             return {
               ...block,
@@ -78,6 +113,8 @@ export function useCaseStudy(slug) {
               })),
             };
           }
+
+          // Lagged Full Viewport
           if (block._type === 'laggedFullViewportMedia') {
             return {
               ...block,
@@ -85,6 +122,8 @@ export function useCaseStudy(slug) {
               poster: block.poster ? urlFor(block.poster) : null,
             };
           }
+
+          // Vertical Media Stack
           if (block._type === 'verticalMediaStack' && Array.isArray(block.items)) {
             return {
               ...block,
@@ -94,9 +133,13 @@ export function useCaseStudy(slug) {
               })),
             };
           }
+
+          // Full Media
           if (block._type === 'fullMedia' && block.image) {
             return { ...block, image: urlFor(block.image) };
           }
+
+          // Split Media
           if (block._type === 'splitMedia') {
             return {
               ...block,
@@ -104,9 +147,13 @@ export function useCaseStudy(slug) {
               mediaRight: block.mediaRight ? urlFor(block.mediaRight) : null,
             };
           }
+
+          // Media + Text
           if (block._type === 'mediaText' && block.media) {
             return { ...block, media: urlFor(block.media) };
           }
+
+          // Image Grid
           if (block._type === 'imageGrid' && Array.isArray(block.items)) {
             return {
               ...block,
@@ -116,6 +163,8 @@ export function useCaseStudy(slug) {
               })),
             };
           }
+
+          // Before / After
           if (block._type === 'beforeAfter') {
             return {
               ...block,
@@ -123,9 +172,13 @@ export function useCaseStudy(slug) {
               afterImage: block.afterImage ? urlFor(block.afterImage) : null,
             };
           }
+
+          // Artifact Showcase
           if (block._type === 'artifactShowcase' && block.media) {
             return { ...block, media: urlFor(block.media) };
           }
+
+          // Process Steps
           if (block._type === 'processSteps' && Array.isArray(block.steps)) {
             return {
               ...block,
@@ -135,116 +188,88 @@ export function useCaseStudy(slug) {
               })),
             };
           }
+
           return block;
         });
 
+        const coverImg = sanityProject.coverImageUrl || (sanityProject.coverImage ? urlFor(sanityProject.coverImage) : null);
+        const heroImg = sanityProject.heroMediaImage || (sanityProject.heroMedia?.image ? urlFor(sanityProject.heroMedia.image) : null) || coverImg;
+
         const normalizedProject = {
-          ...fallbackLocal,
           ...sanityProject,
-          slug: sanityProject.slug?.current || sanityProject.id || slug,
-          title: sanityProject.title || fallbackLocal?.title,
-          coverImage: sanityProject.coverImageUrl || urlFor(sanityProject.coverImage) || fallbackLocal?.coverImage,
+          caseDepth: sanityProject.caseDepth || 'full',
+          eyebrow: sanityProject.eyebrow || null,
+          slug: sanityProject.slug || slug,
+          title: sanityProject.title || 'Untitled Case Study',
+          coverImage: coverImg,
           heroMedia: {
-            mediaType: sanityProject.heroMedia?.mediaType || fallbackLocal?.heroMedia?.mediaType || 'image',
-            image: sanityProject.heroMediaImage || urlFor(sanityProject.heroMedia?.image) || fallbackLocal?.heroMedia?.image,
-            videoUrl: sanityProject.heroMedia?.videoUrl || fallbackLocal?.heroMedia?.videoUrl,
-            poster: sanityProject.heroMediaPoster || urlFor(sanityProject.heroMedia?.poster) || fallbackLocal?.heroMedia?.poster,
-            alt: sanityProject.heroMedia?.alt || fallbackLocal?.heroMedia?.alt || sanityProject.title,
-            alt_en: sanityProject.heroMedia?.alt_en || fallbackLocal?.heroMedia?.alt_en || sanityProject.title,
+            mediaType: sanityProject.heroMedia?.mediaType || 'image',
+            image: heroImg,
+            videoUrl: sanityProject.heroMedia?.videoUrl || null,
+            poster: sanityProject.heroMediaPoster || (sanityProject.heroMedia?.poster ? urlFor(sanityProject.heroMedia.poster) : null),
+            alt: sanityProject.heroMedia?.alt || sanityProject.title,
+            alt_en: sanityProject.heroMedia?.alt_en || sanityProject.title,
             autoplay: sanityProject.heroMedia?.autoplay ?? true,
-            enableDiagonalHeroReveal:
-              sanityProject.heroMedia?.enableDiagonalHeroReveal ??
-              fallbackLocal?.heroMedia?.enableDiagonalHeroReveal ??
-              true,
-            initialRotation: sanityProject.heroMedia?.initialRotation || fallbackLocal?.heroMedia?.initialRotation || '-13',
-            initialScalePreset: sanityProject.heroMedia?.initialScalePreset || fallbackLocal?.heroMedia?.initialScalePreset || 'medium',
-            initialHorizontalDirection: sanityProject.heroMedia?.initialHorizontalDirection || fallbackLocal?.heroMedia?.initialHorizontalDirection || 'left',
-            heroScrollLength: sanityProject.heroMedia?.heroScrollLength || fallbackLocal?.heroMedia?.heroScrollLength || 'medium',
           },
-          heroSummary: sanityProject.heroSummary || sanityProject.description || fallbackLocal?.heroSummary,
-          heroSummary_en: sanityProject.heroSummary_en || fallbackLocal?.heroSummary_en,
-          thesis: sanityProject.thesis || fallbackLocal?.thesis,
-          thesis_en: sanityProject.thesis_en || fallbackLocal?.thesis_en,
-          overview: sanityProject.overview || fallbackLocal?.overview,
-          overview_en: sanityProject.overview_en || fallbackLocal?.overview_en,
-          challenge: sanityProject.challenge || fallbackLocal?.challenge,
-          challenge_en: sanityProject.challenge_en || fallbackLocal?.challenge_en,
-          responsibilities:
-            Array.isArray(sanityProject.responsibilities) && sanityProject.responsibilities.length > 0
-              ? sanityProject.responsibilities
-              : fallbackLocal?.responsibilities || [],
-          responsibilities_en:
-            Array.isArray(sanityProject.responsibilities_en) && sanityProject.responsibilities_en.length > 0
-              ? sanityProject.responsibilities_en
-              : fallbackLocal?.responsibilities_en || [],
-          solution: sanityProject.solution || fallbackLocal?.solution,
-          solution_en: sanityProject.solution_en || fallbackLocal?.solution_en,
-          impact: sanityProject.impact || fallbackLocal?.impact,
-          impact_en: sanityProject.impact_en || fallbackLocal?.impact_en,
-          reflection: sanityProject.reflection || fallbackLocal?.reflection,
-          reflection_en: sanityProject.reflection_en || fallbackLocal?.reflection_en,
+          shortDescription: sanityProject.shortDescription || sanityProject.heroSummary || sanityProject.description || '',
+          shortDescription_en: sanityProject.shortDescription_en || sanityProject.heroSummary_en || '',
+          longDescription: sanityProject.longDescription || sanityProject.overview || sanityProject.context || '',
+          longDescription_en: sanityProject.longDescription_en || sanityProject.overview_en || sanityProject.context_en || '',
+          heroSummary: sanityProject.heroSummary || sanityProject.description || '',
+          heroSummary_en: sanityProject.heroSummary_en || '',
+          thesis: sanityProject.thesis || null,
+          thesis_en: sanityProject.thesis_en || null,
+          overview: sanityProject.overview || null,
+          overview_en: sanityProject.overview_en || null,
+          challenge: sanityProject.challenge || null,
+          challenge_en: sanityProject.challenge_en || null,
+          responsibilities: Array.isArray(sanityProject.responsibilities) ? sanityProject.responsibilities : [],
+          responsibilities_en: Array.isArray(sanityProject.responsibilities_en) ? sanityProject.responsibilities_en : [],
+          solution: sanityProject.solution || null,
+          solution_en: sanityProject.solution_en || null,
+          impact: sanityProject.impact || null,
+          impact_en: sanityProject.impact_en || null,
+          reflection: sanityProject.reflection || null,
+          reflection_en: sanityProject.reflection_en || null,
           contentBlocks: resolvedBlocks,
-          disciplines:
-            Array.isArray(sanityProject.disciplines) && sanityProject.disciplines.length > 0
-              ? sanityProject.disciplines
-              : fallbackLocal?.disciplines || ['Product Design', 'UX/UI Design', 'Design Systems'],
-          projectType: sanityProject.projectType || fallbackLocal?.projectType || 'professionalProject',
-          projectStatus: sanityProject.projectStatus || fallbackLocal?.projectStatus || 'completed',
-          period: sanityProject.period || sanityProject.year || fallbackLocal?.period || '2021—2026',
-          clientOrContext: sanityProject.clientOrContext || sanityProject.context || fallbackLocal?.clientOrContext || 'FGV DGPE · CEnPE / UFC',
-          role: sanityProject.role || fallbackLocal?.role || 'Lead Product Designer',
-          externalUrl: sanityProject.externalUrl || sanityProject.liveLink || fallbackLocal?.externalUrl,
+          disciplines: Array.isArray(sanityProject.disciplines) ? sanityProject.disciplines : [],
+          projectType: sanityProject.projectType || 'professionalProject',
+          projectStatus: sanityProject.projectStatus || 'completed',
+          period: sanityProject.period || sanityProject.year || '',
+          duration: sanityProject.duration || null,
+          clientOrContext: sanityProject.clientOrContext || sanityProject.context || '',
+          role: sanityProject.role || '',
+          externalUrl: sanityProject.externalUrl || sanityProject.liveLink || null,
         };
 
         setCaseStudy(normalizedProject);
 
-        // Next project resolution
-        if (sanityProject.nextCaseRef) {
-          setNextCase(sanityProject.nextCaseRef);
-        } else if (Array.isArray(allSanityProjects) && allSanityProjects.length > 0) {
+        // Resolução do próximo case
+        if (Array.isArray(allSanityProjects) && allSanityProjects.length > 0) {
+          setTotalProjects(allSanityProjects.length);
           const currentIdx = allSanityProjects.findIndex((p) => p.slug === slug);
-          const nextIdx = currentIdx >= 0 && currentIdx < allSanityProjects.length - 1 ? currentIdx + 1 : 0;
-          setNextCase(allSanityProjects[nextIdx]);
-        }
-      } else if (fallbackLocal) {
-        setCaseStudy(fallbackLocal);
+          setCurrentIndex(currentIdx >= 0 ? currentIdx + 1 : 1);
 
-        // Local next project fallback
-        const nextSlug = fallbackLocal.nextCaseSlug || 'aula-f75';
-        const fallbackNext = CASE_STUDIES_DATA[nextSlug] || staticProjects.find((p) => p.id === nextSlug);
-        if (fallbackNext) {
-          setNextCase({
-            title: fallbackNext.title,
-            slug: fallbackNext.slug || fallbackNext.id,
-            projectType: fallbackNext.projectType,
-            heroSummary: fallbackNext.heroSummary || fallbackNext.description,
-            heroSummary_en: fallbackNext.heroSummary_en,
-            coverImage: fallbackNext.coverImage || fallbackNext.image,
-          });
+          if (sanityProject.nextCaseRef) {
+            setNextCase(sanityProject.nextCaseRef);
+          } else {
+            const nextIdx = currentIdx >= 0 && currentIdx < allSanityProjects.length - 1 ? currentIdx + 1 : 0;
+            setNextCase(allSanityProjects[nextIdx] || null);
+          }
+        } else if (sanityProject.nextCaseRef) {
+          setNextCase(sanityProject.nextCaseRef);
+        } else {
+          setNextCase(null);
         }
       } else {
         setCaseStudy(null);
+        setNextCase(null);
       }
     } catch (err) {
-      console.warn('Could not fetch case from Sanity, falling back to static local data:', err);
+      console.warn('Erro ao carregar estudo de caso do Sanity:', err);
       setError(err);
-      if (fallbackLocal) {
-        setCaseStudy(fallbackLocal);
-        const nextSlug = fallbackLocal.nextCaseSlug || 'aula-f75';
-        const fallbackNext = CASE_STUDIES_DATA[nextSlug] || staticProjects.find((p) => p.id === nextSlug);
-        if (fallbackNext) {
-          setNextCase({
-            title: fallbackNext.title,
-            slug: fallbackNext.slug || fallbackNext.id,
-            projectType: fallbackNext.projectType,
-            heroSummary: fallbackNext.heroSummary || fallbackNext.description,
-            heroSummary_en: fallbackNext.heroSummary_en,
-            coverImage: fallbackNext.coverImage || fallbackNext.image,
-          });
-        }
-      } else {
-        setCaseStudy(null);
-      }
+      setCaseStudy(null);
+      setNextCase(null);
     } finally {
       setLoading(false);
     }
@@ -257,6 +282,8 @@ export function useCaseStudy(slug) {
   return {
     caseStudy,
     nextCase,
+    currentIndex,
+    totalProjects,
     loading,
     error,
     refetch: fetchCaseStudy,

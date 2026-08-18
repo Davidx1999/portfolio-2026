@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
 import {
   ArrowDown,
   ArrowUpRight,
@@ -16,6 +15,7 @@ import {
 import { useLanguage } from '../context/LanguageContext';
 import { useLetsTalk } from '../hooks/useLetsTalk';
 import { useHeaderMetrics } from '../hooks/useHeaderMetrics';
+import { RollingText } from '../components/RollingText';
 import {
   resolveInitialCurrency,
   getSavedCurrency,
@@ -57,13 +57,10 @@ const InstagramIcon = ({ size = 16, className = "" }) => (
   </svg>
 );
 
-const EASING = [0.22, 1, 0.36, 1];
-
 export function Contact() {
-  const { language, t } = useLanguage();
+  const { language } = useLanguage();
   const { talkData } = useLetsTalk();
   const { safeOffset } = useHeaderMetrics();
-  const prefersReducedMotion = useReducedMotion();
 
   // 1. Fortaleza Live Clock (Client-only safe hydration)
   const [fortalezaTime, setFortalezaTime] = useState('');
@@ -78,7 +75,7 @@ export function Contact() {
           hour12: false,
         });
         setFortalezaTime(formatter.format(new Date()));
-      } catch (err) {
+      } catch {
         // Fallback
         const now = new Date();
         setFortalezaTime(now.toTimeString().slice(0, 8));
@@ -102,17 +99,16 @@ export function Contact() {
   };
 
   // 3. Currency Localization & Market Selection
-  const [currencyInfo, setCurrencyInfo] = useState(() => resolveInitialCurrency(language));
-  const [detectedCountry, setDetectedCountry] = useState(null);
-
-  // Sync currency with language change ONLY IF user hasn't set manual choice or URL param
-  useEffect(() => {
+  const [manualCurrency, setManualCurrency] = useState(() => {
     const saved = getSavedCurrency();
     const urlCurr = getUrlCurrency();
-    if (!saved && !urlCurr) {
-      setCurrencyInfo(resolveInitialCurrency(language));
-    }
-  }, [language]);
+    if (saved) return { currency: saved, market: saved === 'BRL' ? 'BR' : 'INTL', source: 'localStorage' };
+    if (urlCurr) return { currency: urlCurr, market: urlCurr === 'BRL' ? 'BR' : 'INTL', source: 'url' };
+    return null;
+  });
+
+  const currencyInfo = manualCurrency || resolveInitialCurrency(language);
+  const [detectedCountry, setDetectedCountry] = useState(null);
 
   // Non-blocking, safe IP country check on mount
   useEffect(() => {
@@ -127,9 +123,9 @@ export function Contact() {
       // Only suggest currency if no manual or URL choice was provided
       if (!saved && !urlCurr) {
         if (countryCode === 'BR') {
-          setCurrencyInfo({ currency: 'BRL', market: 'BR', source: 'ip' });
+          setManualCurrency({ currency: 'BRL', market: 'BR', source: 'ip' });
         } else {
-          setCurrencyInfo({ currency: 'USD', market: 'INTL', source: 'ip' });
+          setManualCurrency({ currency: 'USD', market: 'INTL', source: 'ip' });
         }
       }
     });
@@ -142,7 +138,7 @@ export function Contact() {
   const handleCurrencyChange = (newCurrency) => {
     if (newCurrency === currencyInfo.currency) return;
     setSavedCurrency(newCurrency);
-    setCurrencyInfo({
+    setManualCurrency({
       currency: newCurrency,
       market: newCurrency === 'BRL' ? 'BR' : 'INTL',
       source: 'manual',
@@ -382,7 +378,7 @@ Enviado através do portfólio oficial (davidsalviano.com)
               onClick={scrollToForm}
               className="group inline-flex items-center gap-3 font-mono text-xs font-bold uppercase tracking-widest text-[#F4F3EE]/70 hover:text-[#C4FF00] transition-colors cursor-pointer"
             >
-              <span>{language === 'en' ? 'STRUCTURE YOUR PROJECT' : 'ESTRUTURAR PROJETO'}</span>
+              <RollingText text={language === 'en' ? 'STRUCTURE YOUR PROJECT' : 'ESTRUTURAR PROJETO'} />
               <ArrowDown size={14} className="transition-transform group-hover:translate-y-1 text-[#C4FF00]" />
             </button>
           </div>

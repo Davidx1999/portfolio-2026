@@ -7,7 +7,7 @@ import { useAppReady } from '../../context/AppReadyContext';
 import { RollingButton } from '../RollingButton';
 
 const EASING = [0.22, 1, 0.36, 1];
-const CLIP_EASING = [0.77, 0, 0.175, 1]; // power3.inOut
+const CLIP_EASING = [0.77, 0, 0.175, 1];
 
 // Delay (ms) between text animations settling and video reveal starting.
 // Must be perceptible but not feel like a stall.
@@ -91,7 +91,7 @@ export function HomeHero() {
   };
 
   return (
-    <section className="relative w-full min-h-[100svh] pt-24 lg:pt-28 flex flex-col justify-between bg-[#F1F0EB] text-[#111210] select-none border-b border-[rgba(17,18,16,0.1)]">
+    <section className="relative w-full min-h-[100svh] pt-24 pb-14 sm:pb-16 lg:pt-28 lg:pb-12 flex flex-col justify-between bg-[#F1F0EB] text-[#111210] select-none border-b border-[rgba(17,18,16,0.1)]">
       <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16 my-auto">
         <div className="grid grid-cols-1 lg:grid-cols-[42fr_58fr] gap-12 lg:gap-16 items-center">
 

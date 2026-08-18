@@ -1,8 +1,8 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useRef, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate, Link as RouterLink } from 'react-router-dom';
 import { useReducedMotion } from 'framer-motion';
 import { useLanguage } from './LanguageContext';
-import { CASE_STUDIES_DATA } from '../data/caseStudiesData';
 
 /**
  * Route Dictionary for Automatic Title Resolution
@@ -88,18 +88,6 @@ export function resolveRouteTitle(to, language = 'pt') {
   const caseMatch = cleanPath.match(/^\/(?:cases|work|project|projects)\/([^/]+)/);
   if (caseMatch) {
     const slug = caseMatch[1];
-    const knownCase = CASE_STUDIES_DATA?.[slug];
-
-    if (knownCase) {
-      const caseTitle = knownCase.title || slug.toUpperCase();
-      return {
-        title: caseTitle.toUpperCase(),
-        eyebrow: language === 'en' ? 'CASE STUDY //' : 'ESTUDO DE CASO //',
-        index: null,
-      };
-    }
-
-    // Formatted fallback
     const formatted = slug.replace(/[-_]/g, ' ').toUpperCase();
     return {
       title: formatted,

@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
+import { motion, useScroll, useTransform, useSpring, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../../context/LanguageContext';
 
 export function CaseDiagonalMediaScene({ block }) {
@@ -7,19 +7,19 @@ export function CaseDiagonalMediaScene({ block }) {
   const prefersReducedMotion = useReducedMotion();
   const containerRef = useRef(null);
 
-  if (!block || !block.media) return null;
-
-  const caption = language === 'en' && block.caption_en ? block.caption_en : block.caption;
-  const isLight = block.theme === 'light';
-
-  // Scroll Progress across 220vh
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start start', 'end end'],
   });
 
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 120,
+    damping: 35,
+    mass: 0.5,
+  });
+
   // Calculate coordinates based on directionPreset
-  const preset = block.directionPreset || 'topLeftToCenter';
+  const preset = block?.directionPreset || 'topLeftToCenter';
   let startX = '-28vw';
   let startY = '18vh';
   let endX = '28vw';
@@ -43,11 +43,15 @@ export function CaseDiagonalMediaScene({ block }) {
   }
 
   // 0%-25% Enter -> 25%-60% Hold -> 60%-85% Exit -> 85%-100% Clear
-  const scale = useTransform(scrollYProgress, [0, 0.25, 0.6, 0.85, 1], [0.15, 1, 1, 0.15, 0]);
-  const x = useTransform(scrollYProgress, [0, 0.25, 0.6, 0.85, 1], [startX, '0vw', '0vw', endX, endX]);
-  const y = useTransform(scrollYProgress, [0, 0.25, 0.6, 0.85, 1], [startY, '0vh', '0vh', endY, endY]);
-  const opacity = useTransform(scrollYProgress, [0, 0.1, 0.85, 0.95], [0.2, 1, 1, 0]);
+  const scale = useTransform(smoothProgress, [0, 0.25, 0.6, 0.85, 1], [0.15, 1, 1, 0.15, 0]);
+  const x = useTransform(smoothProgress, [0, 0.25, 0.6, 0.85, 1], [startX, '0vw', '0vw', endX, endX]);
+  const y = useTransform(smoothProgress, [0, 0.25, 0.6, 0.85, 1], [startY, '0vh', '0vh', endY, endY]);
+  const opacity = useTransform(smoothProgress, [0, 0.1, 0.85, 0.95], [0.2, 1, 1, 0]);
 
+  if (!block || !block.media) return null;
+
+  const caption = language === 'en' && block.caption_en ? block.caption_en : block.caption;
+  const isLight = block.theme === 'light';
   const isReduced = prefersReducedMotion;
 
   return (

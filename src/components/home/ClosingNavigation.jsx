@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { CurtainLink } from '../../context/RouteCurtainContext';
@@ -8,7 +7,6 @@ import { RollingButton } from '../RollingButton';
 
 export function ClosingNavigation() {
   const { t } = useLanguage();
-  const prefersReducedMotion = useReducedMotion();
 
   const pathways = [
     {

@@ -1,13 +1,9 @@
 import React from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
 import { ThreeColumnGrid } from './ThreeColumnGrid';
 
-const EASING = [0.22, 1, 0.36, 1];
-
 export function CredibilitySection() {
   const { t } = useLanguage();
-  const prefersReducedMotion = useReducedMotion();
 
   const proofs = [
     {
@@ -30,7 +26,7 @@ export function CredibilitySection() {
   return (
     <section
       id="credibility"
-      className="relative w-full bg-[#FAFAF7] text-[#111210] py-24 lg:py-32 border-b border-[rgba(17,18,16,0.1)] select-none"
+      className="relative w-full bg-[#FAFAF7] text-[#111210] pt-12 pb-20 sm:pt-16 sm:pb-24 lg:py-32 border-b border-[rgba(17,18,16,0.1)] select-none"
     >
       <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
 

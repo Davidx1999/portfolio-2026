@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState } from 'react';
 import pt from '../data/locales/pt';
 import en from '../data/locales/en';

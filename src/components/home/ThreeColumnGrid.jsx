@@ -3,6 +3,8 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 import { CurtainLink } from '../../context/RouteCurtainContext';
 
+import { RollingText } from '../RollingText';
+
 const EASING = [0.22, 1, 0.36, 1];
 
 /**
@@ -75,7 +77,7 @@ export function ThreeColumnGrid({
               <div className={`mt-8 pt-2 flex items-center gap-2 font-mono text-[11px] font-bold tracking-wider uppercase text-[#8B8B85] ${
                 isDark ? 'group-hover:text-[#C7F000]' : 'group-hover:text-[#10110F]'
               } transition-colors duration-200`}>
-                <span>{item.actionLabel || 'ACESSAR'}</span>
+                <RollingText text={item.actionLabel || 'ACESSAR'} />
                 <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
               </div>
             )}

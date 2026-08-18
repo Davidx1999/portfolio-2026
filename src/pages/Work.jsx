@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { ArrowUpRight, ChevronDown, ArrowDown } from 'lucide-react';
+import { ArrowUpRight, ChevronDown } from 'lucide-react';
 import { useProjects } from '../hooks/useProjects';
 import { useLanguage } from '../context/LanguageContext';
 import { CurtainLink } from '../context/RouteCurtainContext';
@@ -14,8 +14,8 @@ const getProjectLink = (id) => {
 };
 
 export function Work() {
-  const { allWork: projects, playgroundProjects, loading } = useProjects();
-  const { t, language } = useLanguage();
+  const { allWork: projects, loading } = useProjects();
+  const { t } = useLanguage();
   const prefersReducedMotion = useReducedMotion();
 
   // 1. Controle de Visualização com persistência de sessão
@@ -38,19 +38,31 @@ export function Work() {
 
   // 2. Filtros dinâmicos e Estados de Interação
   const [activeCategory, setActiveCategory] = useState('ALL');
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+  const categoryDropdownRef = useRef(null);
   const [expandedDossierId, setExpandedDossierId] = useState(null);
   const [hoveredCardId, setHoveredCardId] = useState(null);
   const [hoveredIndexRowId, setHoveredIndexRowId] = useState(null);
 
-  // Fechar dossiê com tecla Escape
+  // Fechar dossiê e dropdown com tecla Escape ou clique fora
   useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(e.target)) {
+        setIsCategoryDropdownOpen(false);
+      }
+    };
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
+        setIsCategoryDropdownOpen(false);
         setExpandedDossierId(null);
       }
     };
+    document.addEventListener('mousedown', handleClickOutside);
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
 
   // Extração dinâmica de categorias do Sanity
@@ -69,14 +81,6 @@ export function Work() {
   }, [projects, activeCategory]);
 
   const totalCount = projects.length;
-  const currentCount = filteredProjects.length;
-
-  const handleScrollDown = () => {
-    const target = document.getElementById('work-content');
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
 
   const toggleDossier = (id) => {
     setExpandedDossierId((prev) => (prev === id ? null : id));
@@ -130,7 +134,7 @@ export function Work() {
             </motion.p>
           </div>
 
-          {/* Meta Bar: Contador Real + Indicador de Scroll */}
+          {/* Meta Bar: Contador Real */}
           <motion.div
             initial={prefersReducedMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -144,59 +148,99 @@ export function Work() {
               <span className="text-white/20">•</span>
               <span className="uppercase">SaaS · Design Systems · Interface</span>
             </div>
-
-            <button
-              type="button"
-              onClick={handleScrollDown}
-              className="inline-flex items-center gap-2 font-mono text-[11px] sm:text-xs font-bold uppercase tracking-widest text-[#F4F3EE]/70 hover:text-[#C4FF00] transition-colors cursor-pointer group focus-visible:outline-2 focus-visible:outline-[#C4FF00]"
-              aria-label="Rolar para os projetos"
-            >
-              <span>EXPLORAR</span>
-              <ArrowDown size={13} className="group-hover:translate-y-0.5 transition-transform" />
-            </button>
           </motion.div>
         </div>
       </section>
 
       {/* ============================================================ */}
-      {/* 2. BARRA DE CONTROLES: FILTROS + ALTERNADOR VISUAL / INDEX   */}
+      {/* 2. BARRA DE CONTROLES: FILTRO DROPDOWN + ALTERNADOR VISUAL/INDEX */}
       {/* ============================================================ */}
       <section id="work-content" className="sticky top-[54px] z-40 w-full bg-[#10110F] border-b border-[rgba(244,243,238,0.16)]">
-        <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16 py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3">
-          {/* Filtros de Categoria (exibidos somente se houver >= 2 categorias) */}
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
-            {categories.length >= 2 && (
-              <>
-                <button
-                  type="button"
-                  onClick={() => setActiveCategory('ALL')}
-                  className={`px-3 py-1.5 rounded-[10px] font-mono text-[11px] font-bold tracking-wider uppercase transition-all cursor-pointer focus-visible:outline-2 focus-visible:outline-[#C4FF00] border ${
-                    activeCategory === 'ALL'
-                      ? 'bg-white text-[#10110F] border-white'
-                      : 'text-[#F4F3EE]/60 hover:text-[#F4F3EE] hover:bg-white/5 border-transparent'
-                  }`}
+        <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16 py-3.5 flex flex-row items-center justify-between gap-4">
+          
+          {/* Seletor Dropdown de Categorias */}
+          <div ref={categoryDropdownRef} className="relative z-50">
+            <button
+              type="button"
+              onClick={() => setIsCategoryDropdownOpen((prev) => !prev)}
+              aria-haspopup="listbox"
+              aria-expanded={isCategoryDropdownOpen}
+              className="flex items-center gap-3 px-4 py-2 bg-[#151613] hover:bg-[#1c1e1a] border border-[rgba(244,243,238,0.18)] hover:border-[rgba(196,255,0,0.5)] rounded-[12px] font-mono text-[11px] font-bold tracking-wider uppercase transition-all text-[#FAFAF7] cursor-pointer shadow-md focus-visible:outline-2 focus-visible:outline-[#C4FF00]"
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-[#C4FF00]">
+                  {activeCategory === 'ALL'
+                    ? `${t('work_filter_all', 'Todos')} (${totalCount})`
+                    : `${activeCategory} (${projects.filter((p) => p.category === activeCategory).length})`}
+                </span>
+              </div>
+              <ChevronDown
+                size={14}
+                className={`text-white/60 transition-transform duration-300 ${
+                  isCategoryDropdownOpen ? 'rotate-180 text-[#C4FF00]' : ''
+                }`}
+              />
+            </button>
+
+            <AnimatePresence>
+              {isCategoryDropdownOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -6, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                  transition={{ duration: 0.18, ease: EASING }}
+                  role="listbox"
+                  className="absolute left-0 top-full mt-2 w-max min-w-[260px] bg-[#151613] border border-[rgba(244,243,238,0.18)] rounded-[14px] shadow-2xl p-1.5 z-50 divide-y divide-white/5 backdrop-blur-md"
                 >
-                  {t('work_filter_all', 'Todos')} ({totalCount})
-                </button>
-                {categories.map((cat) => {
-                  const count = projects.filter((p) => p.category === cat).length;
-                  return (
+                  <div className="py-1">
                     <button
-                      key={cat}
                       type="button"
-                      onClick={() => setActiveCategory(cat)}
-                      className={`px-3 py-1.5 rounded-[10px] font-mono text-[11px] font-bold tracking-wider uppercase transition-all whitespace-nowrap cursor-pointer focus-visible:outline-2 focus-visible:outline-[#C4FF00] border ${
-                        activeCategory === cat
-                          ? 'bg-white text-[#10110F] border-white'
-                          : 'text-[#F4F3EE]/60 hover:text-[#F4F3EE] hover:bg-white/5 border-transparent'
+                      role="option"
+                      aria-selected={activeCategory === 'ALL'}
+                      onClick={() => {
+                        setActiveCategory('ALL');
+                        setIsCategoryDropdownOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-[10px] font-mono text-[11px] font-bold tracking-wider uppercase transition-colors cursor-pointer text-left ${
+                        activeCategory === 'ALL'
+                          ? 'bg-[#C4FF00] text-[#10110F]'
+                          : 'text-[#F4F3EE]/80 hover:text-white hover:bg-white/5'
                       }`}
                     >
-                      {cat} ({count})
+                      <span>{t('work_filter_all', 'Todos os Projetos')}</span>
+                      <span className="text-[10px] opacity-75">({totalCount})</span>
                     </button>
-                  );
-                })}
-              </>
-            )}
+                  </div>
+
+                  <div className="py-1">
+                    {categories.map((cat) => {
+                      const count = projects.filter((p) => p.category === cat).length;
+                      const isSelected = activeCategory === cat;
+                      return (
+                        <button
+                          key={cat}
+                          type="button"
+                          role="option"
+                          aria-selected={isSelected}
+                          onClick={() => {
+                            setActiveCategory(cat);
+                            setIsCategoryDropdownOpen(false);
+                          }}
+                          className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-[10px] font-mono text-[11px] font-bold tracking-wider uppercase transition-colors cursor-pointer text-left ${
+                            isSelected
+                              ? 'bg-[#C4FF00] text-[#10110F]'
+                              : 'text-[#F4F3EE]/80 hover:text-white hover:bg-white/5'
+                          }`}
+                        >
+                          <span>{cat}</span>
+                          <span className="text-[10px] opacity-75">({count})</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Alternador de Visualização: Visual / Index */}
@@ -254,24 +298,47 @@ export function Work() {
       {viewMode === 'visual' && (
         <section className="w-full py-12 lg:py-16 bg-[#10110F]">
           <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
-              {filteredProjects.map((project, index) => {
-                const isHovered = hoveredCardId === project.id;
-                const link = getProjectLink(project.id);
-                // Ritmo editorial discreto: coluna 2 com leve offset no desktop
-                const staggerClass = index % 3 === 1 ? 'lg:translate-y-8' : '';
+            {loading ? (
+              <div className="w-full py-24 flex flex-col items-center justify-center gap-4 text-center">
+                <div className="w-6 h-6 border-2 border-[#C4FF00] border-t-transparent rounded-full animate-spin" />
+                <span className="font-mono text-xs text-white/50 uppercase tracking-widest">
+                  {t('work_loading', 'Carregando projetos...')}
+                </span>
+              </div>
+            ) : filteredProjects.length === 0 ? (
+              <div className="w-full py-24 px-6 text-center border border-[rgba(244,243,238,0.12)] rounded-[18px] bg-[#151613]">
+                <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#C4FF00] block mb-3">
+                  [ STATUS // 00 ]
+                </span>
+                <h3 className="font-serif text-2xl sm:text-3xl text-white font-normal mb-3">
+                  {t('work_empty_state_title', 'Novos estudos de caso estão sendo preparados.')}
+                </h3>
+                <p className="font-sans text-sm text-[#F4F3EE]/60 max-w-md mx-auto">
+                  {t(
+                    'work_empty_state_desc',
+                    'A documentação e métricas dos próximos projetos estão em processo de consolidação.'
+                  )}
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
+                {filteredProjects.map((project, index) => {
+                  const isHovered = hoveredCardId === project.id;
+                  const link = getProjectLink(project.id);
+                  // Ritmo editorial discreto: coluna 2 com leve offset no desktop
+                  const staggerClass = index % 3 === 1 ? 'lg:translate-y-8' : '';
 
-                return (
-                  <motion.article
-                    key={project.id}
-                    initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: '-40px' }}
-                    transition={{ duration: 0.5, delay: index * 0.06, ease: EASING }}
-                    onMouseEnter={() => setHoveredCardId(project.id)}
-                    onMouseLeave={() => setHoveredCardId(null)}
-                    className={`group relative w-full aspect-[4/3] rounded-[18px] overflow-hidden border border-[rgba(244,243,238,0.18)] hover:border-[rgba(196,255,0,0.5)] transition-colors duration-500 bg-[#10110F] ${staggerClass}`}
-                  >
+                  return (
+                    <motion.article
+                      key={project.id}
+                      initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: '-40px' }}
+                      transition={{ duration: 0.5, delay: index * 0.06, ease: EASING }}
+                      onMouseEnter={() => setHoveredCardId(project.id)}
+                      onMouseLeave={() => setHoveredCardId(null)}
+                      className={`group relative w-full aspect-[4/3] rounded-[18px] overflow-hidden border border-[rgba(244,243,238,0.18)] hover:border-[rgba(196,255,0,0.5)] transition-colors duration-500 bg-[#10110F] ${staggerClass}`}
+                    >
                     <CurtainLink
                       to={link}
                       curtainTitle={project.title}
@@ -300,12 +367,12 @@ export function Work() {
                         </span>
                       </div>
 
-                      {/* 3. INFORMAÇÕES INFERIORES (Transiciona para overlay no hover permitindo que a imagem preencha 100% da altura da box) */}
+                      {/* 3. INFORMAÇÕES INFERIORES (Sólido em repouso; oculta suavemente no hover para o Reconstruct cobrir 100% do card) */}
                       <div
-                        className={`absolute inset-x-0 bottom-0 z-20 p-4 sm:p-5 flex flex-col justify-center transition-all duration-500 ${
+                        className={`absolute inset-x-0 bottom-0 z-20 h-[33.333%] p-4 sm:p-5 flex flex-col justify-center bg-[#10110F] transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                           isHovered
-                            ? 'bg-gradient-to-t from-[#10110F]/90 via-[#10110F]/40 to-transparent border-t-0'
-                            : 'bg-[#10110F] border-t border-[rgba(244,243,238,0.16)]'
+                            ? 'opacity-0 translate-y-3 pointer-events-none'
+                            : 'opacity-100 translate-y-0 pointer-events-auto'
                         }`}
                       >
                         <div className="flex items-center justify-between gap-3">
@@ -328,9 +395,10 @@ export function Work() {
                 );
               })}
             </div>
-          </div>
-        </section>
-      )}
+          )}
+        </div>
+      </section>
+    )}
 
       {/* ============================================================ */}
       {/* 4. MODO INDEX: SISTEMA VISUAL CONTÍNUO COM PREVIEW DRAWER     */}
@@ -353,7 +421,14 @@ export function Work() {
 
               {/* Linhas do Index */}
               <div className="divide-y divide-[rgba(244,243,238,0.16)]">
-                {filteredProjects.map((project, pIndex) => {
+                {filteredProjects.length === 0 ? (
+                  <div className="py-16 px-6 text-center">
+                    <p className="font-mono text-xs text-[#F4F3EE]/50 uppercase tracking-widest">
+                      {t('work_empty_state_title', 'Novos estudos de caso estão sendo preparados.')}
+                    </p>
+                  </div>
+                ) : (
+                  filteredProjects.map((project, pIndex) => {
                   const isExpanded = expandedDossierId === project.id;
                   const isHovered = hoveredIndexRowId === project.id;
                   const isLast = pIndex === filteredProjects.length - 1;
@@ -585,7 +660,7 @@ export function Work() {
                       </AnimatePresence>
                     </div>
                   );
-                })}
+                }))}
               </div>
             </div>
 

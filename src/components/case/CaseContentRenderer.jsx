@@ -16,8 +16,21 @@ import { CaseProcessSteps } from './blocks/CaseProcessSteps';
 import { CaseArtifactShowcase } from './blocks/CaseArtifactShowcase';
 import { CaseQuote } from './blocks/CaseQuote';
 import { CaseImpact } from './blocks/CaseImpact';
+import { CasePrototypeVideo } from './blocks/CasePrototypeVideo';
+import { CaseDecisionSection } from './blocks/CaseDecisionSection';
+import { CaseOutcomeSection } from './blocks/CaseOutcomeSection';
+import { CaseImageGallery } from './blocks/CaseImageGallery';
+import { CaseStickyNarrative } from './blocks/CaseStickyNarrative';
 
 const BLOCK_COMPONENTS = {
+  // Novos blocos editoriais e de prototipagem
+  stickyNarrative: CaseStickyNarrative,
+  prototypeVideo: CasePrototypeVideo,
+  decisionSection: CaseDecisionSection,
+  outcomeSection: CaseOutcomeSection,
+  imageGallery: CaseImageGallery,
+
+  // Blocos existentes preservados
   chapterIntro: CaseChapterIntro,
   diagonalMediaScene: CaseDiagonalMediaScene,
   artifactMosaicScene: CaseArtifactMosaic,

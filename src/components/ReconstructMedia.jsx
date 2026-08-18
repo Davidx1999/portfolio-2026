@@ -110,7 +110,7 @@ export function ReconstructMedia({
 }) {
   const [internalHovered, setInternalHovered] = useState(false);
   const [isTouchRevealed, setIsTouchRevealed] = useState(false);
-  const [imagesReady, setImagesReady] = useState(false);
+  const [, setImagesReady] = useState(false);
 
   const containerRef = useRef(null);
   const animationRef = useRef(null);
@@ -133,23 +133,17 @@ export function ReconstructMedia({
       return;
     }
 
-    let loaded = 0;
+    let loadedCount = 0;
     sources.forEach((src) => {
       const img = new Image();
       img.src = src;
-      if (img.complete) {
-        loaded++;
-        if (loaded >= sources.length && isMounted) {
+      img.onload = img.onerror = () => {
+        if (!isMounted) return;
+        loadedCount += 1;
+        if (loadedCount === sources.length) {
           setImagesReady(true);
         }
-      } else {
-        img.onload = img.onerror = () => {
-          loaded++;
-          if (loaded >= sources.length && isMounted) {
-            setImagesReady(true);
-          }
-        };
-      }
+      };
     });
 
     return () => {
@@ -257,7 +251,7 @@ export function ReconstructMedia({
         animationRef.current.stop();
       }
     };
-  }, [isRevealed, prefersReducedMotion, isSingleImage]);
+  }, [isRevealed, prefersReducedMotion, isSingleImage, progress]);
 
   // Derivações contínuas para camada base e camada de segurança
   const baseOpacity = useTransform(progress, [0, 1], [1, 0.2], { clamp: true });

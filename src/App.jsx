@@ -10,11 +10,13 @@ import { CaseStudyPage } from './pages/CaseStudyPage';
 import { LoadingScreen } from './components/LoadingScreen';
 import { RouteCurtainProvider, useRouteCurtain, CurtainLink } from './context/RouteCurtainContext';
 import { RouteCurtainOverlay } from './components/RouteCurtainOverlay';
-import { CurtainDemo } from './pages/CurtainDemo';
+import { NotFound } from './pages/NotFound';
 import { AppReadyProvider, useAppReady } from './context/AppReadyContext';
 import { ErrorBoundary } from './ErrorBoundary';
+import { useGlobalSmoothScroll } from './hooks/useGlobalSmoothScroll';
 
 function AppContent() {
+  useGlobalSmoothScroll();
   const [isLoading, setIsLoading] = useState(() => {
     if (typeof window === 'undefined') return false;
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -61,7 +63,6 @@ function AppContent() {
           <Route path="/talk" element={<Navigate to="/contact" replace />} />
           <Route path="/lets-talk" element={<Navigate to="/contact" replace />} />
           <Route path="/projects" element={<Navigate to="/work" replace />} />
-          <Route path="/curtain-demo" element={<CurtainDemo />} />
 
           {/* Unified Dynamic Case Study Routes */}
           <Route path="/cases/:slug" element={<CaseStudyPage />} />
@@ -72,7 +73,9 @@ function AppContent() {
           {/* Legacy Slug Shortcuts */}
           <Route path="/mapear" element={<Navigate to="/cases/mapear" replace />} />
           <Route path="/aula-f75" element={<Navigate to="/cases/aula-f75" replace />} />
-          <Route path="/vincenzo" element={<Navigate to="/cases/vincenzo" replace />} />
+
+          {/* 404 Catch-All Route */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
 

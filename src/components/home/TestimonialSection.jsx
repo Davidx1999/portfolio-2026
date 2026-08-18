@@ -1,10 +1,8 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Quote } from 'lucide-react';
-import { useLanguage } from '../../context/LanguageContext';
 
 export function TestimonialSection({ testimonial }) {
-  const { t } = useLanguage();
   const prefersReducedMotion = useReducedMotion();
 
   // If no testimonial provided or not authorized, hide gracefully as requested

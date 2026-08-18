@@ -7,21 +7,25 @@ import { CurtainLink } from '../context/RouteCurtainContext';
 import { registerHeaderElement } from '../hooks/useHeaderMetrics';
 import { useAppReady } from '../context/AppReadyContext';
 import { RollingButton } from './RollingButton';
+import { RollingText } from './RollingText';
 
 const EASING = [0.22, 1, 0.36, 1];
 
 function HeaderNavLink({ to, isActive, children, onClick }) {
+  const text = typeof children === 'string' ? children : '';
   return (
     <CurtainLink
       to={to}
       onClick={onClick}
       className={`
         relative py-1 font-mono text-[11px] sm:text-xs font-semibold uppercase tracking-[0.18em]
-        transition-colors duration-200 group/navlink focus-visible:outline-2 focus-visible:outline-[#C7F000] focus-visible:outline-offset-4
+        transition-colors duration-200 group focus-visible:outline-2 focus-visible:outline-[#C7F000] focus-visible:outline-offset-4
         ${isActive ? 'text-[#C7F000]' : 'text-[#F4F3EE]/70 hover:text-[#F4F3EE]'}
       `}
     >
-      <span className="relative z-10">{children}</span>
+      <span className="relative z-10">
+        <RollingText text={text} />
+      </span>
       {isActive && (
         <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#C7F000]" />
       )}

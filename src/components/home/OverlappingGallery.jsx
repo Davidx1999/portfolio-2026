@@ -6,48 +6,6 @@ import { useLanguage } from '../../context/LanguageContext';
 gsap.registerPlugin(ScrollTrigger);
 
 /* ────────────────────────────────────────────────────────────
-   DEFAULT ARTIFACTS — 6 cards for a 3 × 2 grid
-   ──────────────────────────────────────────────────────────── */
-const DEFAULT_ARTIFACTS = [
-  {
-    id: 'art-1',
-    title: { pt: 'Educação & Mapeamento', en: 'Education & Mapping' },
-    label: 'SaaS Platform',
-    image: `${import.meta.env.BASE_URL}assets/projects_cape/fgvmapear_card.png`,
-  },
-  {
-    id: 'art-2',
-    title: { pt: 'Design System & Tokens', en: 'Design System & Tokens' },
-    label: 'UI Architecture',
-    image: `${import.meta.env.BASE_URL}assets/projects_cape/aulaf75_card.png`,
-  },
-  {
-    id: 'art-3',
-    title: { pt: 'Fluxos & Arquitetura', en: 'Flows & Architecture' },
-    label: 'Core Ecosystem',
-    image: `${import.meta.env.BASE_URL}assets/projects_cape/fgv_aspect_wide.png`,
-  },
-  {
-    id: 'art-4',
-    title: { pt: 'Interface Tátil & 3D', en: 'Tactile Interface & 3D' },
-    label: 'Interactive Hardware',
-    image: `${import.meta.env.BASE_URL}assets/projects_cape/aulaf75.png`,
-  },
-  {
-    id: 'art-5',
-    title: { pt: 'Engenharia de Interfaces', en: 'Interface Engineering' },
-    label: 'Data Science & CLI',
-    image: `${import.meta.env.BASE_URL}assets/projects_cape/vincenzo_card.png`,
-  },
-  {
-    id: 'art-6',
-    title: { pt: 'Relatórios & Impacto', en: 'Reports & Impact' },
-    label: 'Research Outputs',
-    image: `${import.meta.env.BASE_URL}assets/projects_cape/mapear_reports.jpg`,
-  },
-];
-
-/* ────────────────────────────────────────────────────────────
    DISPERSAL OFFSETS
    ──────────────────────────────────────────────────────────── */
 const DISPERSALS = [
@@ -67,7 +25,7 @@ export function OverlappingGallery({ items }) {
 
   const artifacts = useMemo(() => {
     if (Array.isArray(items) && items.length > 0) return items;
-    return DEFAULT_ARTIFACTS;
+    return [];
   }, [items]);
 
   const row1 = useMemo(() => artifacts.slice(0, 3), [artifacts]);
@@ -118,13 +76,13 @@ export function OverlappingGallery({ items }) {
               trigger: section,
               start: 'top top',
               end: 'bottom bottom',
-              scrub: 0.8,
+              scrub: true,
               invalidateOnRefresh: true, // required for responsive recalc
             },
           });
 
           // Stagger each card converging to its grid slot, but start at 0 so no dead zone
-          cards.forEach((card, i) => {
+          cards.forEach((card) => {
             tl.to(
               card,
               {
@@ -145,6 +103,11 @@ export function OverlappingGallery({ items }) {
 
     return () => ctx.revert();
   }, [artifacts]);
+
+  // Se não houver itens válidos, oculta graciosamente a seção
+  if (artifacts.length === 0) {
+    return null;
+  }
 
   /* ──────────────────────────────────────────────────────────
      RENDER

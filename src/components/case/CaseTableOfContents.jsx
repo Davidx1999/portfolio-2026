@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
 
 export function CaseTableOfContents({ sections = [] }) {
   const { language } = useLanguage();
-  const prefersReducedMotion = useReducedMotion();
   const [activeSection, setActiveSection] = useState(sections[0]?.id || '');
 
   useEffect(() => {

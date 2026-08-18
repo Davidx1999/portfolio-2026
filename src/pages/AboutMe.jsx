@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { ArrowDown, ArrowUpRight, CheckCircle2, Download, ExternalLink, Sparkles, Layers, ShieldCheck, Cpu, Globe, RefreshCw } from 'lucide-react';
+import { useReducedMotion } from 'framer-motion';
+import { ArrowUpRight, CheckCircle2, Download, ExternalLink, Sparkles, Layers, ShieldCheck, Cpu, Globe, RefreshCw } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useAbout } from '../hooks/useAbout';
+import { CurtainLink } from '../context/RouteCurtainContext';
 import { ClosingNavigation } from '../components/home/ClosingNavigation';
+import { RollingText } from '../components/RollingText';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -12,15 +13,7 @@ export function AboutMe() {
   const { t, language } = useLanguage();
   const { aboutData } = useAbout();
   const prefersReducedMotion = useReducedMotion();
-
-  const [hoveredSpectrumStep, setHoveredSpectrumStep] = useState(null);
-
-  const handleScrollDown = () => {
-    const target = document.getElementById('trajectory-section');
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
+  const [, setHoveredSpectrumStep] = useState(null);
 
   // Trajetória Oficial: 6 Momentos Cronológicos
   const trajectoryMoments = [
@@ -139,9 +132,11 @@ export function AboutMe() {
     { id: 'c3', name: t('about_spectrum_comp_3', 'Ilustração & Narrativa'), desc: t('about_spectrum_comp_3_desc', 'Metáforas visuais, composição e ícones autorais') },
   ];
 
-  // Além da Interface: 6 Peças Reais e Prioritárias
+  // Além da Interface: 3 Peças Reais de Branding
   const beyondPieces = [
     {
+      id: 'cenpe-brand',
+      slug: 'cenpe-brand',
       title: t('about_beyond_cenpe_title', 'Identidade CEnPE'),
       area: t('about_beyond_cenpe_area', 'Identidade Visual (2022)'),
       context: t('about_beyond_cenpe_ctx', 'Criação da marca e identidade visual para o Centro de Empreendedorismo da UFC.'),
@@ -150,6 +145,8 @@ export function AboutMe() {
       tag: 'BRANDING · UFC',
     },
     {
+      id: 'programe-ce',
+      slug: 'programe-ce',
       title: t('about_beyond_programe_title', 'Manual Programe_CE'),
       area: t('about_beyond_programe_area', 'Manual de Marca (2021—2022)'),
       context: t('about_beyond_programe_ctx', 'Criação do manual de marca e sistema gráfico para iniciativa de educação tecnológica.'),
@@ -158,36 +155,14 @@ export function AboutMe() {
       tag: 'GUIDELINES · EDTECH',
     },
     {
+      id: 'atlanta-home-concierge',
+      slug: 'atlanta-home-concierge',
       title: t('about_beyond_ahc_title', 'Atlanta Home Concierge'),
       area: t('about_beyond_ahc_area', 'Marca, Digital & Web (2026)'),
       context: t('about_beyond_ahc_ctx', 'Manual de marca, produção digital, animação e direção de modernização da presença web.'),
       image: `${import.meta.env.BASE_URL}assets/apoio/ahc.png`,
       isLogo: true,
       tag: 'FREELANCE · 2026',
-    },
-    {
-      title: t('about_beyond_escutha_title', 'Escutha'),
-      area: t('about_beyond_escutha_area', 'Redesign Web (2026)'),
-      context: t('about_beyond_escutha_ctx', 'Redesign, arquitetura e modernização da presença digital da marca.'),
-      image: `${import.meta.env.BASE_URL}assets/profile/field_notes_mock.png`,
-      isLogo: false,
-      tag: 'WEB REDESIGN · 2026',
-    },
-    {
-      title: t('about_beyond_motion_title', 'Cinética & Interação'),
-      area: t('about_beyond_motion_area', 'Motion Design'),
-      context: t('about_beyond_motion_ctx', 'Microinterações fluidas, física de transição e respostas táteis refinadas.'),
-      image: `${import.meta.env.BASE_URL}assets/profile/loop_vortex.png`,
-      isLogo: false,
-      tag: 'MOTION · INTERACTION',
-    },
-    {
-      title: t('about_beyond_illust_title', 'Narrativa & Ilustração'),
-      area: t('about_beyond_illust_area', 'Narrativa Visual'),
-      context: t('about_beyond_illust_ctx', 'Explorações autorais de forma, composição gráfica, ritmo e significado.'),
-      image: `${import.meta.env.BASE_URL}assets/profile/poster_signal.png`,
-      isLogo: false,
-      tag: 'COMPOSITION · STORY',
     },
   ];
 
@@ -328,7 +303,6 @@ export function AboutMe() {
                 className="pt-6 border-t border-[rgba(244,243,238,0.16)] flex flex-wrap items-center gap-y-3 gap-x-5 font-mono text-[11px] sm:text-xs text-[#F4F3EE]/70 uppercase tracking-wider"
               >
                 <div className="flex items-center gap-2 text-[#FAFAF7]">
-                  <span className="text-[#C4FF00]">📍</span>
                   <span>{t('about_hero_location', 'Fortaleza, Brasil')}</span>
                 </div>
                 <span className="text-white/20 hidden sm:inline">•</span>
@@ -379,19 +353,6 @@ export function AboutMe() {
               </div>
             </motion.div>
 
-          </div>
-
-          {/* Indicador Discreto de Scroll */}
-          <div className="mt-8 pt-4 flex justify-start">
-            <button
-              type="button"
-              onClick={handleScrollDown}
-              className="inline-flex items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-widest text-[#F4F3EE]/60 hover:text-[#C4FF00] transition-colors cursor-pointer group focus-visible:outline-2 focus-visible:outline-[#C4FF00]"
-              aria-label="Rolar para a seção de trajetória"
-            >
-              <span>{t('about_scroll_indicator', 'EXPLORAR TRAJETÓRIA')}</span>
-              <ArrowDown size={13} className="group-hover:translate-y-0.5 transition-transform" />
-            </button>
           </div>
         </div>
       </section>
@@ -567,24 +528,47 @@ export function AboutMe() {
             </h2>
           </div>
 
-          {/* Lista Editorial de Largura Total */}
-          <div className="divide-y divide-[rgba(244,243,238,0.16)] border-y border-[rgba(244,243,238,0.16)]">
-            {workPrinciples.map((item, idx) => (
-              <div
-                key={idx}
-                className="py-8 sm:py-10 grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-8 items-start hover:bg-white/[0.02] transition-colors px-2 sm:px-4"
-              >
-                <div className="md:col-span-2 font-mono text-xs font-bold text-[#C4FF00]">
-                  {item.num} //
+          {/* Grid Estruturado com 4 Colunas, Bordas Laterais e Corner Radius */}
+          <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 border border-[rgba(244,243,238,0.16)] rounded-[20px] sm:rounded-[24px] overflow-hidden bg-[#10110F]">
+            {workPrinciples.map((item, idx) => {
+              const isNotLastLg = idx < 3;
+              const isOddMd = idx % 2 === 0;
+              const isTopHalfMd = idx < 2;
+              const isNotLastMobile = idx < 3;
+
+              return (
+                <div
+                  key={idx}
+                  className={`
+                    p-6 sm:p-8 lg:p-10 flex flex-col justify-between h-full bg-[#151613] hover:bg-white/[0.02] transition-colors
+                    ${isNotLastMobile ? 'border-b border-[rgba(244,243,238,0.16)]' : ''}
+                    ${isTopHalfMd ? 'md:border-b md:border-[rgba(244,243,238,0.16)]' : 'md:border-b-0'}
+                    ${isOddMd ? 'md:border-r md:border-[rgba(244,243,238,0.16)]' : 'md:border-r-0'}
+                    ${isNotLastLg ? 'lg:border-r lg:border-[rgba(244,243,238,0.16)]' : 'lg:border-r-0'}
+                    lg:border-b-0
+                  `}
+                >
+                  <div>
+                    {/* Número do princípio */}
+                    <div className="flex items-center justify-between mb-6 sm:mb-8">
+                      <span className="font-mono text-xs font-bold text-[#8B8B85] tracking-wider">
+                        {item.num} //
+                      </span>
+                    </div>
+
+                    {/* Título */}
+                    <h3 className="font-serif text-xl sm:text-2xl text-white font-normal mb-3 sm:mb-4 leading-snug">
+                      {item.title}
+                    </h3>
+
+                    {/* Descrição */}
+                    <p className="font-sans text-xs sm:text-sm text-[#F4F3EE]/70 leading-relaxed">
+                      {item.desc}
+                    </p>
+                  </div>
                 </div>
-                <div className="md:col-span-5 font-serif text-xl sm:text-2xl text-white font-normal">
-                  {item.title}
-                </div>
-                <div className="md:col-span-5 font-sans text-sm sm:text-base text-[#F4F3EE]/75 leading-relaxed">
-                  {item.desc}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
         </div>
@@ -693,14 +677,15 @@ export function AboutMe() {
             </h2>
           </div>
 
-          {/* 6 Peças Curadas e Focadas */}
+          {/* 3 Cases de Branding Clicáveis e Conectados à Work */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             {beyondPieces.map((piece, pIdx) => (
-              <div
+              <CurtainLink
                 key={pIdx}
-                className="group bg-[#151613] border border-[rgba(244,243,238,0.16)] rounded-[18px] overflow-hidden flex flex-col justify-between hover:border-[rgba(196,255,0,0.4)] transition-all duration-500"
+                to={`/cases/${piece.slug}`}
+                className="group bg-[#151613] border border-[rgba(244,243,238,0.16)] rounded-[18px] overflow-hidden flex flex-col justify-between hover:border-[rgba(196,255,0,0.45)] transition-all duration-500 cursor-pointer shadow-lg hover:shadow-2xl"
               >
-                <div className="aspect-[4/3] w-full overflow-hidden bg-[#10110F] relative flex items-center justify-center p-6">
+                <div className="aspect-[4/3] w-full overflow-hidden bg-[#10110F] relative flex items-center justify-center p-6 border-b border-white/5">
                   {piece.isLogo ? (
                     <div className="w-full h-full flex items-center justify-center p-4">
                       <img
@@ -724,18 +709,25 @@ export function AboutMe() {
                   </div>
                 </div>
 
-                <div className="p-6">
-                  <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#C4FF00] block mb-1">
-                    {piece.area}
-                  </span>
-                  <h3 className="font-serif text-xl text-white font-normal mb-2">
-                    {piece.title}
-                  </h3>
-                  <p className="font-sans text-xs text-[#F4F3EE]/70 leading-relaxed">
-                    {piece.context}
-                  </p>
+                <div className="p-6 flex flex-col justify-between flex-1">
+                  <div>
+                    <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#C4FF00] block mb-1">
+                      {piece.area}
+                    </span>
+                    <h3 className="font-serif text-xl text-white font-normal mb-2 group-hover:text-[#C4FF00] transition-colors">
+                      {piece.title}
+                    </h3>
+                    <p className="font-sans text-xs text-[#F4F3EE]/70 leading-relaxed mb-4">
+                      {piece.context}
+                    </p>
+                  </div>
+
+                  <div className="pt-3 border-t border-white/10 flex items-center justify-between font-mono text-[11px] font-bold uppercase tracking-wider text-[#F4F3EE]/70 group-hover:text-[#C4FF00] transition-colors">
+                    <span>{language === 'en' ? 'Explore Case' : 'Ver Estudo'}</span>
+                    <ArrowUpRight size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                  </div>
                 </div>
-              </div>
+              </CurtainLink>
             ))}
           </div>
 
@@ -833,19 +825,19 @@ export function AboutMe() {
               target="_blank"
               rel="noopener noreferrer"
               download
-              className="inline-flex items-center gap-2.5 px-6 py-3.5 bg-[#C4FF00] hover:bg-[#d4ff1a] text-[#10110F] rounded-[12px] font-mono text-xs font-bold uppercase tracking-wider transition-all shadow-lg"
+              className="group inline-flex items-center gap-2.5 px-6 py-3.5 bg-[#C4FF00] hover:bg-[#d4ff1a] text-[#10110F] rounded-[12px] font-mono text-xs font-bold uppercase tracking-wider transition-all shadow-lg"
             >
               <Download size={15} />
-              <span>{t('about_bio_resume_btn', 'Baixar Currículo (PDF)')}</span>
+              <RollingText text={t('about_bio_resume_btn', 'Baixar Currículo (PDF)')} />
             </a>
 
             <a
               href={lattesUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-3.5 bg-white/5 hover:bg-white/10 hover:text-[#C4FF00] border border-[rgba(244,243,238,0.2)] rounded-[12px] font-mono text-xs font-bold uppercase tracking-wider text-[#FAFAF7] transition-all"
+              className="group inline-flex items-center gap-2 px-5 py-3.5 bg-white/5 hover:bg-white/10 hover:text-[#C4FF00] border border-[rgba(244,243,238,0.2)] rounded-[12px] font-mono text-xs font-bold uppercase tracking-wider text-[#FAFAF7] transition-all"
             >
-              <span>{t('about_bio_lattes_btn', 'Currículo Lattes ↗')}</span>
+              <RollingText text={t('about_bio_lattes_btn', 'Currículo Lattes ↗')} />
               <ExternalLink size={13} />
             </a>
           </div>
