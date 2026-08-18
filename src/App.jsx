@@ -20,6 +20,7 @@ import {
   LegacyRedirect,
   LegacyCaseRedirect,
 } from './components/LanguageRouteWrapper';
+import { SEOHead } from './components/SEOHead';
 
 function AppContent() {
   useGlobalSmoothScroll();
@@ -57,6 +58,7 @@ function AppContent() {
       aria-busy={isCurtainActive}
       className="w-full min-h-[100dvh] font-sans overflow-x-clip text-foreground relative bg-[#10110F]"
     >
+      <SEOHead />
       <Navbar />
 
       <main id="main-content" tabIndex={-1} className="focus:outline-none">
