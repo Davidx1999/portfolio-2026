@@ -27,3 +27,9 @@ dist-ssr
 .env
 .env*.local
 
+# Sanity Studio & Backups
+.sanity
+sanity/.sanity
+sanity/dist/
+sanity/backups/
+backups/

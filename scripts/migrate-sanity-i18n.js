@@ -18,8 +18,8 @@ import { createClient } from '@sanity/client';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const projectId = process.env.VITE_SANITY_PROJECT_ID || 'pjq90dr2';
-const dataset = process.env.VITE_SANITY_DATASET || 'production';
+const projectId = process.env.VITE_SANITY_PROJECT_ID || process.env.SANITY_PROJECT_ID || 'pjq90dr2';
+const dataset = process.env.VITE_SANITY_DATASET || process.env.SANITY_DATASET || 'production';
 const apiVersion = '2024-01-01';
 const token = process.env.SANITY_API_WRITE_TOKEN || process.env.SANITY_AUTH_TOKEN;
 
@@ -73,28 +73,23 @@ async function migrateDocuments() {
   for (const doc of documents) {
     const hasLanguage = !!doc.language;
     const docId = doc._id;
+    const rawDocId = docId.replace(/^drafts\./, '');
     const docType = doc._type;
 
     console.log(`\n📄 Analisando doc [${docType}] ID: ${docId} (language atual: ${doc.language || 'não definido'})`);
 
-    // Se já possui language configurado como 'en' ou 'pt-BR', verifica se precisa de ajustes
     if (hasLanguage) {
       console.log(`   -> Documento já possui campo language="${doc.language}". Mantendo integridade.`);
       continue;
     }
 
-    // Documento legado com possíveis campos inline
-    // Estratégia English-First:
-    // 1. O documento base se torna o documento 'en' (Original / Fonte Principal)
-    // 2. Se houver conteúdo em português, cria documento irmão com language='pt-BR' e translationStatus='reviewed'
-
+    // 1. O documento base se torna o documento 'en' (Original / English-First)
     const enDocPatch = {
       id: docId,
       patch: {
         set: {
           language: 'en',
           translationStatus: 'original',
-          // Se tiver campos _en, preserva o fallback para o valor em inglês se title_en existir
           ...(doc.title_en ? { title: doc.title_en } : {}),
           ...(doc.heroSummary_en ? { heroSummary: doc.heroSummary_en } : {}),
           ...(doc.overview_en ? { overview: doc.overview_en } : {}),
@@ -108,16 +103,18 @@ async function migrateDocuments() {
 
     operations.push({ type: 'patch_en', docId, patch: enDocPatch });
 
-    // Documento traduzido em português (pt-BR)
-    const ptDocId = `${docId.replace('drafts.', '')}__i18n_pt-BR`;
+    // 2. Documento traduzido em português (pt-BR)
+    const ptDocId = `${rawDocId}__i18n_pt-BR`;
     const ptDoc = {
-      _id: ptDocId,
-      _type: docType,
       ...doc,
       _id: ptDocId,
+      _type: docType,
       language: 'pt-BR',
       translationStatus: 'reviewed',
-      // Mantém os campos em português como primários
+      translationOf: {
+        _type: 'reference',
+        _ref: rawDocId,
+      },
       title: doc.title,
       heroSummary: doc.heroSummary || doc.shortDescription || '',
       overview: doc.overview || doc.context || '',
@@ -132,6 +129,32 @@ async function migrateDocuments() {
     delete ptDoc._updatedAt;
 
     operations.push({ type: 'create_pt', docId: ptDocId, doc: ptDoc });
+
+    // 3. Documento de metadados do @sanity/document-internationalization
+    const metadataDocId = `i18n.${rawDocId}`;
+    const metadataDoc = {
+      _id: metadataDocId,
+      _type: 'translation.metadata',
+      schemaTypes: [docType],
+      translations: [
+        {
+          _key: 'en',
+          value: {
+            _type: 'reference',
+            _ref: rawDocId,
+          },
+        },
+        {
+          _key: 'pt-BR',
+          value: {
+            _type: 'reference',
+            _ref: ptDocId,
+          },
+        },
+      ],
+    };
+
+    operations.push({ type: 'create_metadata', docId: metadataDocId, doc: metadataDoc });
   }
 
   console.log(`\n📊 [RESUMO DE OPERAÇÕES] Total de operações calculadas: ${operations.length}`);
@@ -156,7 +179,7 @@ async function migrateDocuments() {
   for (const op of operations) {
     if (op.type === 'patch_en') {
       transaction.patch(op.patch.id, op.patch.patch);
-    } else if (op.type === 'create_pt') {
+    } else if (op.type === 'create_pt' || op.type === 'create_metadata') {
       transaction.createOrReplace(op.doc);
     }
   }

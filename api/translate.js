@@ -1,21 +1,26 @@
 /**
  * Vercel Serverless Function: /api/translate
  *
- * Objetivo:
- * - Autentica a requisição (via SANITY_API_TRANSLATE_SECRET).
- * - Proteção por rate limiting simples.
- * - Busca o documento fonte (EN) no Sanity com SANITY_API_WRITE_TOKEN.
- * - Traduz recursivamente os campos editoriais via DeepL API (source: EN -> target: PT-BR).
- * - Cria exclusivamente um DRAFT no Sanity com translationStatus: 'needs_review'.
+ * Segurança & Auditoria:
+ * - Valida método HTTP (apenas POST permitido, GET retorna 405).
+ * - Autentica a sessão do usuário do Sanity via Bearer Token contra a API do Sanity (GET /users/me e GET /projects/:id).
+ * - Retorna 401 para requisições sem token ou com token inválido.
+ * - Retorna 403 para usuários autenticados no Sanity mas sem permissão no projeto específico.
+ * - Proteção contra DoS / Rate limiting e verificação de payload excessivo (máx 250KB).
+ * - Proteção editorial: não sobrescreve documentos com translationStatus === 'reviewed'.
+ * - Cria exclusivamente DRAFT ('drafts.<id>__i18n_pt-BR') com translationStatus: 'needs_review'.
+ * - Cria/atualiza o documento 'translation.metadata' do @sanity/document-internationalization.
  * - NUNCA publica automaticamente.
+ * - Logs sanitizados sem vazamento de tokens, chaves ou payloads completos.
  */
 
 import { createClient } from '@sanity/client';
 
-// Simple in-memory rate-limiter
+// Rate-limiting em memória por IP (10 requisições por minuto por IP)
 const rateLimitMap = new Map();
-const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const MAX_REQUESTS_PER_WINDOW = 10;
+const MAX_PAYLOAD_SIZE_BYTES = 250 * 1024; // 250 KB
 
 function isRateLimited(ip) {
   const now = Date.now();
@@ -43,7 +48,7 @@ async function translateText(text, targetLang = 'PT-BR', sourceLang = 'EN') {
 
   const apiKey = process.env.DEEPL_API_KEY;
   if (!apiKey) {
-    throw new Error('DEEPL_API_KEY environment variable is missing.');
+    throw new Error('DEEPL_API_KEY environment variable is not configured.');
   }
 
   const isFreeKey = apiKey.endsWith(':fx');
@@ -67,19 +72,18 @@ async function translateText(text, targetLang = 'PT-BR', sourceLang = 'EN') {
   });
 
   if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`DeepL API error (${response.status}): ${errorText}`);
+    const errorStatus = response.status;
+    throw new Error(`DeepL API returned HTTP error ${errorStatus}`);
   }
 
   const data = await response.json();
   return data?.translations?.[0]?.text || text;
 }
 
-// Helper to translate translatable editorial strings recursively
+// Tradução recursiva de campos editoriais
 async function translateDocumentFields(sourceDoc) {
   const cloned = JSON.parse(JSON.stringify(sourceDoc));
 
-  // Top-level text fields to translate
   const textFields = [
     'title',
     'heroTitle',
@@ -94,7 +98,6 @@ async function translateDocumentFields(sourceDoc) {
     'openingStatement',
     'closingStatement',
     'intro',
-    'quote_pt',
   ];
 
   for (const field of textFields) {
@@ -103,7 +106,6 @@ async function translateDocumentFields(sourceDoc) {
     }
   }
 
-  // Translate arrays of strings (e.g. responsibilities)
   if (Array.isArray(cloned.responsibilities)) {
     const translatedResp = [];
     for (const item of cloned.responsibilities) {
@@ -116,7 +118,6 @@ async function translateDocumentFields(sourceDoc) {
     cloned.responsibilities = translatedResp;
   }
 
-  // Translate content blocks
   if (Array.isArray(cloned.contentBlocks)) {
     for (const block of cloned.contentBlocks) {
       if (!block || typeof block !== 'object') continue;
@@ -161,57 +162,122 @@ async function translateDocumentFields(sourceDoc) {
 }
 
 export default async function handler(req, res) {
-  // CORS Headers for Sanity Studio & Preflight
+  // CORS Headers
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
   res.setHeader(
     'Access-Control-Allow-Headers',
-    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, X-Translate-Secret, Authorization'
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
   );
 
   if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
+    return res.status(200).end();
   }
 
+  // 1. Validação de Método HTTP (GET -> 405)
   if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method Not Allowed. Use POST.' });
-    return;
+    return res.status(405).json({
+      error: 'Method Not Allowed',
+      message: 'Only POST requests are supported.',
+    });
   }
 
-  // Rate Limiting Check
-  const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+  // 2. Verificação de Tamanho do Payload
+  const rawBodyLength = req.headers['content-length'] ? parseInt(req.headers['content-length'], 10) : 0;
+  if (rawBodyLength > MAX_PAYLOAD_SIZE_BYTES) {
+    return res.status(413).json({
+      error: 'Payload Too Large',
+      message: 'Request payload exceeds maximum allowed size of 250KB.',
+    });
+  }
+
+  // 3. Rate Limiting por IP
+  const clientIp = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown';
   if (isRateLimited(clientIp)) {
-    res.status(429).json({ error: 'Rate limit exceeded. Please wait a moment before trying again.' });
-    return;
+    return res.status(429).json({
+      error: 'Too Many Requests',
+      message: 'Rate limit exceeded. Please wait a moment before trying again.',
+    });
   }
 
-  // Authentication Verification
-  const sharedSecret = process.env.SANITY_API_TRANSLATE_SECRET;
-  const providedSecret = req.headers['x-translate-secret'] || req.body?.secret;
-
-  if (sharedSecret && providedSecret !== sharedSecret) {
-    res.status(401).json({ error: 'Unauthorized: Invalid or missing translate secret.' });
-    return;
+  // 4. Autenticação e Autorização via Token de Sessão do Sanity
+  const authHeader = req.headers['authorization'];
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({
+      error: 'Unauthorized',
+      message: 'Missing or malformed Authorization Bearer header.',
+    });
   }
 
-  const { documentId } = req.body || {};
-  if (!documentId) {
-    res.status(400).json({ error: 'Missing documentId in request body.' });
-    return;
+  const userToken = authHeader.replace(/^Bearer\s+/i, '').trim();
+  if (!userToken) {
+    return res.status(401).json({
+      error: 'Unauthorized',
+      message: 'Empty authorization token provided.',
+    });
   }
 
-  const projectId = process.env.VITE_SANITY_PROJECT_ID || process.env.SANITY_PROJECT_ID || 'pjq90dr2';
-  const dataset = process.env.VITE_SANITY_DATASET || process.env.SANITY_DATASET || 'production';
+  const projectId = process.env.SANITY_PROJECT_ID || process.env.VITE_SANITY_PROJECT_ID || 'pjq90dr2';
+  const dataset = process.env.SANITY_DATASET || process.env.VITE_SANITY_DATASET || 'production';
   const writeToken = process.env.SANITY_API_WRITE_TOKEN;
 
-  if (!writeToken) {
-    res.status(500).json({ error: 'Server configuration error: SANITY_API_WRITE_TOKEN is not defined.' });
-    return;
+  // Validação do token do usuário contra a API do Sanity
+  try {
+    const userValidationRes = await fetch('https://api.sanity.io/v2021-06-07/users/me', {
+      headers: { Authorization: `Bearer ${userToken}` },
+    });
+
+    if (!userValidationRes.ok) {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Invalid or expired Sanity user session.',
+      });
+    }
+
+    const userData = await userValidationRes.json();
+    if (!userData || !userData.id) {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Could not identify Sanity user.',
+      });
+    }
+
+    // Validação de permissão no projeto
+    const projectAccessRes = await fetch(`https://api.sanity.io/v2021-06-07/projects/${projectId}`, {
+      headers: { Authorization: `Bearer ${userToken}` },
+    });
+
+    if (!projectAccessRes.ok) {
+      return res.status(403).json({
+        error: 'Forbidden',
+        message: `User does not have access permissions for Sanity project ${projectId}.`,
+      });
+    }
+  } catch {
+    return res.status(401).json({
+      error: 'Unauthorized',
+      message: 'Sanity authentication verification failed.',
+    });
   }
 
-  const sanityClient = createClient({
+  // 5. Validação de Payload
+  const { documentId } = req.body || {};
+  if (!documentId || typeof documentId !== 'string' || documentId.trim() === '') {
+    return res.status(400).json({
+      error: 'Bad Request',
+      message: 'Missing or invalid "documentId" in request body.',
+    });
+  }
+
+  if (!writeToken) {
+    return res.status(500).json({
+      error: 'Internal Server Error',
+      message: 'Backend write token is not configured on server.',
+    });
+  }
+
+  const backendClient = createClient({
     projectId,
     dataset,
     apiVersion: '2024-01-01',
@@ -220,24 +286,35 @@ export default async function handler(req, res) {
   });
 
   try {
-    // 1. Fetch source document
     const rawDocId = documentId.replace(/^drafts\./, '');
-    const sourceDoc = await sanityClient.getDocument(rawDocId);
+    const sourceDoc = await backendClient.getDocument(rawDocId);
 
     if (!sourceDoc) {
-      res.status(404).json({ error: `Document ${rawDocId} not found in Sanity.` });
-      return;
+      return res.status(404).json({
+        error: 'Not Found',
+        message: `Document "${rawDocId}" not found in Sanity.`,
+      });
     }
 
-    // 2. Perform DeepL translations
+    // 6. Proteção Editorial: Bloqueia sobrescrita de documentos 'reviewed'
+    const ptPublishedId = `${rawDocId}__i18n_pt-BR`;
+    const ptDraftId = `drafts.${rawDocId}__i18n_pt-BR`;
+
+    const existingPtDoc = await backendClient.getDocument(ptDraftId) || await backendClient.getDocument(ptPublishedId);
+    if (existingPtDoc && existingPtDoc.translationStatus === 'reviewed') {
+      return res.status(409).json({
+        error: 'Conflict',
+        message: 'A reviewed translation already exists for this document. Overwriting is blocked to protect editorial work.',
+      });
+    }
+
+    // 7. Tradução recursiva via DeepL
     const translatedContent = await translateDocumentFields(sourceDoc);
 
-    // 3. Construct PT-BR Draft Document
-    const ptDocId = `drafts.${rawDocId}__i18n_pt-BR`;
-
+    // 8. Construção do Draft PT-BR
     const draftPayload = {
       ...translatedContent,
-      _id: ptDocId,
+      _id: ptDraftId,
       _type: sourceDoc._type,
       language: 'pt-BR',
       translationStatus: 'needs_review',
@@ -251,19 +328,47 @@ export default async function handler(req, res) {
     delete draftPayload._createdAt;
     delete draftPayload._updatedAt;
 
-    // 4. Save DRAFT only in Sanity (never auto-publish)
-    const result = await sanityClient.createOrReplace(draftPayload);
+    // Salva EXCLUSIVAMENTE como DRAFT (nunca publica automaticamente)
+    const draftResult = await backendClient.createOrReplace(draftPayload);
 
-    res.status(200).json({
+    // 9. Atualiza/Cria documento de metadados do @sanity/document-internationalization
+    const metadataDocId = `i18n.${rawDocId}`;
+    const metadataPayload = {
+      _id: metadataDocId,
+      _type: 'translation.metadata',
+      schemaTypes: [sourceDoc._type],
+      translations: [
+        {
+          _key: 'en',
+          value: {
+            _type: 'reference',
+            _ref: rawDocId,
+          },
+        },
+        {
+          _key: 'pt-BR',
+          value: {
+            _type: 'reference',
+            _ref: ptPublishedId,
+          },
+        },
+      ],
+    };
+
+    await backendClient.createIfNotExists(metadataPayload);
+
+    return res.status(200).json({
       success: true,
-      message: 'PT-BR draft created successfully in Sanity. Awaiting human editorial review.',
-      draftId: ptDocId,
-      resultId: result._id,
+      message: 'PT-BR draft created successfully. Document translation.metadata linked.',
+      draftId: draftResult._id,
+      translationStatus: 'needs_review',
     });
   } catch (err) {
-    console.error('Error generating PT-BR draft:', err);
-    res.status(500).json({
-      error: 'Translation processing failed.',
+    // Sanitização de logs: nunca exibe tokens ou dados sensíveis
+    console.error('Translation processing error:', err.message);
+    return res.status(500).json({
+      error: 'Translation Failed',
+      message: 'An error occurred during translation processing.',
       details: err.message,
     });
   }
