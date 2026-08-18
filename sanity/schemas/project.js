@@ -55,6 +55,14 @@ export default {
       description: 'Define se a abertura e narrativa seguem modelo completo (ex: Mapear) ou modelo conciso (ex: estudos ágeis e projetos menores).',
     },
     {
+      name: 'language',
+      title: 'Idioma (Language)',
+      type: 'string',
+      group: 'overview',
+      readOnly: true,
+      hidden: false,
+    },
+    {
       name: 'translationStatus',
       title: 'Status de Tradução (Editorial)',
       type: 'string',

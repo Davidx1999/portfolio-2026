@@ -29,7 +29,7 @@ export function useCaseStudy(slug) {
 
     try {
       // 1. Tenta buscar o projeto no idioma exato solicitado
-      const query = `*[_type == "project" && (slug.current == $slug || id.current == $slug || id == $slug || _id == $slug) && (language == $targetLocale || (!defined(language) && $targetLocale == "en"))][0]{
+      const query = `*[_type == "project" && (lower(slug.current) == lower($slug) || slug.current == $slug || id.current == $slug || id == $slug || _id == $slug) && (language == $targetLocale || (!defined(language) && $targetLocale == "en"))][0]{
         ...,
         "slug": coalesce(slug.current, id.current, id, _id),
         "coverImageUrl": coverImage.asset->url,

@@ -4,6 +4,13 @@ export default {
   type: 'document',
   fields: [
     {
+      name: 'language',
+      title: 'Idioma (Language)',
+      type: 'string',
+      readOnly: true,
+      hidden: false,
+    },
+    {
       name: 'id',
       title: 'ID / Slug (ex: kinetic-study, type-explorations)',
       type: 'slug',

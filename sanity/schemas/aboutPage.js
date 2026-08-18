@@ -4,6 +4,13 @@ export default {
   type: 'document',
   fields: [
     {
+      name: 'language',
+      title: 'Idioma (Language)',
+      type: 'string',
+      readOnly: true,
+      hidden: false,
+    },
+    {
       name: 'translationStatus',
       title: 'Status de Tradução (Editorial)',
       type: 'string',
