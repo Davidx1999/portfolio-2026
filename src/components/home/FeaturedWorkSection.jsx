@@ -83,17 +83,13 @@ export function FeaturedWorkSection() {
       {/* ============================================================ */}
       {/* STICKY SECTION TITLE (Stays pinned during the cases)          */}
       {/* ============================================================ */}
-      <div className="sticky top-[54px] w-full z-20 pointer-events-none py-6">
-        <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <span className="w-2 h-2 rounded-full bg-[#C7F000]" />
-            <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#FAFAF7] drop-shadow-md">
+      <div className="absolute inset-0 z-20 pointer-events-none">
+        <div className="sticky top-[54px] w-full py-6 mix-blend-difference">
+          <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16 flex items-center justify-center text-[#FAFAF7]">
+            <h4 className="font-mono text-base sm:text-lg font-bold uppercase tracking-[0.2em] drop-shadow-md m-0 text-center">
               {t('featured_work_title', 'FEATURED WORK')}
-            </span>
+            </h4>
           </div>
-          <span className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-[#FAFAF7]/70 drop-shadow-md">
-            [ {String(displayCases.length).padStart(2, '0')} SELECIONADOS ]
-          </span>
         </div>
       </div>
 

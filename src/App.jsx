@@ -8,7 +8,6 @@ import { AboutMe } from './pages/AboutMe';
 import { Contact } from './pages/Contact';
 import { CaseStudyPage } from './pages/CaseStudyPage';
 import { LoadingScreen } from './components/LoadingScreen';
-import { MouseFollower } from './components/MouseFollower';
 import { RouteCurtainProvider, useRouteCurtain, CurtainLink } from './context/RouteCurtainContext';
 import { RouteCurtainOverlay } from './components/RouteCurtainOverlay';
 import { CurtainDemo } from './pages/CurtainDemo';
@@ -26,6 +25,17 @@ function AppContent() {
   const { isCurtainActive } = useRouteCurtain();
   const { setIsAppReady } = useAppReady();
 
+  // Failsafe timer: ensures app scroll & visibility are unlocked under any circumstance
+  useEffect(() => {
+    if (!isLoading) return;
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      setIsAppReady(true);
+      document.body.style.overflow = '';
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [isLoading, setIsAppReady]);
+
   // Lock scroll during initial load OR when curtain transition is active
   useEffect(() => {
     document.body.style.overflow = isLoading || isCurtainActive ? 'hidden' : '';
@@ -39,8 +49,6 @@ function AppContent() {
       aria-busy={isCurtainActive}
       className="w-full min-h-[100dvh] font-sans overflow-x-clip text-foreground relative bg-[#10110F]"
     >
-      <MouseFollower />
-
       <Navbar />
 
       <main id="main-content" tabIndex={-1} className="focus:outline-none">

@@ -33,7 +33,7 @@ export function CaseNextProject({ nextCase }) {
 
   return (
     <section className="w-full py-20 lg:py-28 border-b border-[rgba(244,243,238,0.16)] bg-[#10110F] text-[#FAFAF7]">
-      <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
+      <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
         
         <div className="mb-8">
           <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#C4FF00] block">

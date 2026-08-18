@@ -21,7 +21,7 @@ export function CaseProcessSteps({ block }) {
           : 'bg-[#10110F] text-[#FAFAF7] border-[rgba(244,243,238,0.14)]'
       }`}
     >
-      <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
+      <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
         <div className="max-w-4xl mb-12 lg:mb-16">
           <span
             className={`font-mono text-xs font-bold uppercase tracking-[0.2em] block mb-3 ${

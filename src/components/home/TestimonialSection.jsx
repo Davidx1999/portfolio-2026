@@ -14,7 +14,7 @@ export function TestimonialSection({ testimonial }) {
 
   return (
     <section className="relative w-full bg-[#F1F0EB] text-[#111210] py-24 sm:py-32 border-b border-[rgba(17,18,16,0.12)] select-none">
-      <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
+      <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
         <div className="max-w-4xl mx-auto text-center flex flex-col items-center">
           <div className="w-12 h-12 rounded-full bg-[#111210] text-[#FAFAF7] flex items-center justify-center mb-8">
             <Quote size={20} />

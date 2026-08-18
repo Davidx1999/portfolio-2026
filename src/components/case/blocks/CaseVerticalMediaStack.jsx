@@ -138,7 +138,7 @@ export function CaseVerticalMediaStack({ block }) {
         } w-full flex flex-col justify-between py-12 sm:py-16 px-6 sm:px-10 lg:px-16`}
       >
         {/* Statement de Abertura */}
-        <div className="w-full max-w-[1400px] mx-auto z-20">
+        <div className="w-full max-w-[1560px] mx-auto z-20">
           {eyebrow && (
             <span
               className={`font-mono text-xs font-bold uppercase tracking-[0.2em] block mb-2 ${
@@ -172,7 +172,7 @@ export function CaseVerticalMediaStack({ block }) {
 
         {/* Statement de Fechamento */}
         {closing && (
-          <div className="w-full max-w-[1400px] mx-auto text-right z-20">
+          <div className="w-full max-w-[1560px] mx-auto text-right z-20">
             <p className="font-serif text-base sm:text-lg lg:text-xl text-[#F4F3EE]/75 max-w-2xl ml-auto">
               {closing}
             </p>

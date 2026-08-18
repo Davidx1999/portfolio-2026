@@ -14,7 +14,7 @@ export function CaseReflection({ reflection, reflection_en }) {
 
   return (
     <section id="reflection-section" className="w-full py-16 md:py-24 border-b border-[rgba(244,243,238,0.16)] bg-[#10110F] text-[#FAFAF7]">
-      <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
+      <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
         <motion.div
           initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}

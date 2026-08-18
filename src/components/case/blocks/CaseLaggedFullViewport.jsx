@@ -66,7 +66,7 @@ export function CaseLaggedFullViewport({ block }) {
       </motion.div>
 
       {/* Overlaid Headline & Metadata Container */}
-      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 min-h-[100svh] flex flex-col justify-between py-16 sm:py-20 pointer-events-none">
+      <div className="relative z-10 w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16 min-h-[100svh] flex flex-col justify-between py-16 sm:py-20 pointer-events-none">
         <div className="flex items-center gap-2 font-mono text-[10px] uppercase font-bold tracking-widest text-white/60">
           <span className="w-1.5 h-1.5 rounded-full bg-[#C4FF00]" />
           <span>FULL VIEWPORT SCENE</span>

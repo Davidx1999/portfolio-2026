@@ -1,5 +1,5 @@
 export default {
-  "nav_cases": "Projetos",
+  "nav_cases": "Work",
   "nav_about": "Sobre",
   "nav_connect": "Fale Comigo",
   "header_badge": "PRODUCT DESIGNER — BRASIL",
@@ -15,7 +15,7 @@ export default {
   "hero_strip_3": "FORTALEZA, BRASIL · FREELANCE & CONSULTORIA",
   "cred_tag": "MÉTODO & CONTINUIDADE",
   "cred_headline": "Projetos complexos exigem método, não improviso.",
-  "featured_work_title": "FEATURED WORK",
+  "featured_work_title": "Featured Work",
   "cursor_view_case": "VER CASE",
   "principles_tag": "POSICIONAMENTO",
   "positioning_headline_1": "Produtos digitais precisam funcionar.",

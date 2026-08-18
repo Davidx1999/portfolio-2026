@@ -88,7 +88,7 @@ export function Work() {
       {/* 1. INTRODUÇÃO AUTORAL DA PÁGINA WORK (COMPACTADA)             */}
       {/* ============================================================ */}
       <section className="relative w-full pt-20 md:pt-24 lg:pt-28 pb-8 md:pb-10 border-b border-[rgba(244,243,238,0.16)] bg-[#10110F]">
-        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
+        <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
           <div className="max-w-4xl">
             {/* Eyebrow */}
             <motion.div
@@ -162,7 +162,7 @@ export function Work() {
       {/* 2. BARRA DE CONTROLES: FILTROS + ALTERNADOR VISUAL / INDEX   */}
       {/* ============================================================ */}
       <section id="work-content" className="sticky top-[54px] z-40 w-full bg-[#10110F] border-b border-[rgba(244,243,238,0.16)]">
-        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16 py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3">
           {/* Filtros de Categoria (exibidos somente se houver >= 2 categorias) */}
           <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
             {categories.length >= 2 && (
@@ -253,7 +253,7 @@ export function Work() {
       {/* ============================================================ */}
       {viewMode === 'visual' && (
         <section className="w-full py-12 lg:py-16 bg-[#10110F]">
-          <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
+          <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
               {filteredProjects.map((project, index) => {
                 const isHovered = hoveredCardId === project.id;
@@ -337,7 +337,7 @@ export function Work() {
       {/* ============================================================ */}
       {viewMode === 'index' && (
         <section className="w-full py-12 lg:py-16 bg-[#10110F]">
-          <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
+          <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
             
             {/* FRAME PRINCIPAL CONTÍNUO DO INDEX */}
             <div className="w-full bg-[#10110F] border border-[rgba(244,243,238,0.16)] rounded-[18px] relative">
@@ -594,68 +594,7 @@ export function Work() {
       )}
 
       {/* ============================================================ */}
-      {/* 5. SEÇÃO DE ARTEFATOS COMPLEMENTARES ("ALÉM DOS CASES")       */}
-      {/* ============================================================ */}
-      {playgroundProjects && playgroundProjects.length > 0 && (
-        <section className="w-full py-20 border-t border-[rgba(244,243,238,0.16)] bg-[#10110F]">
-          <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
-            <div className="max-w-3xl mb-12">
-              <span className="font-mono text-xs font-bold uppercase tracking-[0.24em] text-[#8B7EC8] block mb-3">
-                {t('work_artifacts_title', 'ALÉM DOS CASES')}
-              </span>
-              <h2 className="font-serif text-3xl sm:text-4xl text-[#FAFAF7] font-normal leading-tight mb-4">
-                Artefatos, documentação e experimentações técnicas.
-              </h2>
-              <p className="font-sans text-sm sm:text-base text-[#F4F3EE]/70 leading-relaxed">
-                {t(
-                  'work_artifacts_subtitle',
-                  'Documentação técnica, Design Tokens, fluxos de arquitetura e protótipos de interação.'
-                )}
-              </p>
-            </div>
-
-            {/* Grid Modular de Artefatos */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {playgroundProjects.slice(0, 4).map((artifact, aIdx) => (
-                <div
-                  key={artifact.id}
-                  className="bg-[#151613] border border-[rgba(244,243,238,0.16)] p-6 rounded-[16px] flex flex-col justify-between gap-6 hover:border-[rgba(244,243,238,0.28)] transition-colors"
-                >
-                  <div>
-                    <div className="flex items-center justify-between font-mono text-[10px] uppercase text-white/50 mb-4">
-                      <span>0{aIdx + 1} //</span>
-                      <span className="text-[#8B7EC8] font-bold">{artifact.category}</span>
-                    </div>
-
-                    <h3 className="font-serif text-xl text-white font-normal mb-2">
-                      {artifact.title}
-                    </h3>
-
-                    <p className="font-sans text-xs text-[#F4F3EE]/65 leading-relaxed">
-                      {artifact.description}
-                    </p>
-                  </div>
-
-                  <div className="pt-4 border-t border-white/5 flex flex-wrap gap-1.5">
-                    {artifact.tags &&
-                      artifact.tags.slice(0, 2).map((tItem, tIndex) => (
-                        <span
-                          key={tIndex}
-                          className="font-mono text-[9px] text-white/40 uppercase tracking-wider"
-                        >
-                          #{tItem}
-                        </span>
-                      ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ============================================================ */}
-      {/* 6. CTA COMPARTILHADO & ENCERRAMENTO COM FOOTER ESCURO        */}
+      {/* 5. CTA COMPARTILHADO & ENCERRAMENTO COM FOOTER ESCURO        */}
       {/* ============================================================ */}
       <ClosingNavigation />
     </div>

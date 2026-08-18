@@ -356,7 +356,7 @@ Enviado através do portfólio oficial (davidsalviano.com)
         style={{ paddingTop: `calc(${safeOffset || 72}px + 2rem)` }}
         className="w-full pb-16 lg:pb-24 border-b border-[rgba(244,243,238,0.12)] bg-[#10110F]"
       >
-        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
+        <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
           <div className="max-w-4xl">
             {/* Eyebrow */}
             <div className="flex items-center gap-3 mb-4">
@@ -393,7 +393,7 @@ Enviado através do portfólio oficial (davidsalviano.com)
       {/* 2. FAIXA DE HORÁRIO GLOBAL (Fortaleza, CE • GMT-3)          */}
       {/* ============================================================ */}
       <div className="w-full bg-[#151613] border-b border-[rgba(244,243,238,0.1)] py-3 px-6 sm:px-10 lg:px-16">
-        <div className="w-full max-w-[1400px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 font-mono text-xs text-[#F4F3EE]/60">
+        <div className="w-full max-w-[1560px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 font-mono text-xs text-[#F4F3EE]/60">
           <div className="flex items-center gap-2.5">
             <span className="w-2 h-2 rounded-full bg-[#C4FF00] animate-pulse" />
             <span className="text-[#FAFAF7] font-semibold tracking-wider">
@@ -413,7 +413,7 @@ Enviado através do portfólio oficial (davidsalviano.com)
       {/* 3. SEÇÃO PRINCIPAL OFF-WHITE (Grid de 12 Colunas)            */}
       {/* ============================================================ */}
       <section id="talk-form-section" className="w-full bg-[#FAFAF7] text-[#10110F] py-20 lg:py-28">
-        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
+        <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
 
             {/* ============================================================ */}

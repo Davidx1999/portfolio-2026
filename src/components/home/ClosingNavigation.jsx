@@ -4,6 +4,7 @@ import { ArrowUpRight } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { CurtainLink } from '../../context/RouteCurtainContext';
 import { ThreeColumnGrid } from './ThreeColumnGrid';
+import { RollingButton } from '../RollingButton';
 
 export function ClosingNavigation() {
   const { t } = useLanguage();
@@ -45,13 +46,14 @@ export function ClosingNavigation() {
             {t('closing_headline', 'Vamos construir algo que funcione e que seja lembrado.')}
           </h2>
 
-          <CurtainLink
+          <RollingButton
+            variant="light"
+            size="lg"
             to="/contact"
-            className="group inline-flex items-center gap-3 px-8 py-4 font-mono text-xs font-bold tracking-widest uppercase text-[#10110F] bg-[#FAFAF7] hover:bg-[#C7F000] hover:text-[#10110F] active:scale-[0.98] transition-all duration-300 rounded-[18px] shadow-md focus-visible:outline-2 focus-visible:outline-[#C7F000]"
+            icon={<ArrowUpRight size={16} className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />}
           >
-            <span>{t('closing_cta', 'VAMOS CONVERSAR')}</span>
-            <ArrowUpRight size={16} className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-          </CurtainLink>
+            {t('closing_cta', 'VAMOS CONVERSAR')}
+          </RollingButton>
         </div>
 
         {/* ============================================================ */}

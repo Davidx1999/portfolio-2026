@@ -1,5 +1,5 @@
 export default {
-  "nav_cases": "Cases",
+  "nav_cases": "Work",
   "nav_about": "About",
   "nav_connect": "Connect",
   "header_badge": "PRODUCT DESIGNER — BRAZIL",
@@ -15,7 +15,7 @@ export default {
   "hero_strip_3": "FORTALEZA, BRAZIL · FREELANCE & CONSULTING",
   "cred_tag": "METHOD & CONTINUITY",
   "cred_headline": "Complex projects require method, not improvisation.",
-  "featured_work_title": "FEATURED WORK",
+  "featured_work_title": "Featured Work",
   "cursor_view_case": "VIEW CASE",
   "principles_tag": "01 // POSITIONING",
   "positioning_headline_1": "Digital products need to work.",

@@ -24,7 +24,7 @@ export function CaseMediaText({ block }) {
           : 'bg-[#10110F] text-[#FAFAF7] border-[rgba(244,243,238,0.14)]'
       }`}
     >
-      <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
+      <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
           {/* Coluna de Mídia */}
           <motion.div

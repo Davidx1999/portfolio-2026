@@ -152,7 +152,7 @@ export function CaseArtifactMosaic({ block }) {
     >
       {/* Header Editorial (Centralizado com padding para leitura) */}
       {(eyebrow || title) && (
-        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 mb-12 lg:mb-16">
+        <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16 mb-12 lg:mb-16">
           {eyebrow && (
             <span
               className={`font-mono text-xs font-bold uppercase tracking-[0.2em] block mb-3 ${

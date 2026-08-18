@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
-import { ArrowUpRight } from 'lucide-react';
 import { CurtainLink } from '../../context/RouteCurtainContext';
 import { ReconstructMedia } from '../ReconstructMedia';
 
@@ -24,9 +23,8 @@ export function FeaturedProjectItem({
     offset: ['start end', 'end start'],
   });
 
-  // Parallax suave
-  const wallpaperY = useTransform(scrollYProgress, [0, 1], ['-6%', '6%']);
-  const mediaY = useTransform(scrollYProgress, [0, 1], ['-3%', '3%']);
+  // Parallax suave do wallpaper de fundo
+  const wallpaperY = useTransform(scrollYProgress, [0, 1], ['-24%', '24%']);
 
   const handleMouseEnter = () => {
     setIsHovered(true);
@@ -41,7 +39,7 @@ export function FeaturedProjectItem({
   return (
     <div
       ref={itemRef}
-      className="relative w-full min-h-[100svh] flex items-center justify-center overflow-hidden border-b border-white/10 select-none bg-[#10110F]"
+      className="relative w-full min-h-[76svh] sm:min-h-[100svh] flex items-center justify-center overflow-hidden border-b border-white/10 select-none bg-[#10110F]"
     >
       {/* ============================================================ */}
       {/* 1. WALLPAPER COM CONTRASTE REDUZIDO & ESCURECIMENTO SUTIL   */}
@@ -53,25 +51,25 @@ export function FeaturedProjectItem({
         <img
           src={wallpaperSrc}
           alt={title}
-          className={`w-full h-full object-cover transition-[filter,transform] duration-700 ease-out ${
-            isHovered
-              ? 'grayscale-0 contrast-[0.95] brightness-[0.72] scale-[1.02]'
+          className={`w-full h-full object-cover transition-[filter,transform] duration-700 ease-out ${isHovered
+              ? 'grayscale-0 contrast-[0.95] brightness-[0.72] scale-100'
               : 'grayscale contrast-[0.85] brightness-[0.6] scale-100'
-          }`}
+            }`}
         />
         {/* Camada escura uniforme garantindo foco no objeto central */}
         <div className="absolute inset-0 bg-[#10110F]/45" />
       </motion.div>
 
       {/* ============================================================ */}
-      {/* 2. OBJETO CENTRAL EXPANDIDO (10-15% MAIOR)                   */}
+      {/* 2. OBJETO CENTRAL EXPANDIDO                                 */}
       {/* ============================================================ */}
-      <motion.div
-        style={{ y: prefersReducedMotion ? 0 : mediaY }}
-        className="relative z-10 w-full max-w-6xl mx-auto px-6 sm:px-10 flex flex-col items-center justify-center py-16"
+      <div
+        className="relative z-10 w-full max-w-6xl mx-auto px-6 sm:px-10 flex flex-col items-center justify-center py-8 sm:py-16"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       >
         {/* Metadados do Projeto */}
-        <div className="flex items-center gap-3 mb-3 text-[#F4F3EE]/80 font-mono text-[11px] font-bold uppercase tracking-[0.22em]">
+        <div className="flex items-center gap-3 mb-2.5 sm:mb-3 text-[#F4F3EE]/80 font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.22em]">
           <span>{number}</span>
           <span className="text-white/30">•</span>
           <span>{category}</span>
@@ -81,13 +79,8 @@ export function FeaturedProjectItem({
         <CurtainLink
           to={link}
           curtainTitle={title}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-          className={`relative block transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] rounded-[20px] shadow-2xl overflow-hidden border border-white/20 group cursor-pointer ${
-            isHovered
-              ? 'w-[94vw] max-w-[940px] aspect-[16/10]'
-              : 'w-[86vw] max-w-[760px] aspect-[16/10]'
-          }`}
+          className="relative block transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] rounded-[16px] sm:rounded-[20px] shadow-2xl overflow-hidden border border-white/20 group cursor-pointer w-[86vw] sm:w-[82vw] max-w-[820px] aspect-[4/3] sm:aspect-[16/10]"
+          style={{ transform: isHovered ? 'scale(1)' : 'scale(0.97)' }}
         >
           {/* Mídia com Reconstrução da Estrutura ao Produto Final */}
           <div className="absolute inset-0 w-full h-full">
@@ -99,24 +92,18 @@ export function FeaturedProjectItem({
               aspectRatio="w-full h-full"
             />
           </div>
-
-          {/* Legenda Direta e Botão de Ação */}
-          <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8 bg-gradient-to-t from-black/85 via-black/35 to-transparent flex items-end justify-between z-30 pointer-events-none">
-            <div className="text-left max-w-xl">
-              <h3 className="font-serif text-2xl sm:text-3xl lg:text-4xl text-[#F4F3EE] font-normal leading-tight">
-                {title}
-              </h3>
-              <p className="font-sans text-xs sm:text-sm text-[#F4F3EE]/75 line-clamp-1 mt-1">
-                {description}
-              </p>
-            </div>
-
-            <div className="w-11 h-11 rounded-full bg-white/10 backdrop-blur-md border border-white/30 text-white flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:bg-[#C7F000] group-hover:text-[#10110F] group-hover:border-[#C7F000]">
-              <ArrowUpRight size={20} />
-            </div>
-          </div>
         </CurtainLink>
-      </motion.div>
+
+        {/* Legenda e Descrição (Abaixo do Card) */}
+        <div className="w-[82vw] max-w-[820px] mt-6 text-left">
+          <h3 className="font-serif text-2xl sm:text-3xl lg:text-4xl text-[#F4F3EE] font-normal leading-tight transition-colors duration-300 group-hover:text-[#C7F000]">
+            {title}
+          </h3>
+          <p className="font-sans text-xs sm:text-sm text-[#F4F3EE]/75 line-clamp-2 mt-2">
+            {description}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

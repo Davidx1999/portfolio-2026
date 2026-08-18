@@ -43,7 +43,7 @@ export function CaseVideo({ block }) {
 
   return (
     <section className="w-full py-12 md:py-20 border-b border-[rgba(244,243,238,0.14)] bg-[#10110F] text-[#FAFAF7]">
-      <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
+      <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
         <motion.div
           initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.99 }}
           whileInView={{ opacity: 1, scale: 1 }}

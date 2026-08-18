@@ -99,7 +99,7 @@ export function CaseHeroDiagonal({ caseStudy }) {
         {/* ============================================================ */}
         <motion.div
           style={isReduced ? {} : { opacity: textOpacity, y: textY }}
-          className="relative z-20 w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 pt-20 md:pt-24 pointer-events-auto"
+          className="relative z-20 w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16 pt-20 md:pt-24 pointer-events-auto"
         >
           <div className="max-w-4xl mb-8">
             <div className="flex items-center gap-3 mb-3">
@@ -183,7 +183,7 @@ export function CaseHeroDiagonal({ caseStudy }) {
               }
               className={`absolute inset-0 w-full h-full overflow-hidden ${
                 isReduced
-                  ? 'rounded-[20px] aspect-[16/9] md:aspect-[21/9] max-w-[1400px] mx-auto relative mt-8'
+                  ? 'rounded-[20px] aspect-[16/9] md:aspect-[21/9] max-w-[1560px] mx-auto relative mt-8'
                   : 'shadow-2xl'
               } border border-[rgba(244,243,238,0.18)] bg-[#151613]`}
             >
@@ -212,7 +212,7 @@ export function CaseHeroDiagonal({ caseStudy }) {
         {!isReduced && (
           <motion.div
             style={{ opacity: textOpacity }}
-            className="relative z-20 w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 pb-6 flex items-center gap-2 font-mono text-[10px] uppercase font-bold tracking-widest text-white/50"
+            className="relative z-20 w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16 pb-6 flex items-center gap-2 font-mono text-[10px] uppercase font-bold tracking-widest text-white/50"
           >
             <span>{language === 'en' ? 'SCROLL TO EXPLORE' : 'ROLE PARA EXPLORAR'}</span>
             <ArrowDown size={12} className="animate-bounce text-[#C4FF00]" />

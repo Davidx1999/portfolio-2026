@@ -59,7 +59,7 @@ export function CaseStudyPage() {
   if (!caseStudy) {
     return (
       <div className="w-full min-h-screen bg-[#10110F] text-[#FAFAF7] flex flex-col justify-between pt-28 pb-16">
-        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 my-auto text-center">
+        <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16 my-auto text-center">
           <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#C4FF00] block mb-4">
             404 // CASE STUDY
           </span>

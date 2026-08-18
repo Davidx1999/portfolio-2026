@@ -413,3 +413,35 @@ hr {
   top: 0;
   padding-top: 0;
 }
+
+/* ==========================================================================
+   ROLLING BUTTON MICRO-INTERACTION (Staggered Rolling Text)
+   ========================================================================== */
+@media (hover: hover) and (pointer: fine) {
+  .rolling-char {
+    display: inline-block;
+    transition: transform 500ms cubic-bezier(0.76, 0, 0.24, 1);
+    /* Multiplies the CSS var by 22ms for an elegant stagger */
+    transition-delay: calc(var(--char-index) * 22ms);
+  }
+  
+  .rolling-char.bottom {
+    transform: translateY(110%);
+  }
+  
+  .group:hover .rolling-char.top,
+  .group:focus-visible .rolling-char.top {
+    transform: translateY(-110%);
+  }
+  
+  .group:hover .rolling-char.bottom,
+  .group:focus-visible .rolling-char.bottom {
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rolling-char.bottom {
+    display: none !important;
+  }
+}

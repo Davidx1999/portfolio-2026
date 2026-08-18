@@ -49,7 +49,7 @@ export function CaseHero({ caseStudy }) {
 
   return (
     <section className="relative w-full pt-20 md:pt-24 lg:pt-28 pb-12 md:pb-16 border-b border-[rgba(244,243,238,0.16)] bg-[#10110F] text-[#FAFAF7]">
-      <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
+      <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
         
         {/* ============================================================ */}
         {/* CABEÇALHO EDITORIAL DO CASE                                  */}

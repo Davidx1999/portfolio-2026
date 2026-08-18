@@ -1,9 +1,10 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowRight, ArrowUpRight } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Play, Pause } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { CurtainLink } from '../../context/RouteCurtainContext';
 import { useAppReady } from '../../context/AppReadyContext';
+import { RollingButton } from '../RollingButton';
 
 const EASING = [0.22, 1, 0.36, 1];
 const CLIP_EASING = [0.77, 0, 0.175, 1]; // power3.inOut
@@ -13,18 +14,35 @@ const CLIP_EASING = [0.77, 0, 0.175, 1]; // power3.inOut
 const VIDEO_REVEAL_DELAY = 500;
 
 export function HomeHero() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const prefersReducedMotion = useReducedMotion();
   const { isAppReady } = useAppReady();
 
   const videoRef = useRef(null);
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [shouldRevealVideo, setShouldRevealVideo] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
 
   // Track when the <video> element has enough data to display a frame
   const handleVideoReady = useCallback(() => {
     setIsVideoReady(true);
   }, []);
+
+  const togglePlayPause = (e) => {
+    e?.stopPropagation?.();
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (video.paused) {
+      video
+        .play()
+        .then(() => setIsPlaying(true))
+        .catch(() => {});
+    } else {
+      video.pause();
+      setIsPlaying(false);
+    }
+  };
 
   // Attach listeners on mount — handles both fresh-load and cached video
   useEffect(() => {
@@ -34,15 +52,21 @@ export function HomeHero() {
     // If the video is already loaded (cached), mark ready immediately
     if (video.readyState >= 2) {
       setIsVideoReady(true);
-      return;
     }
+
+    const onPlay = () => setIsPlaying(true);
+    const onPause = () => setIsPlaying(false);
 
     video.addEventListener('loadeddata', handleVideoReady, { once: true });
     video.addEventListener('canplay', handleVideoReady, { once: true });
+    video.addEventListener('play', onPlay);
+    video.addEventListener('pause', onPause);
 
     return () => {
       video.removeEventListener('loadeddata', handleVideoReady);
       video.removeEventListener('canplay', handleVideoReady);
+      video.removeEventListener('play', onPlay);
+      video.removeEventListener('pause', onPause);
     };
   }, [handleVideoReady]);
 
@@ -69,7 +93,7 @@ export function HomeHero() {
   return (
     <section className="relative w-full min-h-[100svh] pt-24 lg:pt-28 flex flex-col justify-between bg-[#F1F0EB] text-[#111210] select-none border-b border-[rgba(17,18,16,0.1)]">
       <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16 my-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-[42%_58%] gap-12 lg:gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-[42fr_58fr] gap-12 lg:gap-16 items-center">
 
           {/* ============================================================ */}
           {/* LADO ESQUERDO: Posicionamento, Headline & Ações              */}
@@ -122,23 +146,25 @@ export function HomeHero() {
               className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6"
             >
               {/* CTA Principal em Verde Ácido */}
-              <a
+              <RollingButton
+                variant="primary"
+                size="lg"
                 href="#featured-work"
                 onClick={handleScrollToProjects}
-                className="group inline-flex items-center justify-center gap-3 px-7 py-4 font-mono text-xs font-bold tracking-widest uppercase text-[#10110F] bg-[#C7F000] hover:bg-[#d8ff1a] active:scale-[0.98] transition-all duration-300 rounded-[18px] shadow-sm focus-visible:outline-2 focus-visible:outline-[#111210] cursor-pointer"
+                icon={<ArrowRight size={15} className="transition-transform duration-300 group-hover:translate-x-1" />}
               >
-                <span>{t('hero_cta_primary_v2', 'EXPLORAR PROJETOS')}</span>
-                <ArrowRight size={15} className="transition-transform duration-300 group-hover:translate-x-1" />
-              </a>
+                {t('hero_cta_primary_v2', 'EXPLORAR PROJETOS')}
+              </RollingButton>
 
               {/* Ação Secundária */}
-              <CurtainLink
+              <RollingButton
+                variant="secondary"
+                size="md"
                 to="/contact"
-                className="group inline-flex items-center gap-2 px-6 py-4 font-mono text-xs font-bold tracking-widest uppercase text-[#111210] border border-[rgba(17,18,16,0.2)] hover:border-[#111210] hover:bg-[#111210]/5 transition-all duration-300 rounded-[18px] focus-visible:outline-2 focus-visible:outline-[#111210]"
+                icon={<ArrowUpRight size={14} className="text-[#8B8B85] group-hover:text-[#111210] transition-colors" />}
               >
-                <span>{t('hero_cta_secondary_v2', 'VAMOS CONVERSAR')}</span>
-                <ArrowUpRight size={14} className="text-[#8B8B85] group-hover:text-[#111210] transition-colors" />
-              </CurtainLink>
+                {t('hero_cta_secondary_v2', 'VAMOS CONVERSAR')}
+              </RollingButton>
             </motion.div>
 
           </div>
@@ -148,8 +174,28 @@ export function HomeHero() {
           {/* ============================================================ */}
           {/* Outer wrapper: transparent, only reserves layout space.
               No bg-black / bg-[#10110F] — avoids the static black rectangle. */}
-          <div className="w-full flex items-start justify-center">
-            <div className="w-full aspect-[4/3] sm:aspect-[16/11] rounded-[24px] overflow-hidden relative">
+          <div className="w-full flex items-center justify-end">
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={togglePlayPause}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  togglePlayPause(e);
+                }
+              }}
+              className="w-full aspect-[4/3] sm:aspect-[16/11] rounded-[24px] overflow-hidden relative cursor-pointer group/videocard focus-visible:outline-2 focus-visible:outline-[#C7F000] select-none"
+              aria-label={
+                isPlaying
+                  ? language === 'en'
+                    ? 'Pause process video'
+                    : 'Pausar vídeo de processo'
+                  : language === 'en'
+                  ? 'Play process video'
+                  : 'Reproduzir vídeo de processo'
+              }
+            >
               {/* Inner wrapper: clip-path applied here so the entire visual card
                   (video + rounded corners) is clipped, not just the <video>.
                   Starts fully clipped (inset bottom 100%) so nothing shows.
@@ -178,6 +224,27 @@ export function HomeHero() {
                   />
                 </video>
               </motion.div>
+
+              {/* Botão de Controle Sutil e Apenas com Ícone */}
+              {shouldRevealVideo && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.85 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.35, delay: 0.2 }}
+                  className="absolute bottom-4 right-4 sm:bottom-5 sm:right-5 z-20"
+                >
+                  <div
+                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-[#10110F]/60 hover:bg-[#10110F]/85 backdrop-blur-md border border-white/12 hover:border-white/25 text-[#FAFAF7]/80 group-hover/videocard:text-[#FAFAF7] hover:!text-[#C7F000] shadow-md transition-all duration-300 hover:scale-110 active:scale-95"
+                    title={isPlaying ? (language === 'en' ? 'Pause' : 'Pausar') : (language === 'en' ? 'Play' : 'Reproduzir')}
+                  >
+                    {isPlaying ? (
+                      <Pause size={14} className="fill-current" />
+                    ) : (
+                      <Play size={14} className="fill-current ml-0.5 text-[#C7F000]" />
+                    )}
+                  </div>
+                </motion.div>
+              )}
             </div>
           </div>
 

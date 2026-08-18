@@ -21,7 +21,7 @@ export function CaseImageGrid({ block }) {
           : 'bg-[#10110F] text-[#FAFAF7] border-[rgba(244,243,238,0.14)]'
       }`}
     >
-      <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
+      <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
         <div
           className={`grid grid-cols-1 md:grid-cols-2 ${
             is3Cols ? 'lg:grid-cols-3' : 'lg:grid-cols-2'

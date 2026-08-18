@@ -264,7 +264,7 @@ export function AboutMe() {
       {/* 1. HERO PESSOAL E COMPACTA                                    */}
       {/* ============================================================ */}
       <section className="relative w-full pt-20 md:pt-24 lg:pt-28 pb-12 md:pb-16 border-b border-[rgba(244,243,238,0.16)] bg-[#10110F] flex items-center lg:min-h-[clamp(540px,68svh,720px)]">
-        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
+        <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
             
             {/* Coluna Esquerda: Conteúdo Editorial e Metadados (~62%) */}
@@ -400,7 +400,7 @@ export function AboutMe() {
       {/* 2. SEÇÃO “NÃO COMECEI PELAS INTERFACES” (TRAJETÓRIA OFICIAL)   */}
       {/* ============================================================ */}
       <section id="trajectory-section" className="w-full py-20 lg:py-28 border-b border-[rgba(244,243,238,0.16)] bg-[#10110F]">
-        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
+        <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
           
           {/* Cabeçalho da Seção */}
           <div className="max-w-4xl mb-14 lg:mb-18">
@@ -464,7 +464,7 @@ export function AboutMe() {
       {/* 3. SEÇÃO “PERMANECER TAMBÉM É PROFUNDIDADE” (MAPEAR & PRODUTO)*/}
       {/* ============================================================ */}
       <section className="w-full py-20 lg:py-28 border-b border-[rgba(244,243,238,0.16)] bg-[#10110F]">
-        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
+        <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
             
             {/* Coluna Esquerda: Narrativa de Continuidade (~55%) */}
@@ -553,7 +553,7 @@ export function AboutMe() {
       {/* 4. SEÇÃO “COMO EU TRABALHO” (COMPORTAMENTOS PROFISSIONAIS)    */}
       {/* ============================================================ */}
       <section className="w-full py-20 lg:py-28 border-b border-[rgba(244,243,238,0.16)] bg-[#10110F]">
-        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
+        <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
           
           <div className="max-w-4xl mb-14 lg:mb-18">
             <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#C4FF00] block mb-3">
@@ -594,7 +594,7 @@ export function AboutMe() {
       {/* 5. SEÇÃO “ESPECTRO DE ATUAÇÃO” (PROCESSO LINEAR PONTILHADO)  */}
       {/* ============================================================ */}
       <section className="w-full py-20 lg:py-28 border-b border-[rgba(244,243,238,0.16)] bg-[#10110F]">
-        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
+        <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
           
           <div className="max-w-4xl mb-14">
             <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#C4FF00] block mb-3">
@@ -679,7 +679,7 @@ export function AboutMe() {
       {/* 6. SEÇÃO “ALÉM DA INTERFACE” (CURADORIA DE ALTO IMPACTO)      */}
       {/* ============================================================ */}
       <section className="w-full py-20 lg:py-28 border-b border-[rgba(244,243,238,0.16)] bg-[#10110F]">
-        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
+        <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
           
           <div className="max-w-4xl mb-14">
             <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#C4FF00] block mb-3">
@@ -746,7 +746,7 @@ export function AboutMe() {
       {/* 7. SEÇÃO “EXPERIÊNCIA E FORMAÇÃO” (FICHA PROFISSIONAL OBJETIVA)*/}
       {/* ============================================================ */}
       <section className="w-full py-20 lg:py-28 border-b border-[rgba(244,243,238,0.16)] bg-[#10110F]">
-        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
+        <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
           
           <div className="max-w-4xl mb-14">
             <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#C4FF00] block mb-3">
@@ -857,7 +857,7 @@ export function AboutMe() {
       {/* 8. SEÇÃO “POSICIONAMENTO COMERCIAL” (5 FORMATOS)              */}
       {/* ============================================================ */}
       <section className="w-full py-20 lg:py-28 border-b border-[rgba(244,243,238,0.16)] bg-[#10110F]">
-        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
+        <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
           
           <div className="max-w-4xl mb-6">
             <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#C4FF00] block mb-3">
@@ -923,7 +923,7 @@ export function AboutMe() {
       {/* ============================================================ */}
       {aboutData?.testimonial && aboutData.testimonial.published && (
         <section className="w-full py-20 lg:py-28 border-b border-[rgba(244,243,238,0.16)] bg-[#10110F]">
-          <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
+          <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
             <div className="max-w-3xl mx-auto p-10 bg-[#151613] border border-[rgba(244,243,238,0.2)] rounded-[20px]">
               <span className="font-mono text-[10px] uppercase font-bold tracking-[0.2em] text-[#C4FF00] block mb-4">
                 DEPOIMENTO

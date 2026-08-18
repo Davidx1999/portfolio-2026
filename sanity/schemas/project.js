@@ -151,13 +151,29 @@ export default {
     // ============================================================
     {
       name: 'coverImage',
-      title: 'Imagem de Capa / Wallpaper Principal',
+      title: 'Imagem de Capa / Thumbnail Geral',
       type: 'image',
       group: 'media',
       options: {
         hotspot: true,
       },
       validation: (Rule) => Rule.required().error('A imagem de capa é obrigatória para cases publicados.'),
+    },
+    {
+      name: 'coverMedia',
+      title: 'Capa do Card Central (Featured Work)',
+      type: 'image',
+      group: 'media',
+      options: { hotspot: true },
+      description: 'Imagem principal colorida exibida no card central dos Featured Works na Home. Se omitido, usa a Imagem de Capa.',
+    },
+    {
+      name: 'backgroundMedia',
+      title: 'Wallpaper / Mídia de Fundo (Featured Work)',
+      type: 'image',
+      group: 'media',
+      options: { hotspot: true },
+      description: 'Artefato secundário (fluxo, wireframe, detalhe ampliado) utilizado no fundo do palco sticky dos Featured Works.',
     },
     {
       name: 'heroMedia',

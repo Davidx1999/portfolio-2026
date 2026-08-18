@@ -30,6 +30,8 @@ export function useProjects() {
             image: p.image ? urlFor(p.image) : (staticMatch?.image || null),
             processImage: p.processImage ? urlFor(p.processImage) : (staticMatch?.processImage || staticMatch?.imageHover || null),
             finalImage: p.finalImage ? urlFor(p.finalImage) : (staticMatch?.finalImage || p.image ? urlFor(p.image) : staticMatch?.image || null),
+            coverMedia: p.coverMedia ? urlFor(p.coverMedia) : (p.finalImage ? urlFor(p.finalImage) : (staticMatch?.coverMedia || staticMatch?.finalImage || staticMatch?.image || null)),
+            backgroundMedia: p.backgroundMedia ? urlFor(p.backgroundMedia) : (staticMatch?.backgroundMedia || staticMatch?.coverImage || p.coverImage ? urlFor(p.coverImage) : null),
             coverImage: p.coverImage ? urlFor(p.coverImage) : (staticMatch?.coverImage || null),
             imageHover: p.imageHover ? urlFor(p.imageHover) : (staticMatch?.imageHover || null),
             role: p.role || staticMatch?.role || 'Product Designer',

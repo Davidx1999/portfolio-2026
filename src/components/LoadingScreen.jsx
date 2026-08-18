@@ -38,16 +38,11 @@ function preloadCriticalAssets() {
     })
   );
 
-  // 3. Ensure DOM / Header readiness
-  if (typeof document !== 'undefined' && document.readyState !== 'complete') {
-    promises.push(
-      new Promise((resolve) => {
-        window.addEventListener('load', resolve, { once: true });
-      })
-    );
-  }
-
-  return Promise.all(promises);
+  // Fallback race so preloading never stalls longer than 600ms
+  return Promise.race([
+    Promise.all(promises),
+    new Promise((resolve) => setTimeout(resolve, 600)),
+  ]);
 }
 
 export function LoadingScreen({ onComplete, setIsAppReady }) {
@@ -56,19 +51,30 @@ export function LoadingScreen({ onComplete, setIsAppReady }) {
   const contentRef = useRef(null);
   const [isExiting, setIsExiting] = useState(false);
 
+  const onCompleteRef = useRef(onComplete);
+  const setIsAppReadyRef = useRef(setIsAppReady);
+  const hasExitedRef = useRef(false);
+
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
+
+  useEffect(() => {
+    setIsAppReadyRef.current = setIsAppReady;
+  }, [setIsAppReady]);
+
   useEffect(() => {
     // 1. Accessibility: Skip immediately if prefers-reduced-motion is active
     if (typeof window !== 'undefined') {
       const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (prefersReduced) {
-        setIsAppReady?.(true);
-        onComplete?.();
+        setIsAppReadyRef.current?.(true);
+        onCompleteRef.current?.();
         return;
       }
     }
 
     const startTime = performance.now();
-    let isCancelled = false;
     let appReadyFired = false;
 
     const applyFrame = (xVw) => {
@@ -86,7 +92,8 @@ export function LoadingScreen({ onComplete, setIsAppReady }) {
     applyFrame(0);
 
     const triggerCurtainExit = () => {
-      if (isCancelled || isExiting) return;
+      if (hasExitedRef.current) return;
+      hasExitedRef.current = true;
       setIsExiting(true);
 
       const TARGET_X = 135;
@@ -100,27 +107,21 @@ export function LoadingScreen({ onComplete, setIsAppReady }) {
           applyFrame(state.x);
 
           // Fire isAppReady when the curtain has moved ~70% of its exit distance.
-          // This lets the hero/header animations start while the curtain is
-          // still finishing the last 30% of its slide-out, creating a seamless
-          // overlap instead of a blank gap.
           if (!appReadyFired && state.x / TARGET_X >= APP_READY_PROGRESS) {
             appReadyFired = true;
-            setIsAppReady?.(true);
+            setIsAppReadyRef.current?.(true);
           }
         },
         onComplete: () => {
-          if (!isCancelled) {
-            // Ensure appReady fired even if progress check was skipped
-            if (!appReadyFired) {
-              appReadyFired = true;
-              setIsAppReady?.(true);
-            }
-            onComplete?.();
+          if (!appReadyFired) {
+            appReadyFired = true;
+            setIsAppReadyRef.current?.(true);
           }
+          onCompleteRef.current?.();
         },
       });
 
-      // Subtle fade out for the centered text to ensure crisp unveiling
+      // Subtle fade out for the centered text
       if (contentRef.current) {
         animate(contentRef.current, {
           opacity: [1, 0],
@@ -134,7 +135,7 @@ export function LoadingScreen({ onComplete, setIsAppReady }) {
     // 2. Load critical resources and respect min/max timing
     const criticalPromise = preloadCriticalAssets();
     const minTimerPromise = new Promise((resolve) => setTimeout(resolve, MIN_DURATION));
-    const safetyTimer = setTimeout(triggerCurtainExit, SAFETY_TIMEOUT);
+    const safetyTimer = setTimeout(triggerCurtainExit, 1500);
 
     Promise.all([criticalPromise, minTimerPromise]).then(() => {
       clearTimeout(safetyTimer);
@@ -142,23 +143,25 @@ export function LoadingScreen({ onComplete, setIsAppReady }) {
       if (elapsed >= MAX_THRESHOLD) {
         triggerCurtainExit();
       } else {
-        // Smooth transition within 600ms - 1200ms window
         triggerCurtainExit();
       }
+    }).catch(() => {
+      triggerCurtainExit();
     });
 
     return () => {
-      isCancelled = true;
       clearTimeout(safetyTimer);
     };
-  }, [onComplete, setIsAppReady]);
+  }, []);
 
   return (
     <div
       id="initial-preloader"
       aria-live="polite"
       aria-label="Carregando portfólio"
-      className="fixed inset-0 w-full h-[100dvh] overflow-hidden select-none z-[300] pointer-events-auto"
+      className={`fixed inset-0 w-full h-[100dvh] overflow-hidden select-none z-[300] ${
+        isExiting ? 'pointer-events-none' : 'pointer-events-auto'
+      }`}
     >
       {/* 1. Solid Lilac Curtain Panel (Matching Global Route Curtain Geometry) */}
       <div
