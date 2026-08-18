@@ -2,12 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useReducedMotion } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
-import { CurtainLink } from '../context/RouteCurtainContext';
+import { useTranslation } from 'react-i18next';
+import { CurtainLink, useRouteCurtain } from '../context/RouteCurtainContext';
 import { registerHeaderElement } from '../hooks/useHeaderMetrics';
 import { useAppReady } from '../context/AppReadyContext';
 import { RollingButton } from './RollingButton';
 import { RollingText } from './RollingText';
+import {
+  extractRouteInfo,
+} from '../context/RouteCurtainContext';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -34,15 +37,19 @@ function HeaderNavLink({ to, isActive, children, onClick }) {
 }
 
 export function SiteHeader() {
-  const { language, setLanguage, t } = useLanguage();
+  const { t } = useTranslation(['common']);
   const location = useLocation();
   const prefersReducedMotion = useReducedMotion();
   const headerRef = useRef(null);
   const { isAppReady } = useAppReady();
+  const { navigateWithCurtain } = useRouteCurtain();
+
+  // Active route language derived directly from URL path
+  const { lang: currentLang, unPrefixed } = extractRouteInfo(location.pathname);
 
   // Clean translation string in case it includes arrows natively
-  const rawContactText = t('header_contact', 'FALE COMIGO ↗');
-  const contactText = typeof rawContactText === 'string' ? rawContactText.replace('↗', '').trim() : 'FALE COMIGO';
+  const rawContactText = t('header_contact', "LET'S TALK ↗");
+  const contactText = typeof rawContactText === 'string' ? rawContactText.replace('↗', '').trim() : "LET'S TALK";
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -90,6 +97,20 @@ export function SiteHeader() {
     setIsMobileMenuOpen(false);
   };
 
+  /**
+   * Switches language while preserving current route, slug, query parameters, and hash
+   */
+  const handleLanguageSwitch = (targetLang) => {
+    if (targetLang === currentLang) return;
+    setIsMobileMenuOpen(false);
+
+    const targetPath = `/${targetLang}${unPrefixed === '/' ? '' : unPrefixed}${location.search || ''}${location.hash || ''}`;
+    navigateWithCurtain(targetPath, {
+      title: targetLang === 'en' ? 'ENGLISH' : 'PORTUGUÊS',
+      eyebrow: targetLang === 'en' ? 'SWITCHING LANGUAGE //' : 'MUDANDO IDIOMA //',
+    });
+  };
+
   return (
     <>
       <motion.header
@@ -112,7 +133,7 @@ export function SiteHeader() {
             <div className="flex items-center gap-6 sm:gap-8 h-full">
               {/* Logo */}
               <CurtainLink
-                to="/"
+                to={`/${currentLang}`}
                 onClick={handleLinkClick}
                 className="flex items-center group focus-visible:outline-2 focus-visible:outline-[#C7F000] focus-visible:outline-offset-4"
                 aria-label="David Salviano - Home"
@@ -129,18 +150,18 @@ export function SiteHeader() {
               {/* Links Desktop (hidden on mobile, visible on md+) */}
               <nav className="hidden md:flex items-center gap-6 md:gap-8">
                 <HeaderNavLink
-                  to="/work"
-                  isActive={location.pathname === '/work' || location.pathname === '/cases' || location.pathname.startsWith('/project')}
+                  to={`/${currentLang}/work`}
+                  isActive={unPrefixed === '/work' || unPrefixed === '/cases' || unPrefixed.startsWith('/work/') || unPrefixed.startsWith('/cases/')}
                   onClick={handleLinkClick}
                 >
-                  {t('nav_cases', language === 'en' ? 'WORK' : 'PROJETOS')}
+                  {t('nav_work', 'Work')}
                 </HeaderNavLink>
                 <HeaderNavLink
-                  to="/about"
-                  isActive={location.pathname === '/about'}
+                  to={`/${currentLang}/about`}
+                  isActive={unPrefixed === '/about'}
                   onClick={handleLinkClick}
                 >
-                  {t('nav_about', 'SOBRE')}
+                  {t('nav_about', 'About')}
                 </HeaderNavLink>
               </nav>
             </div>
@@ -153,22 +174,22 @@ export function SiteHeader() {
               <div className="hidden md:flex items-center gap-1 font-mono text-[11px] tracking-widest uppercase text-[#F4F3EE]/50">
                 <button
                   type="button"
-                  onClick={() => setLanguage('pt')}
+                  onClick={() => handleLanguageSwitch('pt')}
                   className={`px-1.5 py-0.5 transition-colors cursor-pointer rounded-[8px] focus-visible:outline-2 focus-visible:outline-[#C7F000] ${
-                    language === 'pt' ? 'text-[#C7F000] font-bold' : 'hover:text-[#F4F3EE]'
+                    currentLang === 'pt' ? 'text-[#C7F000] font-bold' : 'hover:text-[#F4F3EE]'
                   }`}
-                  aria-label="Mudar idioma para Português"
+                  aria-label={t('header_switch_to_pt', 'Mudar idioma para Português')}
                 >
                   PT
                 </button>
                 <span className="text-white/20">/</span>
                 <button
                   type="button"
-                  onClick={() => setLanguage('en')}
+                  onClick={() => handleLanguageSwitch('en')}
                   className={`px-1.5 py-0.5 transition-colors cursor-pointer rounded-[8px] focus-visible:outline-2 focus-visible:outline-[#C7F000] ${
-                    language === 'en' ? 'text-[#C7F000] font-bold' : 'hover:text-[#F4F3EE]'
+                    currentLang === 'en' ? 'text-[#C7F000] font-bold' : 'hover:text-[#F4F3EE]'
                   }`}
-                  aria-label="Switch language to English"
+                  aria-label={t('header_switch_to_en', 'Switch language to English')}
                 >
                   EN
                 </button>
@@ -181,7 +202,7 @@ export function SiteHeader() {
                 <RollingButton
                   variant="primary"
                   size="sm"
-                  to="/contact"
+                  to={`/${currentLang}/contact`}
                   onClick={handleLinkClick}
                   icon={<ArrowUpRight size={14} />}
                 >
@@ -194,7 +215,7 @@ export function SiteHeader() {
                 type="button"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="md:hidden p-2 text-white/90 hover:text-white rounded-[8px] focus-visible:outline-2 focus-visible:outline-[#C7F000] z-[160]"
-                aria-label={isMobileMenuOpen ? (language === 'pt' ? "Fechar menu de navegação" : "Close navigation menu") : (language === 'pt' ? "Abrir menu de navegação" : "Open navigation menu")}
+                aria-label={isMobileMenuOpen ? t('nav_close_menu', 'Close navigation menu') : t('nav_open_menu', 'Open navigation menu')}
                 aria-expanded={isMobileMenuOpen}
               >
                 <div className={`hamb-menu style-spin ${isMobileMenuOpen ? 'open' : ''}`}>
@@ -223,33 +244,33 @@ export function SiteHeader() {
             {/* Navegação Principal em Tipografia Grande com Touch Target >= 44px */}
             <div className="flex flex-col gap-3 my-auto">
               <span className="font-mono text-[11px] font-bold uppercase tracking-[0.24em] text-[#8B8B85] mb-2">
-                // {language === 'pt' ? 'NAVEGAÇÃO' : 'NAVIGATION'}
+                // {t('nav_navigation', 'NAVIGATION')}
               </span>
 
               <CurtainLink
-                to="/"
+                to={`/${currentLang}`}
                 onClick={handleLinkClick}
                 className="min-h-[48px] py-2 flex items-center justify-between border-b border-white/[0.08] font-serif text-3xl sm:text-4xl text-[#FAFAF7] hover:text-[#C7F000] transition-colors group"
               >
-                <span>{language === 'pt' ? 'Início' : 'Home'}</span>
+                <span>{t('nav_home', 'Home')}</span>
                 <span className="font-mono text-xs text-white/30 group-hover:text-[#C7F000] tracking-widest font-sans">01</span>
               </CurtainLink>
 
               <CurtainLink
-                to="/work"
+                to={`/${currentLang}/work`}
                 onClick={handleLinkClick}
                 className="min-h-[48px] py-2 flex items-center justify-between border-b border-white/[0.08] font-serif text-3xl sm:text-4xl text-[#FAFAF7] hover:text-[#C7F000] transition-colors group"
               >
-                <span>{t('nav_cases', language === 'en' ? 'Work' : 'Projetos')}</span>
+                <span>{t('nav_work', 'Work')}</span>
                 <span className="font-mono text-xs text-white/30 group-hover:text-[#C7F000] tracking-widest font-sans">02</span>
               </CurtainLink>
 
               <CurtainLink
-                to="/about"
+                to={`/${currentLang}/about`}
                 onClick={handleLinkClick}
                 className="min-h-[48px] py-2 flex items-center justify-between border-b border-white/[0.08] font-serif text-3xl sm:text-4xl text-[#FAFAF7] hover:text-[#C7F000] transition-colors group"
               >
-                <span>{t('nav_about', 'Sobre')}</span>
+                <span>{t('nav_about', 'About')}</span>
                 <span className="font-mono text-xs text-white/30 group-hover:text-[#C7F000] tracking-widest font-sans">03</span>
               </CurtainLink>
             </div>
@@ -258,24 +279,24 @@ export function SiteHeader() {
             <div className="flex flex-col gap-6 pt-6 border-t border-white/10">
               <div className="flex items-center justify-between">
                 <span className="font-mono text-xs text-[#F4F3EE]/50 uppercase tracking-widest">
-                  {language === 'pt' ? 'Idioma' : 'Language'}
+                  {currentLang === 'pt' ? 'Idioma' : 'Language'}
                 </span>
 
                 <div className="flex items-center gap-2 font-mono text-xs tracking-widest uppercase bg-white/[0.06] p-1 rounded-[10px] border border-white/10">
                   <button
                     type="button"
-                    onClick={() => setLanguage('pt')}
+                    onClick={() => handleLanguageSwitch('pt')}
                     className={`min-h-[38px] px-4 py-1.5 transition-all cursor-pointer rounded-[8px] font-bold ${
-                      language === 'pt' ? 'bg-[#C7F000] text-[#10110F]' : 'text-[#F4F3EE]/60 hover:text-white'
+                      currentLang === 'pt' ? 'bg-[#C7F000] text-[#10110F]' : 'text-[#F4F3EE]/60 hover:text-white'
                     }`}
                   >
                     PT
                   </button>
                   <button
                     type="button"
-                    onClick={() => setLanguage('en')}
+                    onClick={() => handleLanguageSwitch('en')}
                     className={`min-h-[38px] px-4 py-1.5 transition-all cursor-pointer rounded-[8px] font-bold ${
-                      language === 'en' ? 'bg-[#C7F000] text-[#10110F]' : 'text-[#F4F3EE]/60 hover:text-white'
+                      currentLang === 'en' ? 'bg-[#C7F000] text-[#10110F]' : 'text-[#F4F3EE]/60 hover:text-white'
                     }`}
                   >
                     EN
@@ -284,7 +305,7 @@ export function SiteHeader() {
               </div>
 
               <CurtainLink
-                to="/contact"
+                to={`/${currentLang}/contact`}
                 onClick={handleLinkClick}
                 className="min-h-[52px] w-full flex items-center justify-center gap-2.5 px-6 py-4 font-mono text-xs sm:text-sm font-bold tracking-widest uppercase text-[#10110F] bg-[#C7F000] hover:bg-[#d8ff1a] active:scale-[0.98] transition-all rounded-[14px] shadow-lg"
               >

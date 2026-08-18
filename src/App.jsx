@@ -14,6 +14,12 @@ import { NotFound } from './pages/NotFound';
 import { AppReadyProvider, useAppReady } from './context/AppReadyContext';
 import { ErrorBoundary } from './ErrorBoundary';
 import { useGlobalSmoothScroll } from './hooks/useGlobalSmoothScroll';
+import {
+  LanguageRouteWrapper,
+  RootRedirect,
+  LegacyRedirect,
+  LegacyCaseRedirect,
+} from './components/LanguageRouteWrapper';
 
 function AppContent() {
   useGlobalSmoothScroll();
@@ -55,26 +61,43 @@ function AppContent() {
 
       <main id="main-content" tabIndex={-1} className="focus:outline-none">
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/work" element={<Work />} />
-          <Route path="/cases" element={<Work />} />
-          <Route path="/about" element={<AboutMe />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/talk" element={<Navigate to="/contact" replace />} />
-          <Route path="/lets-talk" element={<Navigate to="/contact" replace />} />
-          <Route path="/projects" element={<Navigate to="/work" replace />} />
+          {/* Root / redirects to /en or saved language preference */}
+          <Route path="/" element={<RootRedirect />} />
 
-          {/* Unified Dynamic Case Study Routes */}
-          <Route path="/cases/:slug" element={<CaseStudyPage />} />
-          <Route path="/work/:slug" element={<CaseStudyPage />} />
-          <Route path="/project/:slug" element={<CaseStudyPage />} />
-          <Route path="/projects/:slug" element={<CaseStudyPage />} />
+          {/* Prefixed language routes: /en and /pt */}
+          <Route path="/:lang" element={<LanguageRouteWrapper />}>
+            <Route index element={<Home />} />
+            <Route path="work" element={<Work />} />
+            <Route path="work/:slug" element={<CaseStudyPage />} />
+            <Route path="cases/:slug" element={<Navigate to="../work" replace />} />
+            <Route path="about" element={<AboutMe />} />
+            <Route path="contact" element={<Contact />} />
+            <Route path="talk" element={<Navigate to="../contact" replace />} />
+            <Route path="lets-talk" element={<Navigate to="../contact" replace />} />
+            <Route path="projects" element={<Navigate to="../work" replace />} />
+            <Route path="projects/:slug" element={<Navigate to="../work" replace />} />
+            <Route path="*" element={<NotFound />} />
+          </Route>
 
-          {/* Legacy Slug Shortcuts */}
-          <Route path="/mapear" element={<Navigate to="/cases/mapear" replace />} />
-          <Route path="/aula-f75" element={<Navigate to="/cases/aula-f75" replace />} />
+          {/* Legacy un-prefixed routes redirecting to localized equivalent */}
+          <Route path="/work" element={<LegacyRedirect to="work" />} />
+          <Route path="/cases" element={<LegacyRedirect to="work" />} />
+          <Route path="/about" element={<LegacyRedirect to="about" />} />
+          <Route path="/contact" element={<LegacyRedirect to="contact" />} />
+          <Route path="/talk" element={<LegacyRedirect to="contact" />} />
+          <Route path="/lets-talk" element={<LegacyRedirect to="contact" />} />
+          <Route path="/projects" element={<LegacyRedirect to="work" />} />
 
-          {/* 404 Catch-All Route */}
+          <Route path="/cases/:slug" element={<LegacyCaseRedirect />} />
+          <Route path="/work/:slug" element={<LegacyCaseRedirect />} />
+          <Route path="/project/:slug" element={<LegacyCaseRedirect />} />
+          <Route path="/projects/:slug" element={<LegacyCaseRedirect />} />
+
+          {/* Legacy specific slug shortcuts */}
+          <Route path="/mapear" element={<LegacyRedirect to="work/mapear" />} />
+          <Route path="/aula-f75" element={<LegacyRedirect to="work/aula-f75" />} />
+
+          {/* Global catch-all */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

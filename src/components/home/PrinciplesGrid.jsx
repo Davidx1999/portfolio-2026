@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { useLanguage } from '../../context/LanguageContext';
+import { useTranslation } from 'react-i18next';
 
 export function PrinciplesGrid() {
-  const { t } = useLanguage();
+  const { t } = useTranslation(['home']);
   const prefersReducedMotion = useReducedMotion();
   const sectionRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -12,10 +12,10 @@ export function PrinciplesGrid() {
 
   // Dynamic capabilities words from locales
   const words = useMemo(() => [
-    t('cap_strategy', 'ESTRATÉGIA'),
-    t('cap_architecture', 'ARQUITETURA'),
-    t('cap_interfaces', 'INTERFACES'),
-    t('cap_design_systems', 'DESIGN SYSTEMS'),
+    t('home:cap_strategy', 'STRATEGY'),
+    t('home:cap_architecture', 'ARCHITECTURE'),
+    t('home:cap_interfaces', 'INTERFACES'),
+    t('home:cap_design_systems', 'DESIGN SYSTEMS'),
   ], [t]);
 
   // Track tab visibility
@@ -78,12 +78,12 @@ export function PrinciplesGrid() {
         {/* ============================================================ */}
         <div className="max-w-2xl mb-12 sm:mb-20 lg:mb-24">
           <span className="font-mono text-xs font-bold text-[#8B8B85] uppercase tracking-[0.22em] block mb-4 sm:mb-5">
-            {t('principles_tag', 'POSICIONAMENTO')}
+            {t('home:principles_tag', 'POSITIONING')}
           </span>
 
           <h2 className="font-serif text-2xl sm:text-3xl lg:text-[2.25rem] font-normal leading-[1.22] tracking-tight text-[#FAFAF7]/90">
-            <span className="block">{t('positioning_headline_1', 'Produtos digitais precisam funcionar.')}</span>
-            <span className="block text-[#FAFAF7]/60 mt-1">{t('positioning_headline_2', 'Os melhores também impressionam.')}</span>
+            <span className="block">{t('home:positioning_headline_1', 'Digital products must work flawlessly.')}</span>
+            <span className="block text-[#FAFAF7]/60 mt-1">{t('home:positioning_headline_2', 'The best ones also leave an impression.')}</span>
           </h2>
         </div>
 
@@ -95,8 +95,8 @@ export function PrinciplesGrid() {
           <div className="flex flex-col items-start text-left gap-2 pt-4 w-full">
             <p className="font-sans font-bold text-[clamp(1.75rem,5vw,4.5rem)] uppercase leading-[1.05] tracking-[-0.035em] text-[#FAFAF7] text-left">
               {t(
-                'kinetic_reduced_line',
-                'EU ENTREGO ESTRATÉGIA, ARQUITETURA, INTERFACES E DESIGN SYSTEMS.'
+                'home:kinetic_reduced_line',
+                'I DELIVER STRATEGY, ARCHITECTURE, INTERFACES, AND DESIGN SYSTEMS.'
               )}
             </p>
           </div>
@@ -106,7 +106,7 @@ export function PrinciplesGrid() {
             <div
               className="w-full text-left font-sans font-bold uppercase tracking-[-0.035em] sm:tracking-[-0.045em] leading-[0.92] text-[#FAFAF7] select-none text-[clamp(2.4rem,8.5vw,11rem)]"
             >
-              {t('kinetic_fixed_line', 'EU ENTREGO')}
+              {t('home:kinetic_fixed_line', 'I DELIVER')}
             </div>
 
             {/* Segunda Linha Variável com Máscara Vertical */}
@@ -119,7 +119,7 @@ export function PrinciplesGrid() {
                   exit={{ y: '-110%' }}
                   transition={{
                     duration: 0.72,
-                    ease: [0.77, 0, 0.175, 1], // power3.inOut suave e preciso
+                    ease: [0.77, 0, 0.175, 1],
                   }}
                   className={`capability-word font-sans font-bold uppercase tracking-[-0.035em] sm:tracking-[-0.045em] leading-[1.05] text-[#C7F000] whitespace-nowrap will-change-transform text-left flex items-center ${wordTypographyClass}`}
                 >

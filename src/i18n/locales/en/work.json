@@ -1,0 +1,23 @@
+{
+  "intro_eyebrow": "SELECTED WORK / 2021—2026",
+  "intro_title": "Products, systems, and experiences built to make complexity understandable.",
+  "intro_text": "A selection of projects where strategy, architecture, interface, and Design Systems worked as unified parts of the same digital product.",
+  "projects_count": "PROJECTS",
+  "meta_disciplines": "SaaS · Design Systems · Interface",
+  "filter_all": "All",
+  "filter_all_label": "All Projects",
+  "view_visual": "Visual",
+  "view_index": "Index",
+  "table_project": "Project",
+  "table_role": "Role & Scope",
+  "table_context": "Context",
+  "table_period": "Period",
+  "table_action": "Action",
+  "action_dossier": "View dossier",
+  "action_close": "Close",
+  "action_view_case": "Explore Case",
+  "dossier_challenge": "CHALLENGE & ARCHITECTURE",
+  "dossier_process": "Execution Process",
+  "empty_state_title": "New case studies are being prepared.",
+  "empty_state_desc": "Documentation and metrics for upcoming projects are currently being consolidated."
+}

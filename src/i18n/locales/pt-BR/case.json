@@ -1,0 +1,19 @@
+{
+  "meta_client": "Contexto / Cliente",
+  "meta_role": "Atuação & Escopo",
+  "meta_timeline": "Período",
+  "meta_disciplines": "Disciplinas",
+  "section_overview": "Visão Geral & Contexto",
+  "section_challenge": "Desafio & Arquitetura",
+  "section_solution": "Solução & Design System",
+  "section_impact": "Impacto & Resultados",
+  "section_decisions": "Decisões Principais de Design",
+  "section_reflection": "Reflexão & Próximos Passos",
+  "next_case_label": "PRÓXIMO ESTUDO DE CASO",
+  "back_to_work": "Voltar aos Projetos",
+  "translation_missing_title": "Tradução em Revisão",
+  "translation_missing_desc": "A documentação deste projeto em português está passando por revisão editorial. Você pode acessar a versão original em inglês.",
+  "translation_missing_action": "Acessar Versão Original em Inglês",
+  "toc_title": "NESTA PÁGINA",
+  "live_link_label": "Ver Projeto no Ar ↗"
+}

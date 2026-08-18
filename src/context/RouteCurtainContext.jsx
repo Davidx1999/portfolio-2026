@@ -1,8 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useRef, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate, Link as RouterLink } from 'react-router-dom';
-import { useReducedMotion } from 'framer-motion';
-import { useLanguage } from './LanguageContext';
+import { SUPPORTED_ROUTES, DEFAULT_ROUTE } from '../i18n/languageMapping';
 
 /**
  * Route Dictionary for Automatic Title Resolution
@@ -67,40 +66,60 @@ const ROUTE_TITLES = {
 };
 
 /**
+ * Extracts route prefix and un-prefixed path from a given URL path
+ */
+export function extractRouteInfo(pathname) {
+  if (!pathname) return { lang: DEFAULT_ROUTE, unPrefixed: '/' };
+  const cleanPath = pathname.split('?')[0].split('#')[0];
+
+  for (const r of SUPPORTED_ROUTES) {
+    if (cleanPath === `/${r}`) {
+      return { lang: r, unPrefixed: '/' };
+    }
+    if (cleanPath.startsWith(`/${r}/`)) {
+      return { lang: r, unPrefixed: cleanPath.replace(new RegExp(`^/${r}`), '') };
+    }
+  }
+
+  return { lang: DEFAULT_ROUTE, unPrefixed: cleanPath || '/' };
+}
+
+/**
  * Resolves localized curtain title for any internal route.
  */
-export function resolveRouteTitle(to, language = 'pt') {
-  if (!to) return language === 'en' ? 'HOME' : 'INÍCIO';
+export function resolveRouteTitle(to, currentLang = 'en') {
+  if (!to) return currentLang === 'en' ? 'HOME' : 'INÍCIO';
 
-  const cleanPath = to.split('?')[0].split('#')[0];
+  const { lang: targetLang, unPrefixed } = extractRouteInfo(to);
+  const langToUse = targetLang || currentLang;
 
   // Direct match in dictionary
-  if (ROUTE_TITLES[cleanPath]) {
-    const route = ROUTE_TITLES[cleanPath];
+  if (ROUTE_TITLES[unPrefixed]) {
+    const route = ROUTE_TITLES[unPrefixed];
     return {
-      title: language === 'en' ? route.en : route.pt,
-      eyebrow: language === 'en' ? route.eyebrow_en : route.eyebrow_pt,
+      title: langToUse === 'en' ? route.en : route.pt,
+      eyebrow: langToUse === 'en' ? route.eyebrow_en : route.eyebrow_pt,
       index: route.index,
     };
   }
 
   // Dynamic Case Study match: /cases/:slug or /work/:slug or /project/:slug
-  const caseMatch = cleanPath.match(/^\/(?:cases|work|project|projects)\/([^/]+)/);
+  const caseMatch = unPrefixed.match(/^\/(?:cases|work|project|projects)\/([^/]+)/);
   if (caseMatch) {
     const slug = caseMatch[1];
     const formatted = slug.replace(/[-_]/g, ' ').toUpperCase();
     return {
       title: formatted,
-      eyebrow: language === 'en' ? 'CASE STUDY //' : 'ESTUDO DE CASO //',
+      eyebrow: langToUse === 'en' ? 'CASE STUDY //' : 'ESTUDO DE CASO //',
       index: null,
     };
   }
 
   // Generic fallback
-  const fallback = cleanPath.replace(/^\//, '').replace(/[-_]/g, ' ').toUpperCase() || 'HOME';
+  const fallback = unPrefixed.replace(/^\//, '').replace(/[-_]/g, ' ').toUpperCase() || (langToUse === 'en' ? 'HOME' : 'INÍCIO');
   return {
     title: fallback,
-    eyebrow: language === 'en' ? 'NAVIGATING TO' : 'NAVEGANDO PARA',
+    eyebrow: langToUse === 'en' ? 'NAVIGATING TO' : 'NAVEGANDO PARA',
     index: null,
   };
 }
@@ -118,9 +137,9 @@ const ROUTE_RANK = {
 
 function getRouteRank(path) {
   if (!path) return 0;
-  const clean = path.split('?')[0].split('#')[0];
-  if (ROUTE_RANK[clean] !== undefined) return ROUTE_RANK[clean];
-  if (clean.startsWith('/cases') || clean.startsWith('/work') || clean.startsWith('/project')) {
+  const { unPrefixed } = extractRouteInfo(path);
+  if (ROUTE_RANK[unPrefixed] !== undefined) return ROUTE_RANK[unPrefixed];
+  if (unPrefixed.startsWith('/cases') || unPrefixed.startsWith('/work') || unPrefixed.startsWith('/project')) {
     return 1;
   }
   return 1;
@@ -138,8 +157,9 @@ const RouteCurtainContext = createContext({
 export function RouteCurtainProvider({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { language } = useLanguage();
-  const prefersReducedMotion = useReducedMotion();
+
+  // Current route language
+  const { lang: currentRouteLang } = extractRouteInfo(location.pathname);
 
   // Curtain State Machine: 'idle' | 'covering' | 'covered' | 'revealing'
   const [curtainState, setCurtainState] = useState('idle');
@@ -195,10 +215,10 @@ export function RouteCurtainProvider({ children }) {
       }
 
       // 3. Resolve Title & Eyebrow & Direction
-      const resolved = resolveRouteTitle(to, language);
+      const resolved = resolveRouteTitle(to, currentRouteLang);
       const finalTitle =
         options.title ||
-        (language === 'en' && options.title_en ? options.title_en : resolved.title);
+        (currentRouteLang === 'en' && options.title_en ? options.title_en : resolved.title);
       const finalEyebrow = options.eyebrow || resolved.eyebrow;
       const finalIndex = options.index !== undefined ? options.index : resolved.index;
 
@@ -216,7 +236,7 @@ export function RouteCurtainProvider({ children }) {
 
       setCurtainData(newCurtainData);
       setSrAnnouncement(
-        language === 'en' ? `Navigating to ${finalTitle}` : `Navegando para ${finalTitle}`
+        currentRouteLang === 'en' ? `Navigating to ${finalTitle}` : `Navegando para ${finalTitle}`
       );
 
       targetRef.current = {
@@ -235,7 +255,7 @@ export function RouteCurtainProvider({ children }) {
         setCurtainState('idle');
       }, 3500);
     },
-    [curtainState, location.pathname, language]
+    [curtainState, location.pathname, currentRouteLang]
   );
 
   /**
@@ -249,40 +269,38 @@ export function RouteCurtainProvider({ children }) {
     // Execute real route navigation completely hidden behind curtain
     if (targetRef.current) {
       const { to, replace } = targetRef.current;
-      if (replace) {
-        navigate(to, { replace: true });
-      } else {
-        navigate(to);
+      targetRef.current = null;
+
+      try {
+        if (replace) {
+          navigate(to, { replace: true });
+        } else {
+          navigate(to);
+        }
+      } catch (err) {
+        console.error('Route navigation error:', err);
       }
+
+      // Reset scroll position instantly while curtain is 100% opaque
+      window.scrollTo(0, 0);
     }
 
-    // Scroll to top immediately with no animation
-    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-
-    // Choreography:
-    // Route mounts immediately at 100% cover (0.85s)
-    // 150ms buffer before reveal starts (1.00s)
-    clearTransitionTimers();
-
-    const revealDelay = prefersReducedMotion ? 40 : 150;
-    revealTimerRef.current = setTimeout(() => {
+    // Short pause (240ms) with covered curtain to ensure seamless paint
+    exitTimerRef.current = setTimeout(() => {
       setCurtainState('revealing');
-    }, revealDelay);
-  }, [curtainState, navigate, prefersReducedMotion]);
+    }, 240);
+  }, [curtainState, navigate]);
 
   /**
-   * Callback: Fired when revealing animation finishes (curtain completely exited)
+   * Callback: Fired when revealing animation finishes (curtain has exited)
    */
   const handleRevealAnimationComplete = useCallback(() => {
-    if (curtainState !== 'revealing') return;
-
     clearTransitionTimers();
     clearSafetyTimer();
-    targetRef.current = null;
     setCurtainState('idle');
-  }, [curtainState]);
+  }, []);
 
-  // Clean up on unmount
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
       clearSafetyTimer();
@@ -301,9 +319,18 @@ export function RouteCurtainProvider({ children }) {
         navigateWithCurtain,
         handleCoverAnimationComplete,
         handleRevealAnimationComplete,
-        srAnnouncement,
       }}
     >
+      {/* Accessible Live Region for Screen Readers */}
+      <div
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
+        role="status"
+      >
+        {srAnnouncement}
+      </div>
+
       {children}
     </RouteCurtainContext.Provider>
   );
@@ -320,6 +347,7 @@ export function useRouteCurtain() {
 /**
  * CurtainLink: Drop-in replacement for internal <Link> tags.
  * Intercepts internal clicks and triggers the global route curtain.
+ * Automatically ensures links respect the current active route language prefix.
  */
 export function CurtainLink({
   to,
@@ -335,9 +363,23 @@ export function CurtainLink({
   replace = false,
   ...props
 }) {
-  const target = to || href;
+  const rawTarget = to || href;
   const { navigateWithCurtain } = useRouteCurtain();
   const location = useLocation();
+
+  const { lang: currentLang } = extractRouteInfo(location.pathname);
+
+  // Normalize target URL with language prefix if not already prefixed
+  let target = rawTarget;
+  if (
+    typeof target === 'string' &&
+    target.startsWith('/') &&
+    !target.startsWith('/en') &&
+    !target.startsWith('/pt') &&
+    !target.startsWith('//')
+  ) {
+    target = target === '/' ? `/${currentLang}` : `/${currentLang}${target}`;
+  }
 
   const handleClick = (e) => {
     onClick?.(e);

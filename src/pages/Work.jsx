@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { ArrowUpRight, ChevronDown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useProjects } from '../hooks/useProjects';
 import { useLanguage } from '../context/LanguageContext';
 import { CurtainLink } from '../context/RouteCurtainContext';
@@ -9,14 +10,15 @@ import { ClosingNavigation } from '../components/home/ClosingNavigation';
 
 const EASING = [0.22, 1, 0.36, 1];
 
-const getProjectLink = (id) => {
-  return `/cases/${id}`;
-};
-
 export function Work() {
   const { allWork: projects, loading } = useProjects();
-  const { t, language } = useLanguage();
+  const { t } = useTranslation(['work', 'common']);
+  const { language } = useLanguage();
   const prefersReducedMotion = useReducedMotion();
+
+  const getProjectLink = (id) => {
+    return `/${language}/work/${id}`;
+  };
 
   // 1. Controle de Visualização com persistência de sessão
   const [viewMode, setViewMode] = useState(() => {
@@ -103,7 +105,7 @@ export function Work() {
             >
               <span className="w-2 h-2 rounded-full bg-[#C4FF00]" />
               <span className="font-mono text-xs font-bold uppercase tracking-[0.24em] text-[#C4FF00]">
-                {t('work_intro_eyebrow', language === 'en' ? 'SELECTED WORK / 2021—2026' : 'PROJETOS SELECIONADOS / 2021—2026')}
+                {t('work:intro_eyebrow', 'SELECTED WORK / 2021—2026')}
               </span>
             </motion.div>
 
@@ -115,10 +117,8 @@ export function Work() {
               className="font-serif text-[2.25rem] sm:text-[2.75rem] md:text-[3.25rem] lg:text-[3.75rem] xl:text-[4.25rem] font-normal leading-[1.08] tracking-tight text-[#FAFAF7] max-w-[980px] mb-4"
             >
               {t(
-                'work_intro_title',
-                language === 'en'
-                  ? 'Products, systems and experiences built to make complexity understandable.'
-                  : 'Produtos, sistemas e experiências construídos para organizar complexidade.'
+                'work:intro_title',
+                'Products, systems and experiences built to make complexity understandable.'
               )}
             </motion.h1>
 
@@ -130,10 +130,8 @@ export function Work() {
               className="font-sans text-sm sm:text-base lg:text-lg text-[#F4F3EE]/75 leading-relaxed max-w-2xl mb-6"
             >
               {t(
-                'work_intro_text',
-                language === 'en'
-                  ? 'A selection of projects where strategy, architecture, interface and Design Systems worked as parts of the same product.'
-                  : 'Uma seleção de projetos em que estratégia, arquitetura, interface e Design Systems trabalharam como partes do mesmo produto.'
+                'work:intro_text',
+                'A selection of projects where strategy, architecture, interface and Design Systems worked as unified parts of the same digital product.'
               )}
             </motion.p>
           </div>
@@ -147,11 +145,11 @@ export function Work() {
           >
             <div className="flex flex-wrap items-center gap-x-3 sm:gap-x-6 gap-y-1.5 font-mono text-[11px] sm:text-xs text-[#F4F3EE]/60 tracking-wider">
               <span className="text-[#C4FF00] font-bold whitespace-nowrap">
-                [ {String(totalCount).padStart(2, '0')} {t('work_projects_count', language === 'en' ? 'PROJECTS' : 'PROJETOS')} ]
+                [ {String(totalCount).padStart(2, '0')} {t('work:projects_count', 'PROJECTS')} ]
               </span>
               <span className="text-white/20 hidden xs:inline">•</span>
               <span className="uppercase text-[10px] sm:text-xs tracking-wider">
-                SaaS · Design Systems · Interface
+                {t('work:meta_disciplines', 'SaaS · Design Systems · Interface')}
               </span>
             </div>
           </motion.div>
@@ -176,7 +174,7 @@ export function Work() {
               <div className="flex items-center gap-2">
                 <span className="text-[#C4FF00]">
                   {activeCategory === 'ALL'
-                    ? `${t('work_filter_all', language === 'en' ? 'All' : 'Todos')} (${totalCount})`
+                    ? `${t('work:filter_all', 'All')} (${totalCount})`
                     : `${activeCategory} (${projects.filter((p) => p.category === activeCategory).length})`}
                 </span>
               </div>
@@ -213,7 +211,7 @@ export function Work() {
                           : 'text-[#F4F3EE]/80 hover:text-white hover:bg-white/5'
                       }`}
                     >
-                      <span>{t('work_filter_all_label', language === 'en' ? 'All Projects' : 'Todos os Projetos')}</span>
+                      <span>{t('work:filter_all_label', 'All Projects')}</span>
                       <span className="text-[10px] opacity-75">({totalCount})</span>
                     </button>
                   </div>
@@ -272,7 +270,7 @@ export function Work() {
                     className="absolute inset-0 bg-[#C4FF00] rounded-[8px] -z-0"
                   />
                 )}
-                <span className="relative z-10">{t('work_view_visual', 'Visual')}</span>
+                <span className="relative z-10">{t('work:view_visual', 'Visual')}</span>
               </button>
 
               <button
@@ -291,7 +289,7 @@ export function Work() {
                     className="absolute inset-0 bg-[#C4FF00] rounded-[8px] -z-0"
                   />
                 )}
-                <span className="relative z-10">{t('work_view_index', language === 'en' ? 'Index' : 'Índice')}</span>
+                <span className="relative z-10">{t('work:view_index', 'Index')}</span>
               </button>
             </div>
           )}
@@ -308,7 +306,7 @@ export function Work() {
               <div className="w-full py-24 flex flex-col items-center justify-center gap-4 text-center">
                 <div className="w-6 h-6 border-2 border-[#C4FF00] border-t-transparent rounded-full animate-spin" />
                 <span className="font-mono text-xs text-white/50 uppercase tracking-widest">
-                  {t('work_loading', 'Carregando projetos...')}
+                  {t('common:loading_status_assets', 'Carregando projetos...')}
                 </span>
               </div>
             ) : filteredProjects.length === 0 ? (
@@ -317,12 +315,12 @@ export function Work() {
                   [ STATUS // 00 ]
                 </span>
                 <h3 className="font-serif text-2xl sm:text-3xl text-white font-normal mb-3">
-                  {t('work_empty_state_title', 'Novos estudos de caso estão sendo preparados.')}
+                  {t('work:empty_state_title', 'New case studies are being prepared.')}
                 </h3>
                 <p className="font-sans text-sm text-[#F4F3EE]/60 max-w-md mx-auto">
                   {t(
-                    'work_empty_state_desc',
-                    'A documentação e métricas dos próximos projetos estão em processo de consolidação.'
+                    'work:empty_state_desc',
+                    'Documentation and metrics for upcoming projects are currently being consolidated.'
                   )}
                 </p>
               </div>
@@ -331,7 +329,6 @@ export function Work() {
                 {filteredProjects.map((project, index) => {
                   const isHovered = hoveredCardId === project.id;
                   const link = getProjectLink(project.id);
-                  // Ritmo editorial discreto: coluna 2 com leve offset no desktop
                   const staggerClass = index % 3 === 1 ? 'lg:translate-y-8' : '';
 
                   return (
@@ -363,7 +360,7 @@ export function Work() {
                         />
                       </div>
 
-                      {/* 2. IDENTIFICAÇÃO SUPERIOR (Sólida, sem blur, discreta) */}
+                      {/* 2. IDENTIFICAÇÃO SUPERIOR */}
                       <div className="absolute top-3.5 inset-x-3.5 flex items-center justify-between pointer-events-none z-20">
                         <span className="px-2.5 py-1 bg-[#10110F] border border-[rgba(244,243,238,0.18)] rounded-[8px] font-mono text-[10px] uppercase font-bold tracking-wider text-[#C4FF00]">
                           {project.category || (language === 'en' ? 'Product Design' : 'Design de Produto')}
@@ -373,7 +370,7 @@ export function Work() {
                         </span>
                       </div>
 
-                      {/* 3. INFORMAÇÕES INFERIORES (Sólido em repouso; oculta suavemente no hover para o Reconstruct cobrir 100% do card) */}
+                      {/* 3. INFORMAÇÕES INFERIORES */}
                       <div
                         className={`absolute inset-x-0 bottom-0 z-20 h-[33.333%] p-4 sm:p-5 flex flex-col justify-center bg-[#10110F] transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                           isHovered
@@ -418,11 +415,11 @@ export function Work() {
               
               {/* Cabeçalho Tabular Sólido (Desktop) */}
               <div className="hidden md:grid md:grid-cols-12 gap-4 h-14 px-6 sm:px-8 items-center bg-[#151613] border-b border-[rgba(244,243,238,0.16)] font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-[#F4F3EE]/50 rounded-t-[18px]">
-                <div className="col-span-4">{t('work_table_project', language === 'en' ? 'Project' : 'Projeto')}</div>
-                <div className="col-span-3">{t('work_table_role', language === 'en' ? 'Role & Scope' : 'Atuação & Escopo')}</div>
-                <div className="col-span-3">{t('work_table_context', language === 'en' ? 'Context' : 'Contexto')}</div>
-                <div className="col-span-1">{t('work_table_period', language === 'en' ? 'Period' : 'Período')}</div>
-                <div className="col-span-1 text-right">{t('work_table_action', language === 'en' ? 'Action' : 'Ação')}</div>
+                <div className="col-span-4">{t('work:table_project', 'Project')}</div>
+                <div className="col-span-3">{t('work:table_role', 'Role & Scope')}</div>
+                <div className="col-span-3">{t('work:table_context', 'Context')}</div>
+                <div className="col-span-1">{t('work:table_period', 'Period')}</div>
+                <div className="col-span-1 text-right">{t('work:table_action', 'Action')}</div>
               </div>
 
               {/* Linhas do Index */}
@@ -430,7 +427,7 @@ export function Work() {
                 {filteredProjects.length === 0 ? (
                   <div className="py-16 px-6 text-center">
                     <p className="font-mono text-xs text-[#F4F3EE]/50 uppercase tracking-widest">
-                      {t('work_empty_state_title', 'Novos estudos de caso estão sendo preparados.')}
+                      {t('work:empty_state_title', 'New case studies are being prepared.')}
                     </p>
                   </div>
                 ) : (
@@ -487,7 +484,7 @@ export function Work() {
                         {/* Coluna 2: Atuação / Papel */}
                         <div className="col-span-3 font-mono text-xs text-[#F4F3EE]/80">
                           <span className="md:hidden text-white/40 block mb-0.5">
-                            {t('work_table_role', language === 'en' ? 'Role' : 'Atuação')}:
+                            {t('work:table_role', 'Role')}:
                           </span>
                           {project.role || (language === 'en' ? 'Product Designer' : 'Designer de Produto')}
                         </div>
@@ -495,7 +492,7 @@ export function Work() {
                         {/* Coluna 3: Contexto */}
                         <div className="col-span-3 font-sans text-xs sm:text-sm text-[#F4F3EE]/65">
                           <span className="md:hidden text-white/40 block mb-0.5">
-                            {t('work_table_context', language === 'en' ? 'Context' : 'Contexto')}:
+                            {t('work:table_context', 'Context')}:
                           </span>
                           {project.context || project.category || (language === 'en' ? 'Digital Product' : 'Produto Digital')}
                         </div>
@@ -509,8 +506,8 @@ export function Work() {
                         <div className="col-span-1 flex items-center justify-end gap-2 font-mono text-xs font-bold text-[#C4FF00]">
                           <span className="hidden sm:inline">
                             {isExpanded
-                              ? t('work_action_close', language === 'en' ? 'Close' : 'Fechar')
-                              : t('work_action_dossier', language === 'en' ? 'View dossier' : 'Ver dossiê')}
+                              ? t('work:action_close', 'Close')
+                              : t('work:action_dossier', 'View dossier')}
                           </span>
                           <ChevronDown
                             size={16}
@@ -594,7 +591,7 @@ export function Work() {
                               <div className="lg:col-span-6 flex flex-col justify-between h-full gap-6">
                                 <div>
                                   <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#C4FF00] font-bold block mb-2">
-                                    {t('work_dossier_challenge', language === 'en' ? 'CHALLENGE & ARCHITECTURE' : 'DESAFIO & ARQUITETURA')}
+                                    {t('work:dossier_challenge', 'CHALLENGE & ARCHITECTURE')}
                                   </span>
 
                                   <h3 className="font-serif text-2xl text-white font-normal mb-3">
@@ -609,7 +606,7 @@ export function Work() {
                                   {project.process && project.process.length > 0 && (
                                     <div className="mb-6">
                                       <span className="font-mono text-[10px] uppercase tracking-wider text-white/50 block mb-2 font-bold">
-                                        {t('work_dossier_process', language === 'en' ? 'Execution Process' : 'Etapas de Execução')}:
+                                        {t('work:dossier_process', 'Execution Process')}:
                                       </span>
                                       <ul className="space-y-1.5 font-sans text-xs text-[#F4F3EE]/75">
                                         {project.process.map((step, sIdx) => (
@@ -651,11 +648,11 @@ export function Work() {
                                       curtainTitle={project.title}
                                       className="inline-flex items-center gap-2 px-6 py-3 font-mono text-xs font-bold tracking-widest uppercase text-[#10110F] bg-[#C4FF00] hover:bg-[#d8ff1a] transition-all rounded-[12px]"
                                     >
-                                      <span>{t('work_action_view_case', language === 'en' ? 'View Case' : 'Ver Estudo')} ↗</span>
+                                      <span>{t('work:action_view_case', 'Explore Case')} ↗</span>
                                     </CurtainLink>
                                   ) : (
                                     <span className="inline-flex items-center gap-2 px-6 py-3 font-mono text-xs font-bold tracking-widest uppercase text-[#F4F3EE]/40 bg-white/5 border border-white/10 rounded-[12px] cursor-not-allowed">
-                                      {t('work_coming_soon', language === 'en' ? 'Coming soon' : 'Em breve')}
+                                      {t('common:status_coming_soon', 'Coming soon')}
                                     </span>
                                   )}
                                 </div>

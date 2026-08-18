@@ -1,0 +1,7 @@
+{
+  "name_required": "Please provide your name.",
+  "email_required": "Please provide your email address.",
+  "email_invalid": "Please provide a valid email address.",
+  "message_required": "Please provide a short description of your project.",
+  "services_required": "Please select at least one area of interest."
+}

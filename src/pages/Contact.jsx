@@ -9,16 +9,13 @@ import {
   Upload,
   AlertCircle,
   Clock,
-  MapPin,
-  Sparkles,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../context/LanguageContext';
 import { useLetsTalk } from '../hooks/useLetsTalk';
 import { useHeaderMetrics } from '../hooks/useHeaderMetrics';
 import { RollingText } from '../components/RollingText';
-import {
-  getLocalizedBudgetOptions,
-} from '../services/currencyLocalization';
+import { getLocalizedBudgetOptions } from '../services/currencyLocalization';
 
 const LinkedInIcon = ({ size = 16, className = "" }) => (
   <svg
@@ -53,9 +50,12 @@ const InstagramIcon = ({ size = 16, className = "" }) => (
 );
 
 export function Contact() {
-  const { language } = useLanguage();
+  const { t } = useTranslation(['contact', 'validation', 'common']);
+  const { language, currency, market, currencySymbol } = useLanguage();
   const { talkData } = useLetsTalk();
   const { safeOffset } = useHeaderMetrics();
+
+  const isPt = language === 'pt';
 
   // 1. Fortaleza Live Clock (Client-only safe hydration)
   const [fortalezaTime, setFortalezaTime] = useState('');
@@ -71,7 +71,6 @@ export function Contact() {
         });
         setFortalezaTime(formatter.format(new Date()));
       } catch {
-        // Fallback
         const now = new Date();
         setFortalezaTime(now.toTimeString().slice(0, 8));
       }
@@ -86,25 +85,20 @@ export function Contact() {
   const [copiedEmail, setCopiedEmail] = useState(false);
   const handleCopyEmail = (e) => {
     e.preventDefault();
-    const emailToCopy = talkData.email || 'davidsalviano52@gmail.com';
+    const emailToCopy = talkData?.email || 'davidsalviano52@gmail.com';
     navigator.clipboard.writeText(emailToCopy).then(() => {
       setCopiedEmail(true);
       setTimeout(() => setCopiedEmail(false), 2400);
     });
   };
 
-  // 3. Currency Localization: PT -> BRL (R$), EN/Outros -> USD (US$)
-  const currencyInfo = language === 'pt'
-    ? { currency: 'BRL', market: 'BR', symbol: 'R$' }
-    : { currency: 'USD', market: 'INTL', symbol: 'US$' };
-
-  // 4. Form State & Selections
+  // 3. Form State & Selections
   const [selectedServices, setSelectedServices] = useState([]);
   const [selectedFormat, setSelectedFormat] = useState('');
   const [selectedTimeline, setSelectedTimeline] = useState('');
   const [selectedBudget, setSelectedBudget] = useState('');
 
-  // Limpa orçamento selecionado ao alternar idioma para evitar valores desencontrados
+  // Limpa orçamento selecionado ao alternar idioma
   useEffect(() => {
     setSelectedBudget('');
   }, [language]);
@@ -123,7 +117,7 @@ export function Contact() {
   const [attachmentError, setAttachmentError] = useState('');
 
   const [submissionState, setSubmissionState] = useState({
-    status: 'idle', // 'idle' | 'submitting' | 'success' | 'error'
+    status: 'idle',
     message: '',
   });
 
@@ -147,7 +141,7 @@ export function Contact() {
     }
     if (file.size > 5 * 1024 * 1024) {
       setAttachmentError(
-        language === 'en' ? 'File exceeds maximum limit of 5MB.' : 'O arquivo excede o limite máximo de 5MB.'
+        isPt ? 'O arquivo excede o limite máximo de 5MB.' : 'File exceeds maximum limit of 5MB.'
       );
       setAttachmentName('');
       e.target.value = '';
@@ -159,7 +153,6 @@ export function Contact() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Honeypot validation against spam bots
     if (formData.honeypot) {
       return;
     }
@@ -167,62 +160,59 @@ export function Contact() {
     if (!formData.name.trim() || !formData.email.trim() || !formData.description.trim()) {
       setSubmissionState({
         status: 'error',
-        message:
-          language === 'en'
-            ? 'Please fill in the required fields (Name, Email, and Project Description).'
-            : 'Por favor, preencha os campos obrigatórios (Nome, Email e Descrição do Projeto).',
+        message: isPt
+          ? 'Por favor, preencha os campos obrigatórios (Nome, Email e Descrição do Projeto).'
+          : 'Please fill in the required fields (Name, Email, and Project Description).',
       });
       return;
     }
 
     setSubmissionState({ status: 'submitting', message: '' });
 
-    // Format structured summary
-    const servicesList = selectedServices.length > 0 ? selectedServices.join(', ') : 'Não especificado';
-    const formatValue = selectedFormat || 'Não especificado';
-    const timelineValue = selectedTimeline || 'Não especificado';
-    const budgetValue = selectedBudget || 'Não especificado';
+    const servicesListFormatted = selectedServices.length > 0 ? selectedServices.join(', ') : (isPt ? 'Não especificado' : 'Not specified');
+    const formatValue = selectedFormat || (isPt ? 'Não especificado' : 'Not specified');
+    const timelineValue = selectedTimeline || (isPt ? 'Não especificado' : 'Not specified');
+    const budgetValue = selectedBudget || (isPt ? 'Não especificado' : 'Not specified');
 
     const emailSubject = encodeURIComponent(
-      `Novo Projeto // ${formData.name} ${formData.company ? `(${formData.company})` : ''}`
+      `New Project Inquiry // ${formData.name} ${formData.company ? `(${formData.company})` : ''}`
     );
 
     const emailBody = encodeURIComponent(
-`Olá David,
+`Hello David,
 
-Gostaria de conversar sobre um projeto. Aqui estão os detalhes:
+I would like to discuss a project. Here are the details:
 
 --------------------------------------------------
-1. SERVIÇOS DE INTERESSE:
-${servicesList}
+1. SERVICES OF INTEREST:
+${servicesListFormatted}
 
-2. FORMATO PREFERIDO:
+2. PREFERRED FORMAT:
 ${formatValue}
 
-3. PREVISÃO DE INÍCIO:
+3. TARGET TIMELINE:
 ${timelineValue}
 
-4. FAIXA DE INVESTIMENTO ESTIMADA:
-${budgetValue} (Moeda: ${currencyInfo.currency} | Mercado: ${currencyInfo.market})
+4. ESTIMATED INVESTMENT RANGE:
+${budgetValue} (Currency: ${currency} | Market: ${market})
 --------------------------------------------------
 
-DESCRIÇÃO DO PROJETO / DESAFIO:
+PROJECT OVERVIEW & GOALS:
 ${formData.description}
 
-INFORMAÇÕES DE CONTATO:
-- Nome: ${formData.name}
+CONTACT DETAILS:
+- Name: ${formData.name}
 - Email: ${formData.email}
-- Empresa: ${formData.company || 'N/A'}
-- Prazo desejado: ${formData.deadline || 'N/A'}
-- Link de referência: ${formData.referenceLink || 'N/A'}
-${attachmentName ? `- Anexo informado: ${attachmentName}` : ''}
+- Company: ${formData.company || 'N/A'}
+- Desired Deadline: ${formData.deadline || 'N/A'}
+- Reference Link: ${formData.referenceLink || 'N/A'}
+${attachmentName ? `- Attachment: ${attachmentName}` : ''}
 
 --------------------------------------------------
-Enviado através do portfólio oficial (davidsalviano.com)
+Sent via official portfolio (davidsalviano.com)
 `
     );
 
-    // If an external endpoint is configured via VITE_CONTACT_FORM_ENDPOINT, POST JSON to it.
     const customEndpoint = import.meta.env.VITE_CONTACT_FORM_ENDPOINT;
 
     if (customEndpoint) {
@@ -236,8 +226,8 @@ Enviado através do portfólio oficial (davidsalviano.com)
             selectedFormat,
             selectedTimeline,
             selectedBudget: budgetValue,
-            selectedMarket: currencyInfo.market,
-            selectedCurrency: currencyInfo.currency,
+            selectedMarket: market,
+            selectedCurrency: currency,
             attachmentName,
           }),
         });
@@ -245,10 +235,9 @@ Enviado através do portfólio oficial (davidsalviano.com)
         if (response.ok) {
           setSubmissionState({
             status: 'success',
-            message:
-              language === 'en'
-                ? talkData.confirmationMessage_en || 'Message received successfully. I’ll be in touch shortly.'
-                : talkData.confirmationMessage || 'Mensagem recebida com sucesso. Entrarei em contato em breve.',
+            message: isPt
+              ? (talkData?.confirmationMessage || 'Mensagem recebida com sucesso. Entrarei em contato em breve.')
+              : (talkData?.confirmationMessage_en || 'Message received successfully. I’ll be in touch shortly.'),
           });
           return;
         }
@@ -257,38 +246,39 @@ Enviado através do portfólio oficial (davidsalviano.com)
       }
     }
 
-    // Direct mailto fallback with immediate user guidance
-    const mailtoUrl = `mailto:${talkData.email || 'davidsalviano52@gmail.com'}?subject=${emailSubject}&body=${emailBody}`;
+    // Fallback mailto
+    const mailtoUrl = `mailto:${talkData?.email || 'davidsalviano52@gmail.com'}?subject=${emailSubject}&body=${emailBody}`;
     window.open(mailtoUrl, '_self');
 
     setTimeout(() => {
       setSubmissionState({
         status: 'success',
-        message:
-          language === 'en'
-            ? 'Your project brief was formatted and opened in your email client. If it did not open automatically, you can also copy my direct email below.'
-            : 'Seu briefing foi estruturado e aberto no seu aplicativo de email. Caso não tenha aberto automaticamente, você também pode copiar meu email direto ao lado.',
+        message: isPt
+          ? 'Seu briefing foi estruturado e aberto no seu aplicativo de email. Caso não tenha aberto automaticamente, você também pode copiar meu email direto ao lado.'
+          : 'Your project brief was formatted and opened in your email client. If it did not open automatically, you can also copy my direct email on the left.',
       });
     }, 600);
   };
 
-  // Content Selection based on language & currency
-  const heroEyebrow = language === 'en' ? talkData.heroEyebrow_en : talkData.heroEyebrow;
-  const heroTitle = language === 'en' ? talkData.heroTitle_en : talkData.heroTitle;
-  const heroDescription = language === 'en' ? talkData.heroDescription_en : talkData.heroDescription;
-  const availabilityText = language === 'en' ? talkData.availabilityText_en : talkData.availabilityText;
-  const availabilitySubtext = language === 'en' ? talkData.availabilitySubtext_en : talkData.availabilitySubtext;
-  const responseTime = language === 'en' ? talkData.responseTime_en : talkData.responseTime;
-  const ctaText = language === 'en' ? talkData.ctaText_en : talkData.ctaText;
+  // Content Selection
+  const defaultServices = isPt
+    ? ['Design de Produto (End-to-End)', 'Auditoria & Diagnóstico UX/UI', 'Design System & Tokens', 'Presença Digital & Web', 'Suporte Contínuo a Squads']
+    : ['Product Design (End-to-End)', 'UX/UI Audit & Diagnostic', 'Design System & Tokens', 'Digital Web Presence', 'Ongoing Squad Support'];
 
-  const servicesList = language === 'en' ? talkData.servicesOptions_en : talkData.servicesOptions;
-  const formatsList = language === 'en' ? talkData.collaborationFormats_en : talkData.collaborationFormats;
-  const timelinesList = language === 'en' ? talkData.timelineOptions_en : talkData.timelineOptions;
-  
-  // Dynamic Budget options resolved by active currency & language (from Sanity budgetOptions or fallback)
+  const defaultFormats = isPt
+    ? ['Projeto Dedicado', 'Consultoria Pontual', 'Apoio Integrado a Squads', 'Acompanhamento Recorrente']
+    : ['Dedicated Project', 'Design Consulting', 'Embedded Squad Support', 'Ongoing Retainer'];
+
+  const defaultTimelines = isPt
+    ? ['Imediato / Este Mês', 'Próximos 1–2 Meses', 'Próximo Trimestre', 'Apenas Sondando']
+    : ['Immediate / This Month', 'Next 1–2 Months', 'Next Quarter', 'Flexible / Exploratory'];
+
+  const servicesOptions = (isPt ? talkData?.servicesOptions : talkData?.servicesOptions_en) || defaultServices;
+  const formatOptions = (isPt ? talkData?.collaborationFormats : talkData?.collaborationFormats_en) || defaultFormats;
+  const timelineOptions = (isPt ? talkData?.timelineOptions : talkData?.timelineOptions_en) || defaultTimelines;
+
   const budgetsList = getLocalizedBudgetOptions(
-    talkData.budgetOptions,
-    currencyInfo.currency,
+    talkData?.budgetOptions,
     language
   );
 
@@ -311,18 +301,24 @@ Enviado através do portfólio oficial (davidsalviano.com)
             <div className="flex items-center gap-3 mb-4">
               <span className="w-2 h-2 rounded-full bg-[#C4FF00]" />
               <span className="font-mono text-xs font-bold uppercase tracking-[0.22em] text-[#C4FF00]">
-                {heroEyebrow || 'NOVOS PROJETOS / CONSULTORIA'}
+                {t('contact:hero_eyebrow', 'NEW PROJECTS / CONSULTING')}
               </span>
             </div>
 
             {/* Title */}
             <h1 className="font-serif text-[2.25rem] sm:text-[3.25rem] md:text-[4rem] font-normal leading-[1.08] tracking-tight text-[#FAFAF7] mb-6">
-              {heroTitle}
+              {t(
+                'contact:hero_title',
+                "Have an idea, a complex product, or a digital presence to elevate? Let's talk."
+              )}
             </h1>
 
             {/* Description */}
             <p className="font-sans text-base sm:text-lg lg:text-xl text-[#F4F3EE]/80 leading-relaxed max-w-3xl mb-8">
-              {heroDescription}
+              {t(
+                'contact:hero_text',
+                "Tell me what you need to build, organize, or evolve. I'll reply with context, next steps, and honest guidance on what truly makes sense."
+              )}
             </p>
 
             {/* Scroll Indicator Button */}
@@ -331,7 +327,7 @@ Enviado através do portfólio oficial (davidsalviano.com)
               onClick={scrollToForm}
               className="group inline-flex items-center gap-3 font-mono text-xs font-bold uppercase tracking-widest text-[#F4F3EE]/70 hover:text-[#C4FF00] transition-colors cursor-pointer"
             >
-              <RollingText text={language === 'en' ? 'STRUCTURE YOUR PROJECT' : 'ESTRUTURAR PROJETO'} />
+              <RollingText text={isPt ? 'ESTRUTURAR PROJETO' : 'STRUCTURE YOUR PROJECT'} />
               <ArrowDown size={14} className="transition-transform group-hover:translate-y-1 text-[#C4FF00]" />
             </button>
           </div>
@@ -351,9 +347,9 @@ Enviado através do portfólio oficial (davidsalviano.com)
           </div>
 
           <div className="flex items-center justify-center gap-3 text-[10px] sm:text-[11px] uppercase tracking-widest text-white/40">
-            <span>{language === 'en' ? 'REMOTE & WORLDWIDE' : 'REMOTO & GLOBAL'}</span>
+            <span>{isPt ? 'REMOTO & GLOBAL' : 'REMOTE & WORLDWIDE'}</span>
             <span>·</span>
-            <span>{language === 'en' ? 'PT / EN / ES' : 'PT / EN / ES'}</span>
+            <span>PT / EN / ES</span>
           </div>
         </div>
       </div>
@@ -370,11 +366,9 @@ Enviado através do portfólio oficial (davidsalviano.com)
             {/* ============================================================ */}
             <aside className="lg:col-span-5 flex flex-col gap-4 sm:gap-5 lg:sticky lg:top-[calc(var(--header-safe-offset)+1rem)]">
               
-              {/* Card de Perfil e Disponibilidade */}
               <div className="border border-[#10110F]/12 bg-white p-5 sm:p-6 rounded-[16px] shadow-sm flex flex-col gap-4">
                 
-                {/* Imagem de Apoio Compacta e Proporcional */}
-                {talkData.profileImageUrl && (
+                {talkData?.profileImageUrl && (
                   <div className="w-full aspect-[16/8] max-h-[165px] rounded-[10px] overflow-hidden border border-[#10110F]/10 bg-[#10110F]/5">
                     <img
                       src={talkData.profileImageUrl}
@@ -384,43 +378,42 @@ Enviado através do portfólio oficial (davidsalviano.com)
                   </div>
                 )}
 
-                {/* Status de Disponibilidade */}
                 <div className="flex flex-col gap-1.5">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#10110F] relative flex items-center justify-center shrink-0">
                       <span className="w-2.5 h-2.5 rounded-full bg-[#C4FF00] absolute animate-ping opacity-75" />
-                      <span className="w-2 h-2 rounded-full bg-[#C4FF00]" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#C4FF00]" />
                     </span>
                     <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#10110F]">
-                      {availabilityText}
+                      {t('contact:status_accepting', 'Accepting new projects')}
                     </span>
                   </div>
                   <p className="font-sans text-xs sm:text-sm text-[#10110F]/70 leading-relaxed">
-                    {availabilitySubtext}
+                    {t(
+                      'contact:status_subtitle',
+                      'Freelance projects, consulting, and collaboration with product squads.'
+                    )}
                   </p>
                 </div>
 
-                {/* Prazo Médio de Resposta */}
                 <div className="pt-3 border-t border-[#10110F]/10 flex items-center gap-2 text-xs text-[#10110F]/65 font-mono">
                   <Clock size={14} className="text-[#4056F4] shrink-0" />
-                  <span>{responseTime}</span>
+                  <span>{t('contact:response_time_value', 'I usually reply within 24–48 business hours.')}</span>
                 </div>
               </div>
 
-              {/* Contatos Diretos com Interações Úteis */}
               <div className="border border-[#10110F]/12 bg-white p-4 sm:p-5 rounded-[16px] shadow-sm flex flex-col gap-3">
                 <span className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#10110F]/45">
-                  {language === 'en' ? 'DIRECT CHANNELS' : 'CANAIS DIRETOS'}
+                  {t('contact:direct_channels_title', 'DIRECT CHANNELS')}
                 </span>
 
-                {/* Email com Ação de Copiar */}
                 <div className="flex items-center justify-between p-3 rounded-[10px] bg-[#FAFAF7] border border-[#10110F]/10 hover:border-[#10110F]/30 transition-colors">
                   <div className="flex items-center gap-2.5 overflow-hidden">
                     <Mail size={15} className="text-[#10110F]/60 shrink-0" />
                     <div className="flex flex-col overflow-hidden">
                       <span className="font-mono text-[9px] uppercase text-[#10110F]/45">Email</span>
                       <span className="font-sans text-xs sm:text-[13px] font-semibold text-[#10110F] truncate">
-                        {talkData.email}
+                        {talkData?.email || 'davidsalviano52@gmail.com'}
                       </span>
                     </div>
                   </div>
@@ -429,20 +422,19 @@ Enviado através do portfólio oficial (davidsalviano.com)
                     type="button"
                     onClick={handleCopyEmail}
                     className="p-1.5 rounded-[6px] hover:bg-[#10110F]/10 text-[#10110F] transition-colors shrink-0 ml-2 focus-visible:outline-2 focus-visible:outline-[#4056F4] cursor-pointer"
-                    aria-label="Copiar email de contato"
-                    title={copiedEmail ? 'Email copiado!' : 'Copiar email'}
+                    aria-label="Copy contact email"
+                    title={copiedEmail ? (isPt ? 'Email copiado!' : 'Email copied!') : (isPt ? 'Copiar email' : 'Copy email')}
                   >
                     {copiedEmail ? <Check size={15} className="text-green-600" /> : <Copy size={15} />}
                   </button>
                 </div>
                 {copiedEmail && (
                   <span className="font-mono text-[11px] text-green-700 font-bold -mt-1 px-1 block animate-fadeIn">
-                    ✓ {language === 'en' ? 'Email copied to clipboard!' : 'Email copiado para a área de transferência!'}
+                    ✓ {isPt ? 'Email copiado para a área de transferência!' : 'Email copied to clipboard!'}
                   </span>
                 )}
 
-                {/* LinkedIn */}
-                {talkData.linkedIn && (
+                {talkData?.linkedIn && (
                   <a
                     href={talkData.linkedIn}
                     target="_blank"
@@ -462,8 +454,7 @@ Enviado através do portfólio oficial (davidsalviano.com)
                   </a>
                 )}
 
-                {/* WhatsApp (Opcional) */}
-                {talkData.whatsapp && (
+                {talkData?.whatsapp && (
                   <a
                     href={`https://wa.me/${talkData.whatsapp.replace(/[^0-9]/g, '')}`}
                     target="_blank"
@@ -483,8 +474,7 @@ Enviado através do portfólio oficial (davidsalviano.com)
                   </a>
                 )}
 
-                {/* Instagram (Secundário) */}
-                {talkData.instagram && (
+                {talkData?.instagram && (
                   <a
                     href={`https://instagram.com/${talkData.instagram.replace('@', '')}`}
                     target="_blank"
@@ -512,7 +502,6 @@ Enviado através do portfólio oficial (davidsalviano.com)
             <main className="lg:col-span-7 flex flex-col gap-10">
               <form onSubmit={handleSubmit} className="flex flex-col gap-10">
                 
-                {/* Honeypot invisível para proteção contra bots */}
                 <input
                   type="text"
                   name="honeypot"
@@ -523,19 +512,14 @@ Enviado através do portfólio oficial (davidsalviano.com)
                   className="hidden opacity-0 pointer-events-none absolute"
                 />
 
-                {/* ======================================================== */}
-                {/* PERGUNTA 1: Serviços / Necessidades (Multi-select)       */}
-                {/* ======================================================== */}
+                {/* 1. SERVIÇOS */}
                 <fieldset className="flex flex-col gap-3.5 border-b border-[#10110F]/10 pb-8">
                   <legend className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-[#10110F] mb-1">
-                    01 // {language === 'en' ? 'What do you need help with?' : 'Com o que você precisa de ajuda?'}
+                    {t('contact:form_step_services', '1. What do you need help with?')}
                   </legend>
-                  <p className="font-sans text-xs text-[#10110F]/60 -mt-2 mb-2">
-                    {language === 'en' ? 'Select all that apply:' : 'Selecione uma ou mais opções:'}
-                  </p>
 
                   <div className="flex flex-wrap gap-2.5">
-                    {servicesList.map((service) => {
+                    {servicesOptions.map((service) => {
                       const isSelected = selectedServices.includes(service);
                       return (
                         <label
@@ -568,16 +552,14 @@ Enviado através do portfólio oficial (davidsalviano.com)
                   </div>
                 </fieldset>
 
-                {/* ======================================================== */}
-                {/* PERGUNTA 2: Formato de Colaboração (Single Radio)        */}
-                {/* ======================================================== */}
+                {/* 2. FORMATO */}
                 <fieldset className="flex flex-col gap-3.5 border-b border-[#10110F]/10 pb-8">
                   <legend className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-[#10110F] mb-1">
-                    02 // {language === 'en' ? 'Which format makes the most sense right now?' : 'Qual formato faz mais sentido agora?'}
+                    {t('contact:form_step_format', '2. Preferred collaboration format?')}
                   </legend>
 
                   <div className="flex flex-wrap gap-2.5">
-                    {formatsList.map((format) => {
+                    {formatOptions.map((format) => {
                       const isSelected = selectedFormat === format;
                       return (
                         <label
@@ -612,16 +594,14 @@ Enviado através do portfólio oficial (davidsalviano.com)
                   </div>
                 </fieldset>
 
-                {/* ======================================================== */}
-                {/* PERGUNTA 3: Previsão de Início (Single Radio)            */}
-                {/* ======================================================== */}
+                {/* 3. TIMELINE */}
                 <fieldset className="flex flex-col gap-3.5 border-b border-[#10110F]/10 pb-8">
                   <legend className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-[#10110F] mb-1">
-                    03 // {language === 'en' ? 'When are you looking to start?' : 'Quando pretende começar?'}
+                    {t('contact:form_step_timeline', "3. What's your target timeline?")}
                   </legend>
 
                   <div className="flex flex-wrap gap-2.5">
-                    {timelinesList.map((timeline) => {
+                    {timelineOptions.map((timeline) => {
                       const isSelected = selectedTimeline === timeline;
                       return (
                         <label
@@ -656,32 +636,19 @@ Enviado através do portfólio oficial (davidsalviano.com)
                   </div>
                 </fieldset>
 
-                {/* ======================================================== */}
-                {/* PERGUNTA 4: Faixa de Investimento (Single Radio)         */}
-                {/* ======================================================== */}
+                {/* 4. INVESTIMENTO */}
                 <fieldset className="flex flex-col gap-3.5 border-b border-[#10110F]/10 pb-8">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-1">
                     <legend className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-[#10110F]">
-                      04 // {language === 'en' ? 'Do you have an estimated budget range?' : 'Você já possui uma faixa de investimento?'}
+                      {t('contact:form_step_budget', '4. Estimated investment range?')}
                     </legend>
 
-                    {/* Automatic Currency Badge (R$ for PT, US$ for EN) */}
                     <div className="flex items-center gap-1.5 self-start sm:self-auto px-2.5 py-1 bg-[#10110F]/5 rounded-[8px] border border-[#10110F]/10">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#10110F]" />
                       <span className="font-mono text-[11px] font-bold tracking-wider text-[#10110F]">
-                        {currencyInfo.currency} ({currencyInfo.symbol})
+                        {currency} ({currencySymbol})
                       </span>
                     </div>
-                  </div>
-
-                  {/* Subtle indication */}
-                  <div className="flex items-center gap-2 -mt-1 mb-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#B6A9ED]" />
-                    <span className="font-mono text-[11px] text-[#10110F]/60">
-                      {language === 'en'
-                        ? `Values displayed in ${currencyInfo.currency}`
-                        : `Valores exibidos em ${currencyInfo.currency}`}
-                    </span>
                   </div>
 
                   <div className="flex flex-wrap gap-2.5">
@@ -720,18 +687,15 @@ Enviado através do portfólio oficial (davidsalviano.com)
                   </div>
                 </fieldset>
 
-                {/* ======================================================== */}
-                {/* CAMPOS DETALHADOS DE PROJETO & CONTATO                   */}
-                {/* ======================================================== */}
+                {/* 5. DETALHES */}
                 <div className="flex flex-col gap-6">
                   <span className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-[#10110F]">
-                    05 // {language === 'en' ? 'Tell me about the project' : 'Conte sobre o projeto'}
+                    {t('contact:form_step_details', '5. Tell me about your project')}
                   </span>
 
-                  {/* Descrição do Projeto */}
                   <div className="flex flex-col gap-2">
                     <label htmlFor="description" className="font-mono text-[11px] font-bold uppercase text-[#10110F]/70">
-                      {language === 'en' ? 'Project Goals & Context *' : 'Objetivos do Projeto & Contexto *'}
+                      {t('contact:field_message_label', 'Project Overview & Goals')} *
                     </label>
                     <textarea
                       id="description"
@@ -740,20 +704,18 @@ Enviado através do portfólio oficial (davidsalviano.com)
                       rows={4}
                       value={formData.description}
                       onChange={handleInputChange}
-                      placeholder={
-                        language === 'en'
-                          ? 'What are you aiming to build or solve? Share your current state and expectations...'
-                          : 'O que você precisa construir ou resolver? Compartilhe o momento atual e os desafios...'
-                      }
+                      placeholder={t(
+                        'contact:field_message_placeholder',
+                        'Tell me about the problem, current state, and what success looks like...'
+                      )}
                       className="w-full p-4 rounded-[14px] border border-[#10110F]/15 bg-white text-[#10110F] font-sans text-sm focus:outline-none focus:ring-2 focus:ring-[#4056F4] focus:border-transparent transition-all resize-y"
                     />
                   </div>
 
-                  {/* Nome e Email em 2 Colunas */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div className="flex flex-col gap-2">
                       <label htmlFor="name" className="font-mono text-[11px] font-bold uppercase text-[#10110F]/70">
-                        {language === 'en' ? 'Your Name *' : 'Seu Nome *'}
+                        {t('contact:field_name_label', 'Your Name')} *
                       </label>
                       <input
                         type="text"
@@ -762,14 +724,14 @@ Enviado através do portfólio oficial (davidsalviano.com)
                         required
                         value={formData.name}
                         onChange={handleInputChange}
-                        placeholder={language === 'en' ? 'e.g. Alex Silva' : 'ex: Alex Silva'}
+                        placeholder={t('contact:field_name_placeholder', 'Jane Doe')}
                         className="w-full h-12 px-4 rounded-[14px] border border-[#10110F]/15 bg-white text-[#10110F] font-sans text-sm focus:outline-none focus:ring-2 focus:ring-[#4056F4] transition-all"
                       />
                     </div>
 
                     <div className="flex flex-col gap-2">
                       <label htmlFor="email" className="font-mono text-[11px] font-bold uppercase text-[#10110F]/70">
-                        {language === 'en' ? 'Your Email *' : 'Seu Email *'}
+                        {t('contact:field_email_label', 'Email Address')} *
                       </label>
                       <input
                         type="email"
@@ -778,17 +740,16 @@ Enviado através do portfólio oficial (davidsalviano.com)
                         required
                         value={formData.email}
                         onChange={handleInputChange}
-                        placeholder={language === 'en' ? 'alex@company.com' : 'alex@empresa.com'}
+                        placeholder={t('contact:field_email_placeholder', 'jane@company.com')}
                         className="w-full h-12 px-4 rounded-[14px] border border-[#10110F]/15 bg-white text-[#10110F] font-sans text-sm focus:outline-none focus:ring-2 focus:ring-[#4056F4] transition-all"
                       />
                     </div>
                   </div>
 
-                  {/* Empresa e Prazo Desejado em 2 Colunas */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div className="flex flex-col gap-2">
                       <label htmlFor="company" className="font-mono text-[11px] font-bold uppercase text-[#10110F]/70">
-                        {language === 'en' ? 'Company / Organization (Optional)' : 'Empresa / Organização (Opcional)'}
+                        {t('contact:field_company_label', 'Company / Organization (Optional)')}
                       </label>
                       <input
                         type="text"
@@ -796,14 +757,14 @@ Enviado através do portfólio oficial (davidsalviano.com)
                         name="company"
                         value={formData.company}
                         onChange={handleInputChange}
-                        placeholder={language === 'en' ? 'Company name' : 'Nome da empresa'}
+                        placeholder={t('contact:field_company_placeholder', 'Acme Inc.')}
                         className="w-full h-12 px-4 rounded-[14px] border border-[#10110F]/15 bg-white text-[#10110F] font-sans text-sm focus:outline-none focus:ring-2 focus:ring-[#4056F4] transition-all"
                       />
                     </div>
 
                     <div className="flex flex-col gap-2">
                       <label htmlFor="deadline" className="font-mono text-[11px] font-bold uppercase text-[#10110F]/70">
-                        {language === 'en' ? 'Target Deadline (Optional)' : 'Prazo Desejado (Opcional)'}
+                        {isPt ? 'Prazo Desejado (Opcional)' : 'Target Deadline (Optional)'}
                       </label>
                       <input
                         type="text"
@@ -811,16 +772,15 @@ Enviado através do portfólio oficial (davidsalviano.com)
                         name="deadline"
                         value={formData.deadline}
                         onChange={handleInputChange}
-                        placeholder={language === 'en' ? 'e.g. End of Q2, 6 weeks' : 'ex: Fim do trimestre, 6 semanas'}
+                        placeholder={isPt ? 'ex: Fim do trimestre, 6 semanas' : 'e.g. End of Q2, 6 weeks'}
                         className="w-full h-12 px-4 rounded-[14px] border border-[#10110F]/15 bg-white text-[#10110F] font-sans text-sm focus:outline-none focus:ring-2 focus:ring-[#4056F4] transition-all"
                       />
                     </div>
                   </div>
 
-                  {/* Link de Referência */}
                   <div className="flex flex-col gap-2">
                     <label htmlFor="referenceLink" className="font-mono text-[11px] font-bold uppercase text-[#10110F]/70">
-                      {language === 'en' ? 'Reference Link or Website (Optional)' : 'Link de Referência ou Site Atual (Opcional)'}
+                      {isPt ? 'Link de Referência ou Site Atual (Opcional)' : 'Reference Link or Website (Optional)'}
                     </label>
                     <input
                       type="url"
@@ -833,15 +793,14 @@ Enviado através do portfólio oficial (davidsalviano.com)
                     />
                   </div>
 
-                  {/* Anexo Opcional */}
                   <div className="flex flex-col gap-2">
                     <span className="font-mono text-[11px] font-bold uppercase text-[#10110F]/70">
-                      {language === 'en' ? 'Briefing Document or Attachment (Optional - Max 5MB)' : 'Documento de Briefing ou Anexo (Opcional - Máx 5MB)'}
+                      {t('contact:field_attachment_label', 'Briefing / Attachments (Optional)')}
                     </span>
                     <label className="flex items-center gap-3 p-4 rounded-[14px] border border-dashed border-[#10110F]/25 bg-white hover:bg-[#FAFAF7] hover:border-[#10110F]/50 transition-colors cursor-pointer">
                       <Upload size={18} className="text-[#10110F]/60" />
                       <span className="font-sans text-xs text-[#10110F]/75">
-                        {attachmentName || (language === 'en' ? 'Upload PDF, image, or deck (Max 5MB)' : 'Selecionar PDF, imagem ou apresentação (Máx 5MB)')}
+                        {attachmentName || t('contact:field_attachment_hint', 'PDF, Figma link or image up to 10MB')}
                       </span>
                       <input
                         type="file"
@@ -856,9 +815,7 @@ Enviado através do portfólio oficial (davidsalviano.com)
                   </div>
                 </div>
 
-                {/* ======================================================== */}
-                {/* MENSAGENS DE STATUS (Aria-live para Acessibilidade)      */}
-                {/* ======================================================== */}
+                {/* STATUS */}
                 <div aria-live="polite" className="w-full">
                   {submissionState.status === 'error' && (
                     <div className="p-4 rounded-[14px] bg-red-50 border border-red-200 flex items-start gap-3 text-red-800 text-xs sm:text-sm font-sans">
@@ -871,7 +828,7 @@ Enviado através do portfólio oficial (davidsalviano.com)
                     <div className="p-6 rounded-[16px] bg-emerald-50 border border-emerald-200 flex flex-col gap-3 text-emerald-900 font-sans">
                       <div className="flex items-center gap-2 font-bold text-sm sm:text-base">
                         <Check size={20} className="text-emerald-700" />
-                        <span>{language === 'en' ? 'Briefing Structured Successfully!' : 'Briefing Estruturado com Sucesso!'}</span>
+                        <span>{t('contact:confirmation_title', 'Message received successfully')}</span>
                       </div>
                       <p className="text-xs sm:text-sm text-emerald-800/90 leading-relaxed">
                         {submissionState.message}
@@ -880,13 +837,11 @@ Enviado através do portfólio oficial (davidsalviano.com)
                   )}
                 </div>
 
-                {/* ======================================================== */}
-                {/* BOTÃO DE SUBMISSÃO (CTA) & TEXTO AUXILIAR                */}
-                {/* ======================================================== */}
+                {/* SUBMIT BUTTON */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pt-4 border-t border-[#10110F]/10">
                   <div className="flex items-center gap-2.5 text-xs text-[#10110F]/65 font-mono">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#10110F]/40" />
-                    <span>{responseTime}</span>
+                    <span>{t('contact:response_time_value', 'I usually reply within 24–48 business hours.')}</span>
                   </div>
 
                   <button
@@ -896,10 +851,8 @@ Enviado através do portfólio oficial (davidsalviano.com)
                   >
                     <span>
                       {submissionState.status === 'submitting'
-                        ? language === 'en'
-                          ? 'FORMATTING...'
-                          : 'ESTRUTURANDO...'
-                        : ctaText || 'ENVIAR PROJETO ↗'}
+                        ? t('contact:submit_sending', 'SENDING...')
+                        : t('contact:submit_button', 'SUBMIT PROJECT ↗')}
                     </span>
                     <ArrowUpRight size={16} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </button>

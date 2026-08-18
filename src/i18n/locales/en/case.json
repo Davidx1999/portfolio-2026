@@ -1,0 +1,19 @@
+{
+  "meta_client": "Context / Client",
+  "meta_role": "Role & Scope",
+  "meta_timeline": "Timeline",
+  "meta_disciplines": "Disciplines",
+  "section_overview": "Overview & Context",
+  "section_challenge": "Challenge & Architecture",
+  "section_solution": "Solution & Design System",
+  "section_impact": "Impact & Business Results",
+  "section_decisions": "Key Design Decisions",
+  "section_reflection": "Reflection & Next Steps",
+  "next_case_label": "NEXT CASE STUDY",
+  "back_to_work": "Back to Selected Work",
+  "translation_missing_title": "Translation in Progress",
+  "translation_missing_desc": "This case study has not yet been reviewed in Portuguese. You can read the original English version below.",
+  "translation_missing_action": "Read Original English Version",
+  "toc_title": "ON THIS PAGE",
+  "live_link_label": "Live Project ↗"
+}

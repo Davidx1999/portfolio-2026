@@ -1,11 +1,13 @@
 import React, { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useProjects } from '../../hooks/useProjects';
 import { useLanguage } from '../../context/LanguageContext';
 import { FeaturedProjectItem } from './FeaturedProjectItem';
 import { ContextualCursor } from './ContextualCursor';
 
 export function FeaturedWorkSection() {
-  const { t, language } = useLanguage();
+  const { t } = useTranslation(['home']);
+  const { language } = useLanguage();
   const { featuredProjects } = useProjects();
   const [cursorVisible, setCursorVisible] = useState(false);
 
@@ -22,13 +24,13 @@ export function FeaturedWorkSection() {
         title: p.title || 'Untitled Project',
         category: p.category || p.context || 'Digital Product',
         description: p.shortDescription || p.heroSummary || p.description || '',
-        link: `/cases/${slug}`,
+        link: `/${language}/work/${slug}`,
         wallpaperSrc: p.coverImage || p.finalImage || p.image,
         mediaThumbSrc: p.processImage || p.image || p.coverImage,
         mediaExpandedSrc: p.finalImage || p.image || p.coverImage,
       };
     });
-  }, [featuredProjects]);
+  }, [featuredProjects, language]);
 
   // Se não houver projetos em destaque no Sanity, oculta graciosamente a seção
   if (displayCases.length === 0) {
@@ -41,7 +43,7 @@ export function FeaturedWorkSection() {
       className="relative w-full bg-[#111210] text-[#FAFAF7] overflow-visible"
     >
       <div className="absolute z-[9999] pointer-events-none">
-        <ContextualCursor isVisible={cursorVisible} label={t('cursor_view_case', 'VER CASE')} />
+        <ContextualCursor isVisible={cursorVisible} label={t('home:cursor_view_case', 'VIEW CASE')} />
       </div>
 
       {/* ============================================================ */}
@@ -51,24 +53,28 @@ export function FeaturedWorkSection() {
         <div className="sticky top-[54px] w-full py-6 mix-blend-difference">
           <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16 flex items-center justify-center text-[#FAFAF7]">
             <h4 className="font-mono text-base sm:text-lg font-bold uppercase tracking-[0.2em] drop-shadow-md m-0 text-center">
-              {t('featured_work_title', language === 'en' ? 'FEATURED WORK' : 'PROJETOS SELECIONADOS')}
+              {t('home:featured_work_title', 'FEATURED WORK')}
             </h4>
           </div>
         </div>
       </div>
 
       {/* ============================================================ */}
-      {/* PROJETOS SELECIONADOS (1 Viewport por Projeto, Scroll Normal) */}
+      {/* PROJETOS (Scroll Natural com Parallax e Pixel Reveal)         */}
       {/* ============================================================ */}
-      <div className="relative w-full">
-        {displayCases.map((project) => (
+      <div className="w-full flex flex-col">
+        {displayCases.map((caseItem, index) => (
           <FeaturedProjectItem
-            key={project.id}
-            {...project}
-            onCursorChange={setCursorVisible}
+            key={caseItem.id}
+            caseItem={caseItem}
+            index={index}
+            totalCount={displayCases.length}
+            onHoverChange={setCursorVisible}
           />
         ))}
       </div>
     </section>
   );
 }
+
+export default FeaturedWorkSection;

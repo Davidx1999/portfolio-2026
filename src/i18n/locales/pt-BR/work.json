@@ -1,0 +1,23 @@
+{
+  "intro_eyebrow": "PROJETOS SELECIONADOS / 2021—2026",
+  "intro_title": "Produtos, sistemas e experiências construídos para organizar complexidade.",
+  "intro_text": "Uma seleção de projetos em que estratégia, arquitetura, interface e Design Systems trabalharam como partes do mesmo produto.",
+  "projects_count": "PROJETOS",
+  "meta_disciplines": "SaaS · Design Systems · Interface",
+  "filter_all": "Todos",
+  "filter_all_label": "Todos os Projetos",
+  "view_visual": "Visual",
+  "view_index": "Índice",
+  "table_project": "Projeto",
+  "table_role": "Atuação & Escopo",
+  "table_context": "Contexto",
+  "table_period": "Período",
+  "table_action": "Ação",
+  "action_dossier": "Ver dossiê",
+  "action_close": "Fechar",
+  "action_view_case": "Ver Estudo Completo",
+  "dossier_challenge": "DESAFIO & ARQUITETURA",
+  "dossier_process": "Etapas de Execução",
+  "empty_state_title": "Novos estudos de caso estão sendo preparados.",
+  "empty_state_desc": "A documentação e métricas dos próximos projetos estão em processo de consolidação."
+}

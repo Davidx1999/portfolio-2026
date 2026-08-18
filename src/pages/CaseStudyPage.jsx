@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useCaseStudy } from '../hooks/useCaseStudy';
 import { useLanguage } from '../context/LanguageContext';
 import { CurtainLink } from '../context/RouteCurtainContext';
@@ -17,13 +18,13 @@ import { CaseNextProject } from '../components/case/CaseNextProject';
 /**
  * CaseStudyPage
  * Template editorial reutilizável, performático e orientado pelo Sanity CMS.
- * Acomoda cases extensos, projetos compactos, estudos independentes e trabalhos com clientes.
  */
 export function CaseStudyPage() {
   const params = useParams();
   const slug = params.slug || params.projectId || 'mapear';
-  const { caseStudy, nextCase, currentIndex, totalProjects, loading } = useCaseStudy(slug);
+  const { t } = useTranslation(['case', 'common']);
   const { language } = useLanguage();
+  const { caseStudy, nextCase, currentIndex, totalProjects, loading } = useCaseStudy(slug);
 
   // Scroll to top on slug change
   useEffect(() => {
@@ -94,11 +95,11 @@ export function CaseStudyPage() {
               : 'O projeto solicitado não foi localizado. Explore nosso índice completo de trabalhos selecionados.'}
           </p>
           <CurtainLink
-            to="/work"
+            to={`/${language}/work`}
             className="inline-flex items-center gap-2 px-6 py-3.5 bg-[#C4FF00] hover:bg-[#d4ff1a] text-[#10110F] font-mono text-xs font-bold uppercase tracking-wider rounded-[12px] transition-all"
           >
             <ArrowLeft size={14} />
-            <span>{language === 'en' ? 'Back to Selected Work' : 'Voltar para Trabalhos'}</span>
+            <span>{t('case:back_to_work', 'Back to Selected Work')}</span>
           </CurtainLink>
         </div>
       </div>
@@ -107,41 +108,62 @@ export function CaseStudyPage() {
 
   return (
     <article className="w-full bg-[#10110F] text-[#FAFAF7] relative">
+      {/* Banner de Tradução Pendente em Português */}
+      {caseStudy.translationStatus === 'missing' && language === 'pt' && (
+        <div className="w-full bg-[#151613] border-b border-[#C4FF00]/30 py-3.5 px-6 sm:px-10 lg:px-16 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sticky top-[54px] z-50 backdrop-blur-md">
+          <div className="text-left">
+            <span className="font-mono text-[11px] font-bold text-[#C4FF00] uppercase block">
+              // {t('case:translation_missing_title', 'Tradução em Revisão')}
+            </span>
+            <p className="font-sans text-xs text-[#F4F3EE]/80 mt-0.5">
+              {t(
+                'case:translation_missing_desc',
+                'A documentação deste projeto em português está passando por revisão editorial. Você pode acessar a versão original em inglês.'
+              )}
+            </p>
+          </div>
+          <CurtainLink
+            to={`/en/work/${slug}`}
+            className="px-3.5 py-1.5 bg-[#C4FF00] hover:bg-[#d8ff1a] text-[#10110F] font-mono text-[11px] font-bold uppercase rounded-[8px] shrink-0 transition-colors"
+          >
+            {t('case:translation_missing_action', 'Acessar Versão Original em Inglês')} ↗
+          </CurtainLink>
+        </div>
+      )}
+
       {/* Sumário Flutuante para Cases Extensos */}
       <CaseTableOfContents sections={tocSections} />
 
       {/* ============================================================ */}
       {/* 1. HERO VISUAL STICKY                                        */}
-      {/* Ocupa exatamente calc(100svh - var(--header-safe-offset))    */}
       {/* ============================================================ */}
       <CaseHeroCover caseStudy={caseStudy} />
 
       {/* ============================================================ */}
-      {/* 2. FOLHA EDITORIAL FRONTAL (Passa à frente da mídia sticky)  */}
-      {/* Cantos superiores arredondados, sem vazamento ou gaps        */}
+      {/* 2. FOLHA EDITORIAL FRONTAL                                   */}
       {/* ============================================================ */}
       <div className="relative z-10 w-full bg-[#10110F] rounded-t-[28px] sm:rounded-t-[36px] shadow-[0_-20px_50px_rgba(0,0,0,0.6)] border-t border-[rgba(244,243,238,0.12)]">
         
         {/* Abertura Editorial: Link Voltar, Eyebrow, Título, Descrição e Metadados */}
         <CaseEditorialHeader caseStudy={caseStudy} />
 
-        {/* Tese / Pergunta Central (se informada) */}
+        {/* Tese / Pergunta Central */}
         {caseStudy.thesis && (
           <CaseThesis thesis={caseStudy.thesis} thesis_en={caseStudy.thesis_en} />
         )}
 
-        {/* Visão Geral: Contexto, Desafio e Atuação (Preserva estrutura editorial) */}
+        {/* Visão Geral */}
         <CaseOverview caseStudy={caseStudy} />
 
-        {/* Blocos Modulares do Sanity (Vídeo Protótipo, Decisões, Resultados, Mídias, etc.) */}
+        {/* Blocos Modulares do Sanity */}
         {Array.isArray(caseStudy.contentBlocks) && caseStudy.contentBlocks.length > 0 && (
           <CaseContentRenderer contentBlocks={caseStudy.contentBlocks} />
         )}
 
-        {/* Solução Estruturada e Impacto Qualitativo (se preenchidos nos metadados raiz) */}
+        {/* Solução Estruturada e Impacto Qualitativo */}
         <CaseSolutionImpact caseStudy={caseStudy} />
 
-        {/* Reflexão Pessoal em Primeira Pessoa (se informada) */}
+        {/* Reflexão Pessoal */}
         {caseStudy.reflection && (
           <CaseReflection
             reflection={caseStudy.reflection}
@@ -149,7 +171,7 @@ export function CaseStudyPage() {
           />
         )}
 
-        {/* Continue Explorando (Redesenhado com preview panorâmico e navegação de fechamento) */}
+        {/* Continue Explorando */}
         <CaseNextProject
           nextCase={nextCase}
           currentIndex={currentIndex}

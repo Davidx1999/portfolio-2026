@@ -1,20 +1,18 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, ArrowUpRight, Play, Pause } from 'lucide-react';
-import { useLanguage } from '../../context/LanguageContext';
-import { CurtainLink } from '../../context/RouteCurtainContext';
+import { useTranslation } from 'react-i18next';
 import { useAppReady } from '../../context/AppReadyContext';
 import { RollingButton } from '../RollingButton';
+import { useLanguage } from '../../context/LanguageContext';
 
 const EASING = [0.22, 1, 0.36, 1];
 const CLIP_EASING = [0.77, 0, 0.175, 1];
-
-// Delay (ms) between text animations settling and video reveal starting.
-// Must be perceptible but not feel like a stall.
 const VIDEO_REVEAL_DELAY = 500;
 
 export function HomeHero() {
-  const { t, language } = useLanguage();
+  const { t } = useTranslation(['home', 'common']);
+  const { language } = useLanguage();
   const prefersReducedMotion = useReducedMotion();
   const { isAppReady } = useAppReady();
 
@@ -49,7 +47,6 @@ export function HomeHero() {
     const video = videoRef.current;
     if (!video) return;
 
-    // If the video is already loaded (cached), mark ready immediately
     if (video.readyState >= 2) {
       setIsVideoReady(true);
     }
@@ -70,8 +67,7 @@ export function HomeHero() {
     };
   }, [handleVideoReady]);
 
-  // Coordinate the video reveal: wait for isAppReady + isVideoReady,
-  // then add the intentional delay so the video enters after text is settled.
+  // Coordinate the video reveal: wait for isAppReady + isVideoReady
   useEffect(() => {
     if (!isAppReady || !isVideoReady) return;
 
@@ -107,7 +103,7 @@ export function HomeHero() {
               className="mb-4 sm:mb-6"
             >
               <span className="font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.22em] text-[#8B8B85]">
-                {t('hero_label', 'PRODUCT DESIGNER • UX/UI • DESIGN SYSTEMS')}
+                {t('home:hero_label', 'PRODUCT DESIGNER • UX/UI • DESIGN SYSTEMS')}
               </span>
             </motion.div>
 
@@ -119,7 +115,7 @@ export function HomeHero() {
               className="mb-5 sm:mb-6"
             >
               <h1 className="font-serif text-[1.95rem] xs:text-[2.25rem] sm:text-[2.75rem] lg:text-[3rem] xl:text-[3.25rem] font-normal leading-[1.12] tracking-tight text-[#111210]">
-                {t('hero_headline_v2', 'Transformo complexidade em produtos digitais claros e marcantes.')}
+                {t('home:hero_headline', 'I turn complexity into clear, memorable digital products.')}
               </h1>
             </motion.div>
 
@@ -132,8 +128,8 @@ export function HomeHero() {
             >
               <p className="font-sans text-[0.95rem] sm:text-[1.05rem] lg:text-[1.1rem] text-[#111210]/80 leading-relaxed max-w-md">
                 {t(
-                  'hero_description_v2',
-                  'Estratégia, UX/UI e sistemas de design para empresas que precisam transformar ideias complexas em experiências consistentes, escaláveis e fáceis de usar.'
+                  'home:hero_description',
+                  'Strategy, UX/UI, and design systems for companies that need to transform complex ideas into consistent, scalable, and intuitive digital experiences.'
                 )}
               </p>
             </motion.div>
@@ -153,17 +149,17 @@ export function HomeHero() {
                 onClick={handleScrollToProjects}
                 icon={<ArrowRight size={15} className="transition-transform duration-300 group-hover:translate-x-1" />}
               >
-                {t('hero_cta_primary_v2', 'EXPLORAR PROJETOS')}
+                {t('home:hero_cta_primary', 'EXPLORE PROJECTS')}
               </RollingButton>
 
               {/* Ação Secundária */}
               <RollingButton
                 variant="secondary"
                 size="md"
-                to="/contact"
+                to={`/${language}/contact`}
                 icon={<ArrowUpRight size={14} className="text-[#8B8B85] group-hover:text-[#111210] transition-colors" />}
               >
-                {t('hero_cta_secondary_v2', 'VAMOS CONVERSAR')}
+                {t('home:hero_cta_secondary', "LET'S TALK")}
               </RollingButton>
             </motion.div>
 
@@ -172,8 +168,6 @@ export function HomeHero() {
           {/* ============================================================ */}
           {/* LADO DIREITO: Container de Vídeo com Clip-Path Top-Down      */}
           {/* ============================================================ */}
-          {/* Outer wrapper: transparent, only reserves layout space.
-              No bg-black / bg-[#10110F] — avoids the static black rectangle. */}
           <div className="w-full flex items-center justify-end">
             <div
               role="button"
@@ -196,10 +190,6 @@ export function HomeHero() {
                   : 'Reproduzir vídeo de processo'
               }
             >
-              {/* Inner wrapper: clip-path applied here so the entire visual card
-                  (video + rounded corners) is clipped, not just the <video>.
-                  Starts fully clipped (inset bottom 100%) so nothing shows.
-                  Reveals top-down only when shouldRevealVideo is true. */}
               <motion.div
                 initial={prefersReducedMotion ? false : { clipPath: 'inset(0% 0% 100% 0%)' }}
                 animate={shouldRevealVideo ? { clipPath: 'inset(0% 0% 0% 0%)' } : { clipPath: 'inset(0% 0% 100% 0%)' }}
