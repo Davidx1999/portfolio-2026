@@ -18,18 +18,21 @@ export function ClosingNavigation() {
           title: 'Projetos',
           desc: 'Explore a coleção completa de estudos de caso e produtos digitais.',
           link: `/${language}/work`,
+          actionLabel: 'ACESSAR',
         },
         {
           num: '02',
           title: 'Sobre Mim',
           desc: 'Conheça minha trajetória, princípios de design e ferramentas.',
           link: `/${language}/about`,
+          actionLabel: 'ACESSAR',
         },
         {
           num: '03',
           title: 'Fale Comigo',
           desc: 'Inicie uma conversa sobre consultoria, freelance ou novo produto.',
           link: `/${language}/contact`,
+          actionLabel: 'ACESSAR',
         },
       ]
     : [
@@ -38,18 +41,21 @@ export function ClosingNavigation() {
           title: 'Work',
           desc: 'Explore the complete collection of case studies and digital products.',
           link: `/${language}/work`,
+          actionLabel: 'EXPLORE',
         },
         {
           num: '02',
           title: 'About Me',
           desc: 'Learn about my trajectory, design principles, and toolkit.',
           link: `/${language}/about`,
+          actionLabel: 'EXPLORE',
         },
         {
           num: '03',
           title: "Let's Talk",
           desc: 'Start a conversation about consulting, freelance, or a new product.',
           link: `/${language}/contact`,
+          actionLabel: 'EXPLORE',
         },
       ];
 

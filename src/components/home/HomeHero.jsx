@@ -78,13 +78,6 @@ export function HomeHero() {
     return () => clearTimeout(timer);
   }, [isAppReady, isVideoReady]);
 
-  const handleScrollToProjects = (e) => {
-    e.preventDefault();
-    const target = document.getElementById('featured-work');
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
 
   return (
     <section className="relative w-full min-h-[100svh] pt-24 pb-14 sm:pb-16 lg:pt-28 lg:pb-12 flex flex-col justify-between bg-[#F1F0EB] text-[#111210] select-none border-b border-[rgba(17,18,16,0.1)]">
@@ -141,18 +134,17 @@ export function HomeHero() {
               transition={{ duration: 0.5, delay: 0.42, ease: EASING }}
               className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-6"
             >
-              {/* CTA Principal em Verde Ácido */}
+              {/* CTA Principal em Verde Ácido -> Navega para Work */}
               <RollingButton
                 variant="primary"
                 size="lg"
-                href="#featured-work"
-                onClick={handleScrollToProjects}
+                to={`/${language}/work`}
                 icon={<ArrowRight size={15} className="transition-transform duration-300 group-hover:translate-x-1" />}
               >
                 {t('home:hero_cta_primary', 'EXPLORE PROJECTS')}
               </RollingButton>
 
-              {/* Ação Secundária */}
+              {/* Ação Secundária -> Navega para Let's Talk */}
               <RollingButton
                 variant="secondary"
                 size="md"

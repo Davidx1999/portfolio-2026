@@ -66,10 +66,11 @@ export function FeaturedWorkSection() {
         {displayCases.map((caseItem, index) => (
           <FeaturedProjectItem
             key={caseItem.id}
+            {...caseItem}
             caseItem={caseItem}
             index={index}
             totalCount={displayCases.length}
-            onHoverChange={setCursorVisible}
+            onCursorChange={setCursorVisible}
           />
         ))}
       </div>

@@ -94,15 +94,19 @@ export function FeaturedProjectItem({
           </div>
         </CurtainLink>
 
-        {/* Legenda e Descrição (Abaixo do Card) */}
-        <div className="w-[82vw] max-w-[820px] mt-6 text-left">
+        {/* Legenda e Descrição (Abaixo do Card - Clicável) */}
+        <CurtainLink
+          to={link}
+          curtainTitle={title}
+          className="w-[82vw] max-w-[820px] mt-6 text-left block group cursor-pointer focus-visible:outline-2 focus-visible:outline-[#C7F000] focus-visible:outline-offset-4 rounded-[8px]"
+        >
           <h3 className="font-serif text-2xl sm:text-3xl lg:text-4xl text-[#F4F3EE] font-normal leading-tight transition-colors duration-300 group-hover:text-[#C7F000]">
             {title}
           </h3>
           <p className="font-sans text-xs sm:text-sm text-[#F4F3EE]/75 line-clamp-2 mt-2">
             {description}
           </p>
-        </div>
+        </CurtainLink>
       </div>
     </div>
   );
