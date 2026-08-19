@@ -1,14 +1,8 @@
 import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
 import { visionTool } from '@sanity/vision';
-import { documentInternationalization } from '@sanity/document-internationalization';
 import { schemaTypes } from './schemas';
 import { createGeneratePtDraftAction } from './actions/generatePtDraftAction';
-
-export const supportedLanguages = [
-  { id: 'en', title: 'English (Original / English-First)' },
-  { id: 'pt-BR', title: 'Português (Brasil)' },
-];
 
 export default defineConfig({
   name: 'default',
@@ -20,10 +14,6 @@ export default defineConfig({
   plugins: [
     structureTool(),
     visionTool(),
-    documentInternationalization({
-      supportedLanguages,
-      schemaTypes: ['project', 'aboutPage', 'letsTalkPage', 'playgroundProject'],
-    }),
   ],
 
   schema: {

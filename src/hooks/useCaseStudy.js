@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { sanityClient, urlFor } from '../services/sanityClient';
 import { useLanguage } from '../context/LanguageContext';
+import { resolveField } from '../utils/i18nField';
 
 /**
  * useCaseStudy
- * Hook editorial orientado ao Sanity.io com suporte à localização document-level ($locale).
+ * Hook editorial com suporte a Field-Level Internationalization.
+ * Busca o documento canônico único pelo slug e resolve os campos para o idioma ativo.
  */
 export function useCaseStudy(slug) {
   const { locale, language } = useLanguage();
@@ -25,243 +27,166 @@ export function useCaseStudy(slug) {
     setLoading(true);
     setError(null);
 
-    const targetLocale = locale || (language === 'pt' ? 'pt-BR' : 'en');
+    const activeLocale = locale || (language === 'pt' ? 'pt-BR' : 'en');
 
     try {
-      // 1. Tenta buscar o projeto no idioma exato solicitado
-      const query = `*[_type == "project" && !(_id in path("drafts.**")) && (lower(slug.current) == lower($slug) || slug.current == $slug || id.current == $slug || id == $slug || _id == $slug) && coalesce(language, "en") == $targetLocale][0]{
+      // 1. Busca o documento canônico único pelo slug compartilhado
+      const query = `*[_type == "project" && !(_id in path("drafts.**")) && (lower(slug.current) == lower($slug) || slug.current == $slug || id.current == $slug || id == $slug || _id == $slug)][0]{
         ...,
         "slug": coalesce(slug.current, id.current, id, _id),
+        "mainVisualImageUrl": mainVisual.image.asset->url,
+        "mainVisualPosterUrl": mainVisual.videoPoster.asset->url,
         "coverImageUrl": coverImage.asset->url,
-        "heroMediaImage": heroMedia.image.asset->url,
-        "heroMediaPoster": heroMedia.poster.asset->url,
+        "heroMediaImage": heroMediaOverride.image.asset->url,
+        "heroMediaPoster": heroMediaOverride.videoPoster.asset->url,
         "nextCaseRef": nextCase->{
           title,
           "slug": coalesce(slug.current, id.current, id, _id),
           projectType,
           caseDepth,
           eyebrow,
+          heroEyebrow,
           heroSummary,
-          heroSummary_en,
           shortDescription,
-          shortDescription_en,
-          description,
+          "mainVisualImageUrl": mainVisual.image.asset->url,
           "coverImage": coverImage.asset->url,
           "image": image.asset->url
         }
       }`;
 
-      // 2. Consulta todos os projetos para o índice do carrossel no mesmo idioma
-      const allProjectsQuery = `*[_type == "project" && !(_id in path("drafts.**")) && coalesce(language, "en") == $targetLocale] | order(featuredOrder asc, orderRank asc, _createdAt desc){
+      // 2. Consulta todos os projetos para o índice e navegação
+      const allProjectsQuery = `*[_type == "project" && !(_id in path("drafts.**")) && published != false] | order(featuredOrder asc, orderRank asc, _createdAt desc){
         title,
         "slug": coalesce(slug.current, id.current, id, _id),
         projectType,
         caseDepth,
         eyebrow,
+        heroEyebrow,
         heroSummary,
-        heroSummary_en,
         shortDescription,
-        shortDescription_en,
-        description,
+        "mainVisualImageUrl": mainVisual.image.asset->url,
         "coverImage": coverImage.asset->url,
         "image": image.asset->url
       }`;
 
-      let [sanityProject, allSanityProjects] = await Promise.all([
-        sanityClient.fetch(query, { slug, targetLocale }),
-        sanityClient.fetch(allProjectsQuery, { targetLocale }),
+      const [sanityProject, allSanityProjects] = await Promise.all([
+        sanityClient.fetch(query, { slug }),
+        sanityClient.fetch(allProjectsQuery),
       ]);
 
-      // Se não encontrar o documento em pt-BR, busca a versão 'en' e marca como 'missing' para o banner editorial
-      if (!sanityProject && targetLocale !== 'en') {
-        const enQuery = `*[_type == "project" && !(_id in path("drafts.**")) && (lower(slug.current) == lower($slug) || slug.current == $slug || id.current == $slug || id == $slug || _id == $slug) && coalesce(language, "en") == "en"][0]{
-          ...,
-          "slug": coalesce(slug.current, id.current, id, _id),
-          "coverImageUrl": coverImage.asset->url,
-          "heroMediaImage": heroMedia.image.asset->url,
-          "heroMediaPoster": heroMedia.poster.asset->url,
-          "nextCaseRef": nextCase->{
-            title,
-            "slug": coalesce(slug.current, id.current, id, _id),
-            projectType,
-            caseDepth,
-            eyebrow,
-            heroSummary,
-            heroSummary_en,
-            shortDescription,
-            shortDescription_en,
-            description,
-            "coverImage": coverImage.asset->url,
-            "image": image.asset->url
-          }
-        }`;
-        const enProject = await sanityClient.fetch(enQuery, { slug });
-        if (enProject) {
-          sanityProject = {
-            ...enProject,
-            translationStatus: 'missing',
-          };
-        }
-      }
-
       if (sanityProject) {
-        // Resolve blocos modulares dinamicamente
+        // Resolução de Mídias
+        const mainImg = sanityProject.mainVisualImageUrl || (sanityProject.mainVisual?.image ? urlFor(sanityProject.mainVisual.image).url() : null);
+        const fallbackImg = mainImg || sanityProject.coverImageUrl || (sanityProject.coverImage ? urlFor(sanityProject.coverImage).url() : null);
+        const heroImg = sanityProject.heroMediaImage || (sanityProject.heroMediaOverride?.image ? urlFor(sanityProject.heroMediaOverride.image).url() : null) || fallbackImg;
+
+        // Resolução dos blocos modulares
         const rawBlocks = Array.isArray(sanityProject.contentBlocks) ? sanityProject.contentBlocks : [];
-
         const resolvedBlocks = rawBlocks.map((block) => {
-          if (!block) return block;
+          if (!block || typeof block !== 'object') return block;
 
-          if (block._type === 'prototypeVideo' && block.poster) {
-            return { ...block, poster: urlFor(block.poster) };
-          }
+          const blockImg = block.image ? urlFor(block.image).url() : null;
+          const blockSecImg = block.secondaryImage ? urlFor(block.secondaryImage).url() : null;
 
-          if (block._type === 'decisionSection' && Array.isArray(block.decisions)) {
-            return {
-              ...block,
-              decisions: block.decisions.map((dec) => ({
-                ...dec,
-                artifactMedia: dec.artifactMedia ? urlFor(dec.artifactMedia) : null,
-              })),
-            };
-          }
-
-          if (block._type === 'imageGallery' && Array.isArray(block.images)) {
-            return {
-              ...block,
-              images: block.images.map((img) => ({
-                ...img,
-                image: img.image ? urlFor(img.image) : null,
-              })),
-            };
-          }
-
-          if (block._type === 'artifactMosaicScene' && Array.isArray(block.items)) {
-            return {
-              ...block,
-              items: block.items.map((it) => ({
-                ...it,
-                media: it.media ? urlFor(it.media) : null,
-              })),
-            };
-          }
-
-          if (block._type === 'laggedFullViewportMedia') {
-            return {
-              ...block,
-              image: block.image ? urlFor(block.image) : null,
-              poster: block.poster ? urlFor(block.poster) : null,
-            };
-          }
-
-          if (block._type === 'verticalMediaStack' && Array.isArray(block.items)) {
-            return {
-              ...block,
-              items: block.items.map((it) => ({
-                ...it,
-                media: it.media ? urlFor(it.media) : null,
-              })),
-            };
-          }
-
-          if (block._type === 'fullMedia' && block.image) {
-            return { ...block, image: urlFor(block.image) };
-          }
-
-          if (block._type === 'splitMedia') {
-            return {
-              ...block,
-              mediaLeft: block.mediaLeft ? urlFor(block.mediaLeft) : null,
-              mediaRight: block.mediaRight ? urlFor(block.mediaRight) : null,
-            };
-          }
-
-          if (block._type === 'mediaText' && block.media) {
-            return { ...block, media: urlFor(block.media) };
-          }
-
-          if (block._type === 'imageGrid' && Array.isArray(block.items)) {
-            return {
-              ...block,
-              items: block.items.map((it) => ({
-                ...it,
-                image: it.image ? urlFor(it.image) : null,
-              })),
-            };
-          }
-
-          if (block._type === 'beforeAfter') {
-            return {
-              ...block,
-              beforeImage: block.beforeImage ? urlFor(block.beforeImage) : null,
-              afterImage: block.afterImage ? urlFor(block.afterImage) : null,
-            };
-          }
-
-          if (block._type === 'artifactShowcase' && block.media) {
-            return { ...block, media: urlFor(block.media) };
-          }
-
-          if (block._type === 'processSteps' && Array.isArray(block.steps)) {
-            return {
-              ...block,
-              steps: block.steps.map((st) => ({
-                ...st,
-                media: st.media ? urlFor(st.media) : null,
-              })),
-            };
-          }
-
-          return block;
+          return {
+            ...block,
+            eyebrow: resolveField(block.eyebrow, activeLocale),
+            title: resolveField(block.title, activeLocale),
+            subtitle: resolveField(block.subtitle, activeLocale),
+            body: resolveField(block.body, activeLocale),
+            caption: resolveField(block.caption, activeLocale),
+            alt: resolveField(block.alt, activeLocale),
+            secondaryCaption: resolveField(block.secondaryCaption, activeLocale),
+            imageUrl: blockImg,
+            secondaryImageUrl: blockSecImg,
+            topics: Array.isArray(block.topics)
+              ? block.topics.map((t) => ({
+                  title: resolveField(t.title, activeLocale),
+                  content: resolveField(t.content, activeLocale),
+                }))
+              : [],
+            decisions: Array.isArray(block.decisions)
+              ? block.decisions.map((d) => ({
+                  challenge: resolveField(d.challenge, activeLocale),
+                  decision: resolveField(d.decision, activeLocale),
+                  impact: resolveField(d.impact, activeLocale),
+                  artifactCaption: resolveField(d.artifactCaption, activeLocale),
+                }))
+              : [],
+          };
         });
 
-        const coverImg = sanityProject.coverImageUrl || (sanityProject.coverImage ? urlFor(sanityProject.coverImage) : null);
-        const heroImg = sanityProject.heroMediaImage || (sanityProject.heroMedia?.image ? urlFor(sanityProject.heroMedia.image) : null) || coverImg;
+        // Resolução dos Textos Principais do Case
+        const displayTitle = resolveField(sanityProject.title, activeLocale) || (typeof sanityProject.title === 'string' ? sanityProject.title : 'Untitled Project');
+        const displayHeroEyebrow = resolveField(sanityProject.heroEyebrow || sanityProject.eyebrow, activeLocale);
+        const displayHeroHeadline = resolveField(sanityProject.heroHeadline, activeLocale) || displayTitle;
+        const displayHeroSummary = resolveField(sanityProject.heroSummary || sanityProject.shortDescription || sanityProject.overview, activeLocale);
+        const displayShortDesc = resolveField(sanityProject.shortDescription || sanityProject.heroSummary, activeLocale);
+        const displayOverview = resolveField(sanityProject.overview || sanityProject.overview_en, activeLocale);
+        const displayContext = resolveField(sanityProject.context || sanityProject.clientOrContext, activeLocale);
+        const displayChallenge = resolveField(sanityProject.challenge || sanityProject.challenge_en, activeLocale);
+        const displaySolution = resolveField(sanityProject.solutionSummary || sanityProject.solution || sanityProject.solution_en, activeLocale);
+        const displayImpact = resolveField(sanityProject.impact || sanityProject.impact_en, activeLocale);
+        const displayLearnings = resolveField(sanityProject.learnings, activeLocale);
+        const displayLimitations = resolveField(sanityProject.limitations, activeLocale);
+        const displayNextSteps = resolveField(sanityProject.nextSteps, activeLocale);
+        const displayReflection = resolveField(sanityProject.finalReflection || sanityProject.reflection || sanityProject.reflection_en, activeLocale);
+
+        const rawResp = sanityProject.responsibilities || sanityProject.responsibilities_en;
+        const displayResponsibilities = Array.isArray(rawResp)
+          ? rawResp.map((r) => resolveField(r, activeLocale)).filter(Boolean)
+          : [];
+
+        const rawSteps = sanityProject.processSteps || sanityProject.process;
+        const displayProcessSteps = Array.isArray(rawSteps)
+          ? rawSteps.map((s) => resolveField(s, activeLocale)).filter(Boolean)
+          : [];
+
+        const rawDeliverables = sanityProject.deliverables;
+        const displayDeliverables = Array.isArray(rawDeliverables)
+          ? rawDeliverables.map((d) => resolveField(d, activeLocale)).filter(Boolean)
+          : [];
 
         const normalizedProject = {
           ...sanityProject,
           caseDepth: sanityProject.caseDepth || 'full',
-          eyebrow: sanityProject.eyebrow || null,
+          eyebrow: displayHeroEyebrow,
+          heroEyebrow: displayHeroEyebrow,
           slug: sanityProject.slug || slug,
-          title: sanityProject.title || 'Untitled Case Study',
-          coverImage: coverImg,
-          heroMedia: {
-            mediaType: sanityProject.heroMedia?.mediaType || 'image',
-            image: heroImg,
-            videoUrl: sanityProject.heroMedia?.videoUrl || null,
-            poster: sanityProject.heroMediaPoster || (sanityProject.heroMedia?.poster ? urlFor(sanityProject.heroMedia.poster) : null),
-            alt: sanityProject.heroMedia?.alt || sanityProject.title,
-            alt_en: sanityProject.heroMedia?.alt_en || sanityProject.title,
-            autoplay: sanityProject.heroMedia?.autoplay ?? true,
-          },
-          shortDescription: sanityProject.shortDescription || sanityProject.heroSummary || sanityProject.description || '',
-          shortDescription_en: sanityProject.shortDescription_en || sanityProject.heroSummary_en || '',
-          longDescription: sanityProject.longDescription || sanityProject.overview || sanityProject.context || '',
-          longDescription_en: sanityProject.longDescription_en || sanityProject.overview_en || sanityProject.context_en || '',
-          heroSummary: sanityProject.heroSummary || sanityProject.description || '',
-          heroSummary_en: sanityProject.heroSummary_en || '',
-          thesis: sanityProject.thesis || null,
-          thesis_en: sanityProject.thesis_en || null,
-          overview: sanityProject.overview || null,
-          overview_en: sanityProject.overview_en || null,
-          challenge: sanityProject.challenge || null,
-          challenge_en: sanityProject.challenge_en || null,
-          responsibilities: Array.isArray(sanityProject.responsibilities) ? sanityProject.responsibilities : [],
-          responsibilities_en: Array.isArray(sanityProject.responsibilities_en) ? sanityProject.responsibilities_en : [],
-          solution: sanityProject.solution || null,
-          solution_en: sanityProject.solution_en || null,
-          impact: sanityProject.impact || null,
-          impact_en: sanityProject.impact_en || null,
-          reflection: sanityProject.reflection || null,
-          reflection_en: sanityProject.reflection_en || null,
+          title: displayTitle,
+          heroHeadline: displayHeroHeadline,
+          heroSummary: displayHeroSummary,
+          shortDescription: displayShortDesc,
+          overview: displayOverview,
+          context: displayContext,
+          challenge: displayChallenge,
+          solution: displaySolution,
+          impact: displayImpact,
+          learnings: displayLearnings,
+          limitations: displayLimitations,
+          nextSteps: displayNextSteps,
+          reflection: displayReflection,
+          responsibilities: displayResponsibilities,
+          processSteps: displayProcessSteps,
+          deliverables: displayDeliverables,
           contentBlocks: resolvedBlocks,
-          disciplines: Array.isArray(sanityProject.disciplines) ? sanityProject.disciplines : [],
+          coverImage: fallbackImg,
+          heroMedia: {
+            mediaType: sanityProject.heroMediaOverride?.videoUrl || sanityProject.mainVisual?.videoUrl ? 'video' : 'image',
+            image: heroImg,
+            videoUrl: sanityProject.heroMediaOverride?.videoUrl || sanityProject.mainVisual?.videoUrl || null,
+            poster: sanityProject.heroMediaPoster || (sanityProject.heroMediaOverride?.videoPoster ? urlFor(sanityProject.heroMediaOverride.videoPoster).url() : fallbackImg),
+            alt: resolveField(sanityProject.mainVisual?.alt || sanityProject.alt, activeLocale) || displayTitle,
+            autoplay: true,
+          },
+          disciplines: Array.isArray(sanityProject.disciplines) ? sanityProject.disciplines : (Array.isArray(sanityProject.tags) ? sanityProject.tags : []),
           projectType: sanityProject.projectType || 'professionalProject',
           projectStatus: sanityProject.projectStatus || 'completed',
           period: sanityProject.period || sanityProject.year || '',
           duration: sanityProject.duration || null,
-          clientOrContext: sanityProject.clientOrContext || sanityProject.context || '',
-          role: sanityProject.role || '',
-          externalUrl: sanityProject.externalUrl || sanityProject.liveLink || null,
+          clientOrContext: sanityProject.clientOrContext || displayContext || '',
+          role: resolveField(sanityProject.role, activeLocale) || 'Product Designer',
+          translationStatus: sanityProject.translationStatus || 'original',
         };
 
         setCaseStudy(normalizedProject);
@@ -272,16 +197,30 @@ export function useCaseStudy(slug) {
           const currentIdx = allSanityProjects.findIndex((p) => p.slug === slug);
           setCurrentIndex(currentIdx >= 0 ? currentIdx + 1 : 1);
 
-          if (sanityProject.nextCaseRef) {
-            setNextCase(sanityProject.nextCaseRef);
+          const rawNext = sanityProject.nextCaseRef;
+          if (rawNext) {
+            setNextCase({
+              ...rawNext,
+              title: resolveField(rawNext.title, activeLocale),
+              shortDescription: resolveField(rawNext.shortDescription || rawNext.heroSummary, activeLocale),
+              eyebrow: resolveField(rawNext.heroEyebrow || rawNext.eyebrow, activeLocale),
+              coverImage: rawNext.mainVisualImageUrl || rawNext.coverImage || rawNext.image,
+            });
           } else {
             const nextIdx = currentIdx >= 0 && currentIdx < allSanityProjects.length - 1 ? currentIdx + 1 : 0;
-            setNextCase(allSanityProjects[nextIdx] || null);
+            const autoNext = allSanityProjects[nextIdx];
+            if (autoNext) {
+              setNextCase({
+                ...autoNext,
+                title: resolveField(autoNext.title, activeLocale),
+                shortDescription: resolveField(autoNext.shortDescription || autoNext.heroSummary, activeLocale),
+                eyebrow: resolveField(autoNext.heroEyebrow || autoNext.eyebrow, activeLocale),
+                coverImage: autoNext.mainVisualImageUrl || autoNext.coverImage || autoNext.image,
+              });
+            } else {
+              setNextCase(null);
+            }
           }
-        } else if (sanityProject.nextCaseRef) {
-          setNextCase(sanityProject.nextCaseRef);
-        } else {
-          setNextCase(null);
         }
       } else {
         setCaseStudy(null);

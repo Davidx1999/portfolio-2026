@@ -131,7 +131,7 @@ export function CaseEditorialHeader({ caseStudy }) {
           className="mb-8 md:mb-10"
         >
           <CurtainLink
-            to="/work"
+            to={`/${language}/work`}
             className="group inline-flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-[#F4F3EE]/60 hover:text-[#C4FF00] transition-colors focus-visible:outline-2 focus-visible:outline-[#C4FF00] rounded-[4px]"
           >
             <ArrowLeft

@@ -1,26 +1,24 @@
 /**
  * Vercel Serverless Function: /api/translate
  *
- * Segurança & Auditoria:
- * - Valida método HTTP (apenas POST permitido, GET retorna 405).
- * - Autentica a sessão do usuário do Sanity via Bearer Token contra a API do Sanity (GET /users/me e GET /projects/:id).
- * - Retorna 401 para requisições sem token ou com token inválido.
- * - Retorna 403 para usuários autenticados no Sanity mas sem permissão no projeto específico.
- * - Proteção contra DoS / Rate limiting e verificação de payload excessivo (máx 250KB).
- * - Proteção editorial: não sobrescreve documentos com translationStatus === 'reviewed'.
- * - Cria exclusivamente DRAFT ('drafts.<id>__i18n_pt-BR') com translationStatus: 'needs_review'.
- * - Cria/atualiza o documento 'translation.metadata' do @sanity/document-internationalization.
- * - NUNCA publica automaticamente.
- * - Logs sanitizados sem vazamento de tokens, chaves ou payloads completos.
+ * Arquitetura Field-Level Internationalization:
+ * - Traduz recursivamente os campos 'en' para 'ptBR' dentro do MESMO documento.
+ * - Lê preferencialmente o draft 'drafts.<id>' mais recente (com fallback para publicado).
+ * - Suporta dois modos: 'missing_only' (apenas campos vazios) ou 'regenerate_all' (sobrescrever todos).
+ * - Calcula hash SHA-256 do conteúdo em inglês (sourceContentHash) para detecção de alterações futuras ('outdated').
+ * - Cria/atualiza exclusivamente o draft 'drafts.<id>' no Sanity.
+ * - NUNCA cria documentos separados, NUNCA duplica slugs e NUNCA publica automaticamente.
+ * - Autenticação segura contra a API oficial do Sanity.
  */
 
 import { createClient } from '@sanity/client';
+import crypto from 'crypto';
 
 // Rate-limiting em memória por IP (10 requisições por minuto por IP)
 const rateLimitMap = new Map();
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const MAX_REQUESTS_PER_WINDOW = 10;
-const MAX_PAYLOAD_SIZE_BYTES = 250 * 1024; // 250 KB
+const MAX_PAYLOAD_SIZE_BYTES = 350 * 1024; // 350 KB
 
 function isRateLimited(ip) {
   const now = Date.now();
@@ -80,85 +78,78 @@ async function translateText(text, targetLang = 'PT-BR', sourceLang = 'EN') {
   return data?.translations?.[0]?.text || text;
 }
 
-// Tradução recursiva de campos editoriais
-async function translateDocumentFields(sourceDoc) {
-  const cloned = JSON.parse(JSON.stringify(sourceDoc));
+/**
+ * Coleta todas as strings 'en' do documento para gerar o hash de controle de versão.
+ */
+function collectEnglishStrings(node, collected = []) {
+  if (!node) return collected;
 
-  const textFields = [
-    'title',
-    'heroTitle',
-    'heroSummary',
-    'shortDescription',
-    'longDescription',
-    'overview',
-    'challenge',
-    'solution',
-    'impact',
-    'reflection',
-    'openingStatement',
-    'closingStatement',
-    'intro',
-  ];
-
-  for (const field of textFields) {
-    if (cloned[field] && typeof cloned[field] === 'string') {
-      cloned[field] = await translateText(cloned[field], 'PT-BR', 'EN');
+  if (typeof node === 'object') {
+    if (typeof node.en === 'string') {
+      collected.push(node.en);
+    }
+    for (const key of Object.keys(node)) {
+      if (key !== 'ptBR') {
+        collectEnglishStrings(node[key], collected);
+      }
+    }
+  } else if (Array.isArray(node)) {
+    for (const item of node) {
+      collectEnglishStrings(item, collected);
     }
   }
 
-  if (Array.isArray(cloned.responsibilities)) {
-    const translatedResp = [];
-    for (const item of cloned.responsibilities) {
-      if (typeof item === 'string') {
-        translatedResp.push(await translateText(item, 'PT-BR', 'EN'));
-      } else {
-        translatedResp.push(item);
-      }
+  return collected;
+}
+
+function computeContentHash(doc) {
+  const strings = collectEnglishStrings(doc);
+  const concatenated = strings.join('|||');
+  return crypto.createHash('sha256').update(concatenated, 'utf8').digest('hex');
+}
+
+/**
+ * Tradução recursiva de campos localizados { en: "...", ptBR: "..." }
+ */
+async function translateFieldLevelObject(node, mode = 'missing_only') {
+  if (!node || typeof node !== 'object') return node;
+
+  // Se for um objeto localizado { en: string, ptBR?: string }
+  if (Object.prototype.hasOwnProperty.call(node, 'en') && typeof node.en === 'string') {
+    const hasExistingPt = typeof node.ptBR === 'string' && node.ptBR.trim() !== '';
+    if (mode === 'missing_only' && hasExistingPt) {
+      return node;
     }
-    cloned.responsibilities = translatedResp;
+    if (node.en.trim() !== '') {
+      const translated = await translateText(node.en, 'PT-BR', 'EN');
+      return {
+        ...node,
+        ptBR: translated,
+      };
+    }
+    return node;
   }
 
-  if (Array.isArray(cloned.contentBlocks)) {
-    for (const block of cloned.contentBlocks) {
-      if (!block || typeof block !== 'object') continue;
-
-      if (block.sectionTitle) block.sectionTitle = await translateText(block.sectionTitle, 'PT-BR', 'EN');
-      if (block.sectionSubtitle) block.sectionSubtitle = await translateText(block.sectionSubtitle, 'PT-BR', 'EN');
-      if (block.title) block.title = await translateText(block.title, 'PT-BR', 'EN');
-      if (block.subtitle) block.subtitle = await translateText(block.subtitle, 'PT-BR', 'EN');
-      if (block.shortDescription) block.shortDescription = await translateText(block.shortDescription, 'PT-BR', 'EN');
-      if (block.caption) block.caption = await translateText(block.caption, 'PT-BR', 'EN');
-      if (block.intro) block.intro = await translateText(block.intro, 'PT-BR', 'EN');
-      if (block.headline) block.headline = await translateText(block.headline, 'PT-BR', 'EN');
-      if (block.description) block.description = await translateText(block.description, 'PT-BR', 'EN');
-      if (block.summary) block.summary = await translateText(block.summary, 'PT-BR', 'EN');
-
-      if (Array.isArray(block.topics)) {
-        for (const topic of block.topics) {
-          if (topic.title) topic.title = await translateText(topic.title, 'PT-BR', 'EN');
-          if (topic.content) topic.content = await translateText(topic.content, 'PT-BR', 'EN');
-        }
-      }
-
-      if (Array.isArray(block.decisions)) {
-        for (const dec of block.decisions) {
-          if (dec.challenge) dec.challenge = await translateText(dec.challenge, 'PT-BR', 'EN');
-          if (dec.decision) dec.decision = await translateText(dec.decision, 'PT-BR', 'EN');
-          if (dec.rationale) dec.rationale = await translateText(dec.rationale, 'PT-BR', 'EN');
-          if (dec.artifactCaption) dec.artifactCaption = await translateText(dec.artifactCaption, 'PT-BR', 'EN');
-        }
-      }
-
-      if (Array.isArray(block.outcomes)) {
-        for (const out of block.outcomes) {
-          if (out.title) out.title = await translateText(out.title, 'PT-BR', 'EN');
-          if (out.description) out.description = await translateText(out.description, 'PT-BR', 'EN');
-        }
-      }
+  // Se for um array
+  if (Array.isArray(node)) {
+    const newArr = [];
+    for (const item of node) {
+      newArr.push(await translateFieldLevelObject(item, mode));
     }
+    return newArr;
   }
 
-  return cloned;
+  // Se for um objeto regular (ex: contentBlock, mainVisual, seo)
+  const result = { ...node };
+  for (const key of Object.keys(result)) {
+    // Ignora campos internos do Sanity
+    if (['_id', '_type', '_rev', '_createdAt', '_updatedAt', 'slug'].includes(key)) {
+      continue;
+    }
+    result[key] = await translateFieldLevelObject(result[key], mode);
+  }
+
+  return result;
 }
 
 export default async function handler(req, res) {
@@ -188,7 +179,7 @@ export default async function handler(req, res) {
   if (rawBodyLength > MAX_PAYLOAD_SIZE_BYTES) {
     return res.status(413).json({
       error: 'Payload Too Large',
-      message: 'Request payload exceeds maximum allowed size of 250KB.',
+      message: 'Request payload exceeds maximum allowed size.',
     });
   }
 
@@ -262,7 +253,7 @@ export default async function handler(req, res) {
   }
 
   // 5. Validação de Payload
-  const { documentId } = req.body || {};
+  const { documentId, mode = 'missing_only' } = req.body || {};
   if (!documentId || typeof documentId !== 'string' || documentId.trim() === '') {
     return res.status(400).json({
       error: 'Bad Request',
@@ -287,84 +278,50 @@ export default async function handler(req, res) {
 
   try {
     const rawDocId = documentId.replace(/^drafts\./, '');
-    const sourceDoc = await backendClient.getDocument(rawDocId);
+    const draftId = `drafts.${rawDocId}`;
 
-    if (!sourceDoc) {
+    // 6. Busca primeiro o draft 'drafts.<id>' mais recente; se não existir, usa o publicado
+    let activeDoc = await backendClient.getDocument(draftId);
+    if (!activeDoc) {
+      activeDoc = await backendClient.getDocument(rawDocId);
+    }
+
+    if (!activeDoc) {
       return res.status(404).json({
         error: 'Not Found',
         message: `Document "${rawDocId}" not found in Sanity.`,
       });
     }
 
-    // 6. Proteção Editorial: Bloqueia sobrescrita de documentos 'reviewed'
-    const ptPublishedId = `${rawDocId}__i18n_pt-BR`;
-    const ptDraftId = `drafts.${rawDocId}__i18n_pt-BR`;
+    // 7. Tradução recursiva dos campos field-level
+    const translatedDoc = await translateFieldLevelObject(activeDoc, mode);
 
-    const existingPtDoc = await backendClient.getDocument(ptDraftId) || await backendClient.getDocument(ptPublishedId);
-    if (existingPtDoc && existingPtDoc.translationStatus === 'reviewed') {
-      return res.status(409).json({
-        error: 'Conflict',
-        message: 'A reviewed translation already exists for this document. Overwriting is blocked to protect editorial work.',
-      });
-    }
+    // 8. Cálculo de hash do conteúdo em inglês
+    const contentHash = computeContentHash(translatedDoc);
 
-    // 7. Tradução recursiva via DeepL
-    const translatedContent = await translateDocumentFields(sourceDoc);
-
-    // 8. Construção do Draft PT-BR
+    // 9. Atualização exclusiva do DRAFT do próprio documento
     const draftPayload = {
-      ...translatedContent,
-      _id: ptDraftId,
-      _type: sourceDoc._type,
-      language: 'pt-BR',
+      ...translatedDoc,
+      _id: draftId,
       translationStatus: 'needs_review',
-      translationOf: {
-        _type: 'reference',
-        _ref: rawDocId,
-      },
+      sourceContentHash: contentHash,
     };
 
     delete draftPayload._rev;
     delete draftPayload._createdAt;
     delete draftPayload._updatedAt;
 
-    // Salva EXCLUSIVAMENTE como DRAFT (nunca publica automaticamente)
-    const draftResult = await backendClient.createOrReplace(draftPayload);
-
-    // 9. Atualiza/Cria documento de metadados do @sanity/document-internationalization
-    const metadataDocId = `i18n.${rawDocId}`;
-    const metadataPayload = {
-      _id: metadataDocId,
-      _type: 'translation.metadata',
-      schemaTypes: [sourceDoc._type],
-      translations: [
-        {
-          _key: 'en',
-          value: {
-            _type: 'reference',
-            _ref: rawDocId,
-          },
-        },
-        {
-          _key: 'pt-BR',
-          value: {
-            _type: 'reference',
-            _ref: ptPublishedId,
-          },
-        },
-      ],
-    };
-
-    await backendClient.createIfNotExists(metadataPayload);
+    // Salva como draft no mesmo documento (NUNCA publica automaticamente)
+    const result = await backendClient.createOrReplace(draftPayload);
 
     return res.status(200).json({
       success: true,
-      message: 'PT-BR draft created successfully. Document translation.metadata linked.',
-      draftId: draftResult._id,
+      message: `PT-BR fields updated in draft (${mode === 'missing_only' ? 'missing fields only' : 'all fields'}).`,
+      draftId: result._id,
       translationStatus: 'needs_review',
+      sourceContentHash: contentHash,
     });
   } catch (err) {
-    // Sanitização de logs: nunca exibe tokens ou dados sensíveis
     console.error('Translation processing error:', err.message);
     return res.status(500).json({
       error: 'Translation Failed',

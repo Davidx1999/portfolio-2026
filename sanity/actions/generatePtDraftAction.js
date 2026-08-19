@@ -1,11 +1,13 @@
 import { useState } from 'react';
 
 /**
- * Custom Sanity Document Action: "Generate PT-BR draft (DeepL)"
+ * Custom Sanity Document Action: "Generate / Update PT-BR with DeepL"
  *
- * Segurança:
- * - Não utiliza nem armazena nenhuma chave estática ou shared secret.
- * - Utiliza o token de sessão do usuário logado no Studio para autorizar o endpoint /api/translate.
+ * Integração Field-Level:
+ * - Lê os campos em 'en' da versão mais recente (draft ou publicado).
+ * - Traduz e preenche os campos 'ptBR' dentro do MESMO documento.
+ * - Oferece opções para preencher apenas campos vazios ou regenerar todos.
+ * - Salva exclusivamente no draft do próprio documento.
  */
 export function createGeneratePtDraftAction(context) {
   return function GeneratePtDraftAction(props) {
@@ -15,23 +17,37 @@ export function createGeneratePtDraftAction(context) {
     const doc = draft || published;
     if (!doc) return null;
 
-    // Apenas para tipos com tradução ativa
-    const translatableTypes = ['project', 'aboutPage', 'letsTalkPage', 'playgroundProject'];
-    if (!translatableTypes.includes(type)) {
-      return null;
-    }
-
-    // Apenas para documentos originais em inglês (English-First)
-    const isEn = !doc.language || doc.language === 'en';
-    if (!isEn) {
+    // Apenas para tipos de estudo de caso / projeto na Fase 1
+    if (type !== 'project') {
       return null;
     }
 
     return {
-      label: isTranslating ? 'Generating PT-BR draft...' : 'Generate PT-BR draft (DeepL)',
+      label: isTranslating ? 'Traduzindo com DeepL...' : 'Generate / Update PT-BR with DeepL',
       disabled: isTranslating,
-      title: 'Generates a PT-BR draft for human review via DeepL',
+      title: 'Traduz os campos em inglês para português no mesmo documento via DeepL',
       onHandle: async () => {
+        const hasExistingPt = !!(doc.title?.ptBR || doc.shortDescription?.ptBR || doc.overview?.ptBR);
+
+        let mode = 'missing_only';
+        if (hasExistingPt) {
+          const userChoice = window.confirm(
+            'Já existem traduções em português neste documento.\n\n' +
+            'Clique [OK] para preencher APENAS os campos portugueses vazios.\n' +
+            'Clique [Cancelar] para REGENERAR todas as traduções em português.'
+          );
+          mode = userChoice ? 'missing_only' : 'regenerate_all';
+
+          if (!userChoice) {
+            const doubleConfirm = window.confirm(
+              '⚠️ ATENÇÃO: Você escolheu REGENERAR todas as traduções em português. Isso atualizará os textos em ptBR no draft atual. Deseja continuar?'
+            );
+            if (!doubleConfirm) {
+              return;
+            }
+          }
+        }
+
         setIsTranslating(true);
 
         try {
@@ -40,7 +56,7 @@ export function createGeneratePtDraftAction(context) {
           const userToken = client.config().token || (typeof window !== 'undefined' ? window.localStorage.getItem('__sanity_session_token') : null);
 
           if (!userToken) {
-            alert('ℹ️ Translation API requires an active authenticated Sanity session token.');
+            alert('ℹ️ A API de Tradução requer uma sessão autenticada no Sanity Studio.');
             setIsTranslating(false);
             return;
           }
@@ -55,20 +71,24 @@ export function createGeneratePtDraftAction(context) {
             },
             body: JSON.stringify({
               documentId: id,
-              targetLanguage: 'pt-BR',
+              mode,
             }),
           });
 
           const data = await res.json();
 
           if (!res.ok) {
-            throw new Error(data.message || data.error || 'Failed to translate document.');
+            throw new Error(data.message || data.error || 'Falha ao processar tradução.');
           }
 
-          alert('✅ PT-BR Draft created successfully! It is now linked in Sanity and awaiting editorial review.');
+          alert(
+            `✅ Tradução concluída com sucesso!\n\n` +
+            `Os campos em português (ptBR) foram preenchidos no rascunho (draft) deste documento.\n` +
+            `Revise os textos e clique em "Publish" quando estiver pronto.`
+          );
         } catch (err) {
           console.error('Translation action error:', err);
-          alert(`❌ Translation Failed: ${err.message || 'Could not connect to /api/translate'}`);
+          alert(`❌ Erro na tradução: ${err.message || 'Não foi possível conectar ao endpoint /api/translate'}`);
         } finally {
           setIsTranslating(false);
         }

@@ -15,6 +15,8 @@ import { CaseSolutionImpact } from '../components/case/CaseSolutionImpact';
 import { CaseReflection } from '../components/case/CaseReflection';
 import { CaseNextProject } from '../components/case/CaseNextProject';
 
+import { resolveField } from '../utils/i18nField';
+
 /**
  * CaseStudyPage
  * Template editorial reutilizável, performático e orientado pelo Sanity CMS.
@@ -31,14 +33,12 @@ export function CaseStudyPage() {
     window.scrollTo(0, 0);
   }, [slug]);
 
-  // Update Document Title & SEO Meta
+  // Update Document Title & SEO Meta com fallback universal
   useEffect(() => {
     if (caseStudy) {
-      const metaTitle =
-        language === 'en' && caseStudy.seo?.metaTitle_en
-          ? caseStudy.seo.metaTitle_en
-          : caseStudy.seo?.metaTitle || `${caseStudy.title} — David Salviano`;
-      document.title = metaTitle;
+      const seoTitle = resolveField(caseStudy.seo?.title, language);
+      const metaTitle = seoTitle || caseStudy.title || 'Case Study';
+      document.title = `${metaTitle} — David Salviano`;
     } else {
       document.title = 'Case Study — David Salviano';
     }
