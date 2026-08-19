@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { Stack, Button, Card, Text, Flex, Spinner, Box } from '@sanity/ui';
-import { useClient } from 'sanity';
+import { useClient, PatchEvent, set } from 'sanity';
 
 function UploadSvg() {
   return (
@@ -71,7 +71,8 @@ export function BulkImageArrayInput(props) {
           const hasMediaField = fields.some((f) => f.name === 'media');
           const imageFieldName = hasMediaField ? 'media' : 'image';
 
-          const itemKey = `img-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+          // Generate stable and unique random key (12 alphanumeric characters, standard Sanity format)
+          const itemKey = Math.random().toString(36).substring(2, 14);
 
           const newItem = {
             _key: itemKey,
@@ -85,25 +86,35 @@ export function BulkImageArrayInput(props) {
             },
           };
 
-          // Initialize optional localized fields if defined
-          if (fields.some((f) => f.name === 'caption')) {
-            newItem.caption = { _type: 'localizedString', en: '', ptBR: '' };
-          }
-          if (fields.some((f) => f.name === 'alt')) {
-            newItem.alt = { _type: 'localizedString', en: '', ptBR: '' };
-          }
+          // Populate initial values and localized string fields if defined
+          fields.forEach((field) => {
+            if (field.name === imageFieldName || newItem[field.name] !== undefined) {
+              return;
+            }
+            if (
+              typeof field.initialValue === 'string' ||
+              typeof field.initialValue === 'number' ||
+              typeof field.initialValue === 'boolean'
+            ) {
+              newItem[field.name] = field.initialValue;
+            } else if (
+              field.name === 'caption' ||
+              field.name === 'alt' ||
+              field.name === 'supportingText'
+            ) {
+              newItem[field.name] = { _type: 'localizedString', en: '', ptBR: '' };
+            }
+          });
 
           newItems.push(newItem);
         }
 
-        // Append new items to array
-        const updatedValue = [...(value || []), ...newItems];
+        // Merge existing array with newly uploaded items
+        const currentArray = Array.isArray(value) ? value : [];
+        const updatedValue = [...currentArray, ...newItems];
 
-        // Use Sanity form onChange API
-        onChange({
-          type: 'set',
-          value: updatedValue,
-        });
+        // Dispatch official Sanity PatchEvent
+        onChange(PatchEvent.from(set(updatedValue)));
       } catch (err) {
         console.error('Bulk image upload error:', err);
         setErrorMessage(err.message || 'Erro durante o upload das imagens.');
