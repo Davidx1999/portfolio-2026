@@ -61,6 +61,7 @@ export default {
       group: 'overview',
       readOnly: true,
       hidden: false,
+      initialValue: 'en',
     },
     {
       name: 'translationStatus',

@@ -29,7 +29,7 @@ export function useCaseStudy(slug) {
 
     try {
       // 1. Tenta buscar o projeto no idioma exato solicitado
-      const query = `*[_type == "project" && (lower(slug.current) == lower($slug) || slug.current == $slug || id.current == $slug || id == $slug || _id == $slug) && (language == $targetLocale || (!defined(language) && $targetLocale == "en"))][0]{
+      const query = `*[_type == "project" && !(_id in path("drafts.**")) && (lower(slug.current) == lower($slug) || slug.current == $slug || id.current == $slug || id == $slug || _id == $slug) && coalesce(language, "en") == $targetLocale][0]{
         ...,
         "slug": coalesce(slug.current, id.current, id, _id),
         "coverImageUrl": coverImage.asset->url,
@@ -52,7 +52,7 @@ export function useCaseStudy(slug) {
       }`;
 
       // 2. Consulta todos os projetos para o índice do carrossel no mesmo idioma
-      const allProjectsQuery = `*[_type == "project" && published != false && (language == $targetLocale || (!defined(language) && $targetLocale == "en"))] | order(featuredOrder asc, orderRank asc, _createdAt desc){
+      const allProjectsQuery = `*[_type == "project" && !(_id in path("drafts.**")) && coalesce(language, "en") == $targetLocale] | order(featuredOrder asc, orderRank asc, _createdAt desc){
         title,
         "slug": coalesce(slug.current, id.current, id, _id),
         projectType,
@@ -74,7 +74,7 @@ export function useCaseStudy(slug) {
 
       // Se não encontrar o documento em pt-BR, busca a versão 'en' e marca como 'missing' para o banner editorial
       if (!sanityProject && targetLocale !== 'en') {
-        const enQuery = `*[_type == "project" && (slug.current == $slug || id.current == $slug || id == $slug || _id == $slug) && (language == "en" || !defined(language))][0]{
+        const enQuery = `*[_type == "project" && !(_id in path("drafts.**")) && (lower(slug.current) == lower($slug) || slug.current == $slug || id.current == $slug || id == $slug || _id == $slug) && coalesce(language, "en") == "en"][0]{
           ...,
           "slug": coalesce(slug.current, id.current, id, _id),
           "coverImageUrl": coverImage.asset->url,
@@ -288,7 +288,7 @@ export function useCaseStudy(slug) {
         setNextCase(null);
       }
     } catch (err) {
-      console.warn('Erro ao carregar estudo de caso do Sanity:', err);
+      console.error('❌ [Sanity Query Error in useCaseStudy]:', err);
       setError(err);
       setCaseStudy(null);
       setNextCase(null);

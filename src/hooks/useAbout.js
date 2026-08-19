@@ -16,14 +16,14 @@ export function useAbout() {
       try {
         const [data, brandingData] = await Promise.all([
           sanityClient.fetch(
-            `*[_type == "aboutPage" && (language == $targetLocale || (!defined(language) && $targetLocale == "en"))][0]{
+            `*[_type == "aboutPage" && !(_id in path("drafts.**")) && coalesce(language, "en") == $targetLocale][0]{
               ...,
               "resumeFileUrl": resumeFile.asset->url
             }`,
             { targetLocale }
           ),
           sanityClient.fetch(
-            `*[_type == "project" && published != false && (language == $targetLocale || (!defined(language) && $targetLocale == "en")) && (showInAbout == true || category match "Brand*" || category match "Identidade*")] | order(aboutOrder asc, orderRank asc, _createdAt desc)[0...3]{
+            `*[_type == "project" && !(_id in path("drafts.**")) && coalesce(language, "en") == $targetLocale && (showInAbout == true || category match "Brand*" || category match "Identidade*")] | order(aboutOrder asc, orderRank asc, _createdAt desc)[0...3]{
               _id,
               title,
               "slug": slug.current,
@@ -71,7 +71,7 @@ export function useAbout() {
           }
         }
       } catch (err) {
-        console.warn('Could not fetch aboutPage or brandingProjects from Sanity:', err);
+        console.error('❌ [Sanity Query Error in useAbout]:', err);
       } finally {
         if (isMounted) setLoading(false);
       }

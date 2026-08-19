@@ -9,6 +9,7 @@ export default {
       type: 'string',
       readOnly: true,
       hidden: false,
+      initialValue: 'en',
     },
     {
       name: 'translationStatus',

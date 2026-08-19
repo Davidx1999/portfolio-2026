@@ -4,7 +4,8 @@ import { useLanguage } from '../context/LanguageContext';
 
 /**
  * useProjects
- * Hook orientado ao Sanity.io com suporte à localização document-level ($locale).
+ * Hook orientado ao Sanity.io com suporte à localização document-level ($targetLocale).
+ * Busca apenas documentos publicados (!(_id in path("drafts.**"))) e faz fallback seguro para "en".
  */
 export function useProjects() {
   const { locale, language } = useLanguage();
@@ -17,9 +18,10 @@ export function useProjects() {
     setError(null);
 
     try {
-      // 1. Busca projetos no locale ativo (ex: 'pt-BR' ou 'en')
       const targetLocale = locale || (language === 'pt' ? 'pt-BR' : 'en');
-      const query = `*[_type == "project" && published != false && (language == $targetLocale || (!defined(language) && $targetLocale == "en"))] | order(featuredOrder asc, orderRank asc, _createdAt desc){
+      
+      // 1. Busca projetos no targetLocale (ex: 'pt-BR' ou 'en')
+      const query = `*[_type == "project" && !(_id in path("drafts.**")) && coalesce(language, "en") == $targetLocale] | order(featuredOrder asc, orderRank asc, _createdAt desc){
         ...,
         "coverImageUrl": coverImage.asset->url,
         "imageUrl": image.asset->url,
@@ -30,9 +32,9 @@ export function useProjects() {
 
       let sanityProjects = await sanityClient.fetch(query, { targetLocale });
 
-      // Se nenhum projeto for retornado no idioma solicitado e não estivermos em 'en', busca a versão 'en' com flag de tradução pendente
+      // 2. Se nenhum projeto for retornado no idioma solicitado e não estivermos em 'en', busca versão 'en'
       if ((!Array.isArray(sanityProjects) || sanityProjects.length === 0) && targetLocale !== 'en') {
-        const fallbackQuery = `*[_type == "project" && published != false && (language == "en" || !defined(language))] | order(featuredOrder asc, orderRank asc, _createdAt desc){
+        const fallbackQuery = `*[_type == "project" && !(_id in path("drafts.**")) && coalesce(language, "en") == "en"] | order(featuredOrder asc, orderRank asc, _createdAt desc){
           ...,
           "coverImageUrl": coverImage.asset->url,
           "imageUrl": image.asset->url,
@@ -82,7 +84,7 @@ export function useProjects() {
         setProjects([]);
       }
     } catch (err) {
-      console.warn('Erro ao carregar projetos do Sanity:', err);
+      console.error('❌ [Sanity Query Error in useProjects]:', err);
       setError(err);
       setProjects([]);
     } finally {

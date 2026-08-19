@@ -81,7 +81,7 @@ export function useLetsTalk() {
     async function fetchLetsTalk() {
       try {
         const data = await sanityClient.fetch(
-          `*[_type == "letsTalkPage" && (language == $targetLocale || (!defined(language) && $targetLocale == "en"))][0]{
+          `*[_type == "letsTalkPage" && !(_id in path("drafts.**")) && coalesce(language, "en") == $targetLocale][0]{
             ...,
             "profileImageUrl": profileImage.asset->url
           }`,
@@ -96,7 +96,7 @@ export function useLetsTalk() {
           });
         }
       } catch (err) {
-        console.warn('Could not fetch letsTalkPage from Sanity, using built-in defaults:', err);
+        console.error('❌ [Sanity Query Error in useLetsTalk]:', err);
       } finally {
         if (isMounted) setLoading(false);
       }
