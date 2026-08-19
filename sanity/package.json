@@ -10,11 +10,13 @@
     "deploy": "sanity deploy"
   },
   "dependencies": {
-    "@sanity/document-internationalization": "^3.3.3",
-    "@sanity/vision": "^3.78.0",
+    "@sanity/document-internationalization": "^6.2.31",
+    "@sanity/language-filter": "^5.0.16",
+    "@sanity/vision": "6.10.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "sanity": "^3.78.0",
+    "sanity": "6.10.1",
+    "sanity-plugin-internationalized-array": "^5.2.0",
     "styled-components": "^6.1.15"
   }
 }
