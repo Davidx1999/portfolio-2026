@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
+import { resolveLocalized } from '../../utils/i18nField';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -8,7 +9,8 @@ export function CaseReflection({ reflection, reflection_en }) {
   const { language } = useLanguage();
   const prefersReducedMotion = useReducedMotion();
 
-  const text = language === 'en' && reflection_en ? reflection_en : reflection;
+  const rawText = language === 'en' && reflection_en ? reflection_en : reflection;
+  const text = resolveLocalized(rawText, language);
 
   if (!text) return null;
 

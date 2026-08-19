@@ -14,6 +14,7 @@ import { CaseContentRenderer } from '../components/case/CaseContentRenderer';
 import { CaseSolutionImpact } from '../components/case/CaseSolutionImpact';
 import { CaseReflection } from '../components/case/CaseReflection';
 import { CaseNextProject } from '../components/case/CaseNextProject';
+import { resolveLocalized } from '../utils/i18nField';
 
 /**
  * CaseStudyPage
@@ -35,12 +36,13 @@ export function CaseStudyPage() {
   // Update Document Title & SEO Meta com fallback universal
   useEffect(() => {
     if (caseStudy) {
-      const metaTitle = caseStudy.seo?.title || `${caseStudy.title} — David Salviano`;
+      const displayTitle = resolveLocalized(caseStudy.title, language) || 'Untitled Project';
+      const metaTitle = resolveLocalized(caseStudy.seo?.title, language) || `${displayTitle} — David Salviano`;
       document.title = metaTitle;
     } else {
       document.title = 'Case Study — David Salviano';
     }
-  }, [caseStudy]);
+  }, [caseStudy, language]);
 
   // Build dynamic Table of Contents sections
   const tocSections = useMemo(() => {
@@ -51,8 +53,9 @@ export function CaseStudyPage() {
 
     if (blocks.length > 0) {
       blocks.forEach((block, idx) => {
-        if (block.title || block.sectionTitle || block.headline || block.statement) {
-          const label = block.title || block.sectionTitle || block.headline || block.statement;
+        const rawLabel = block.title || block.sectionTitle || block.headline || block.statement;
+        const label = resolveLocalized(rawLabel, language);
+        if (label) {
           const shortLabel = label.length > 28 ? `${label.substring(0, 25)}...` : label;
           const num = String(idx + 1).padStart(2, '0');
           list.push({

@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../../context/LanguageContext';
+import { resolveLocalized } from '../../../utils/i18nField';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -16,8 +17,8 @@ export function CaseImageGallery({ block }) {
     return null;
   }
 
-  const eyebrow = language === 'en' && block.eyebrow_en ? block.eyebrow_en : block.eyebrow;
-  const title = language === 'en' && block.title_en ? block.title_en : block.title;
+  const eyebrow = resolveLocalized(language === 'en' && block.eyebrow_en ? block.eyebrow_en : block.eyebrow, language);
+  const title = resolveLocalized(language === 'en' && block.title_en ? block.title_en : block.title, language);
   const isLight = block.theme === 'light';
 
   const gridColsClass =
@@ -62,8 +63,9 @@ export function CaseImageGallery({ block }) {
         {/* Grid de Imagens */}
         <div className={`grid ${gridColsClass} gap-6 md:gap-8 items-start`}>
           {block.images.map((item, idx) => {
-            const caption = language === 'en' && item.caption_en ? item.caption_en : item.caption;
-            const alt = language === 'en' && item.alt_en ? item.alt_en : item.alt || caption || `Galeria foto ${idx + 1}`;
+            const caption = resolveLocalized(language === 'en' && item.caption_en ? item.caption_en : item.caption, language);
+            const rawAlt = language === 'en' && item.alt_en ? item.alt_en : item.alt || caption || `Galeria foto ${idx + 1}`;
+            const alt = resolveLocalized(rawAlt, language);
             
             const aspectClass =
               item.aspectRatio === '16/9'

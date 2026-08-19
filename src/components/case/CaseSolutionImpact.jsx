@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Layers, Zap, CheckCircle2 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { resolveLocalized } from '../../utils/i18nField';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -13,15 +14,17 @@ export function CaseSolutionImpact({ caseStudy }) {
 
   const isIndependent = caseStudy.projectType === 'independentStudy';
 
-  const solution =
+  const rawSolution =
     language === 'en' && caseStudy.solution_en
       ? caseStudy.solution_en
       : caseStudy.solution;
+  const solution = resolveLocalized(rawSolution, language);
 
-  const impact =
+  const rawImpact =
     language === 'en' && caseStudy.impact_en
       ? caseStudy.impact_en
       : caseStudy.impact;
+  const impact = resolveLocalized(rawImpact, language);
 
   if (!solution && !impact) return null;
 

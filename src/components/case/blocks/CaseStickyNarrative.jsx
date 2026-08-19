@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { CheckCircle2 } from 'lucide-react';
 import { useLanguage } from '../../../context/LanguageContext';
+import { resolveLocalized } from '../../../utils/i18nField';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -20,20 +21,23 @@ export function CaseStickyNarrative({ block }) {
     return null;
   }
 
-  const eyebrow =
+  const rawEyebrow =
     language === 'en' && block.eyebrow_en
       ? block.eyebrow_en
       : block.eyebrow || (language === 'en' ? '01 // OVERVIEW & CONTEXT' : '01 // VISÃO GERAL & CONTEXTO');
+  const eyebrow = resolveLocalized(rawEyebrow, language);
 
-  const sectionTitle =
+  const rawSectionTitle =
     language === 'en' && block.sectionTitle_en
       ? block.sectionTitle_en
       : block.sectionTitle || (language === 'en' ? 'Context, Friction & Scope' : 'Contexto, Complexidade & Atuação');
+  const sectionTitle = resolveLocalized(rawSectionTitle, language);
 
-  const sectionSubtitle =
+  const rawSectionSubtitle =
     language === 'en' && block.sectionSubtitle_en
       ? block.sectionSubtitle_en
       : block.sectionSubtitle;
+  const sectionSubtitle = resolveLocalized(rawSectionSubtitle, language);
 
   const isLight = block.theme === 'light';
 
@@ -78,15 +82,16 @@ export function CaseStickyNarrative({ block }) {
           {/* Coluna de Conteúdo Direita (~65%) */}
           <div className="lg:col-span-8 space-y-8 md:space-y-10">
             {block.topics.map((topic, idx) => {
-              const label = language === 'en' && topic.topicKey_en ? topic.topicKey_en : topic.topicKey;
-              const title = language === 'en' && topic.title_en ? topic.title_en : topic.title;
-              const content = language === 'en' && topic.content_en ? topic.content_en : topic.content;
-              const bullets =
+              const label = resolveLocalized(language === 'en' && topic.topicKey_en ? topic.topicKey_en : topic.topicKey, language);
+              const title = resolveLocalized(language === 'en' && topic.title_en ? topic.title_en : topic.title, language);
+              const content = resolveLocalized(language === 'en' && topic.content_en ? topic.content_en : topic.content, language);
+              const rawBullets =
                 language === 'en' && Array.isArray(topic.bulletPoints_en) && topic.bulletPoints_en.length > 0
                   ? topic.bulletPoints_en
                   : Array.isArray(topic.bulletPoints)
                   ? topic.bulletPoints
                   : [];
+              const bullets = rawBullets.map((bp) => resolveLocalized(bp, language)).filter(Boolean);
 
               return (
                 <motion.div

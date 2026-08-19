@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
 import { useLanguage } from '../../../context/LanguageContext';
+import { resolveLocalized } from '../../../utils/i18nField';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -77,10 +78,10 @@ export function CasePrototypeVideo({ block }) {
 
   const videoSrc = block.videoUrl || block.videoFile || block.externalVideo;
   const posterSrc = block.poster;
-  const title = language === 'en' && block.title_en ? block.title_en : block.title;
+  const title = resolveLocalized(language === 'en' && block.title_en ? block.title_en : block.title, language);
   const shortDescription =
-    language === 'en' && block.shortDescription_en ? block.shortDescription_en : block.shortDescription;
-  const caption = language === 'en' && block.caption_en ? block.caption_en : block.caption;
+    resolveLocalized(language === 'en' && block.shortDescription_en ? block.shortDescription_en : block.shortDescription, language);
+  const caption = resolveLocalized(language === 'en' && block.caption_en ? block.caption_en : block.caption, language);
   const isLight = block.theme === 'light';
   const shouldLoop = block.loop ?? true;
 

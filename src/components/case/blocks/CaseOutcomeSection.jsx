@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { CheckCircle2 } from 'lucide-react';
 import { useLanguage } from '../../../context/LanguageContext';
+import { resolveLocalized } from '../../../utils/i18nField';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -18,17 +19,20 @@ export function CaseOutcomeSection({ block }) {
     return null;
   }
 
-  const eyebrow =
+  const rawEyebrow =
     language === 'en' && block.eyebrow_en
       ? block.eyebrow_en
       : block.eyebrow || (language === 'en' ? 'OUTCOMES // LEARNINGS' : 'RESULTADOS // APRENDIZADOS');
+  const eyebrow = resolveLocalized(rawEyebrow, language);
 
-  const title =
+  const rawTitle =
     language === 'en' && block.title_en
       ? block.title_en
       : block.title || (language === 'en' ? 'Verifiable Impact & Systemic Consistency' : 'Impacto Real e Consistência Sistêmica');
+  const title = resolveLocalized(rawTitle, language);
 
-  const intro = language === 'en' && block.intro_en ? block.intro_en : block.intro;
+  const rawIntro = language === 'en' && block.intro_en ? block.intro_en : block.intro;
+  const intro = resolveLocalized(rawIntro, language);
   const isLight = block.theme === 'light';
 
   return (
@@ -65,9 +69,10 @@ export function CaseOutcomeSection({ block }) {
         {/* Grid de Resultados Qualitativos */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {block.outcomes.map((item, idx) => {
-            const tag = item.tag || (language === 'en' ? 'Quality & Scale' : 'Qualidade & Escala');
-            const outcomeTitle = language === 'en' && item.title_en ? item.title_en : item.title;
-            const description = language === 'en' && item.description_en ? item.description_en : item.description;
+            const rawTag = item.tag || (language === 'en' ? 'Quality & Scale' : 'Qualidade & Escala');
+            const tag = resolveLocalized(rawTag, language) || (language === 'en' ? 'Quality & Scale' : 'Qualidade & Escala');
+            const outcomeTitle = resolveLocalized(language === 'en' && item.title_en ? item.title_en : item.title, language);
+            const description = resolveLocalized(language === 'en' && item.description_en ? item.description_en : item.description, language);
 
             return (
               <motion.div

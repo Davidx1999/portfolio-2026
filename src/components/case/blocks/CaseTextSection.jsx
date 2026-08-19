@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../../context/LanguageContext';
+import { resolveLocalized } from '../../../utils/i18nField';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -10,9 +11,9 @@ export function CaseTextSection({ block }) {
 
   if (!block) return null;
 
-  const eyebrow = language === 'en' && block.eyebrow_en ? block.eyebrow_en : block.eyebrow;
-  const title = language === 'en' && block.title_en ? block.title_en : block.title;
-  const body = language === 'en' && block.body_en ? block.body_en : block.body;
+  const eyebrow = resolveLocalized(language === 'en' && block.eyebrow_en ? block.eyebrow_en : block.eyebrow, language);
+  const title = resolveLocalized(language === 'en' && block.title_en ? block.title_en : block.title, language);
+  const body = resolveLocalized(language === 'en' && block.body_en ? block.body_en : block.body, language);
   const isCenter = block.alignment === 'center';
   const isLight = block.theme === 'light';
 

@@ -41,24 +41,20 @@ export function useCaseStudy(slug) {
         "heroMediaPoster": heroMediaOverride.videoPoster.asset->url,
         "slug": coalesce(slug.current, id.current, id, _id),
         "nextCaseRef": nextCase->{
-          title,
+          ...,
           "slug": coalesce(slug.current, id.current, id, _id),
-          category,
-          shortDescription,
-          heroSummary,
           "coverImageUrl": coverImage.asset->url,
+          "reconstructImageUrl": reconstructImage.asset->url,
           "mainVisualImageUrl": mainVisual.image.asset->url
         }
       }`;
 
       // 2. Consulta todos os projetos para o índice e navegação
       const allProjectsQuery = `*[_type == "project" && !(_id in path("drafts.**")) && published != false] | order(featuredOrder asc, _createdAt desc){
-        title,
+        ...,
         "slug": coalesce(slug.current, id.current, id, _id),
-        category,
-        shortDescription,
-        heroSummary,
         "coverImageUrl": coverImage.asset->url,
+        "reconstructImageUrl": reconstructImage.asset->url,
         "mainVisualImageUrl": mainVisual.image.asset->url
       }`;
 

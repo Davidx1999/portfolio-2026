@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { CheckCircle2, ShieldCheck, Zap } from 'lucide-react';
 import { useLanguage } from '../../../context/LanguageContext';
+import { resolveLocalized } from '../../../utils/i18nField';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -11,7 +12,8 @@ export function CaseImpact({ block }) {
 
   if (!block || !Array.isArray(block.items) || block.items.length === 0) return null;
 
-  const title = language === 'en' && block.title_en ? block.title_en : block.title || 'Impacto & Resultados Reais';
+  const rawTitle = language === 'en' && block.title_en ? block.title_en : block.title || (language === 'en' ? 'Verifiable Impact & Outcomes' : 'Impacto & Resultados Reais');
+  const title = resolveLocalized(rawTitle, language);
 
   return (
     <section className="w-full py-16 md:py-24 border-b border-[rgba(244,243,238,0.14)] bg-[#10110F] text-[#FAFAF7]">
@@ -27,8 +29,8 @@ export function CaseImpact({ block }) {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {block.items.map((item, idx) => {
-            const label = language === 'en' && item.label_en ? item.label_en : item.label;
-            const desc = language === 'en' && item.description_en ? item.description_en : item.description;
+            const label = resolveLocalized(language === 'en' && item.label_en ? item.label_en : item.label, language);
+            const desc = resolveLocalized(language === 'en' && item.description_en ? item.description_en : item.description, language);
 
             return (
               <motion.div

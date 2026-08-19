@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
 import { useLanguage } from '../../../context/LanguageContext';
+import { resolveLocalized } from '../../../utils/i18nField';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -15,7 +16,7 @@ export function CaseVideo({ block }) {
   if (!block || (!block.externalVideo && !block.videoFile)) return null;
 
   const videoSrc = block.externalVideo || block.videoFile;
-  const caption = language === 'en' && block.caption_en ? block.caption_en : block.caption;
+  const caption = resolveLocalized(language === 'en' && block.caption_en ? block.caption_en : block.caption, language);
 
   const togglePlay = () => {
     if (!videoRef.current) return;

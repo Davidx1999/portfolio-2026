@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useLanguage } from '../../../context/LanguageContext';
+import { resolveLocalized } from '../../../utils/i18nField';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -221,9 +222,9 @@ export function CaseVerticalMediaStack({ block }) {
         {/* Palco Central dos Cards */}
         <div className="relative w-full flex-1 flex items-center justify-center my-auto z-10 min-h-0 overflow-hidden">
           {items.map((item, idx) => {
-            const caption = language === 'en' && item.caption_en ? item.caption_en : item.caption;
+            const caption = resolveLocalized(language === 'en' && item.caption_en ? item.caption_en : item.caption, language);
             const supportingText =
-              language === 'en' && item.supportingText_en ? item.supportingText_en : item.supportingText;
+              resolveLocalized(language === 'en' && item.supportingText_en ? item.supportingText_en : item.supportingText, language);
 
             return (
               <div
@@ -294,9 +295,9 @@ export function CaseVerticalMediaStack({ block }) {
 
         <div className="flex flex-col gap-10">
           {items.map((item, idx) => {
-            const caption = language === 'en' && item.caption_en ? item.caption_en : item.caption;
+            const caption = resolveLocalized(language === 'en' && item.caption_en ? item.caption_en : item.caption, language);
             const supportingText =
-              language === 'en' && item.supportingText_en ? item.supportingText_en : item.supportingText;
+              resolveLocalized(language === 'en' && item.supportingText_en ? item.supportingText_en : item.supportingText, language);
 
             return (
               <div key={item._key || `mobile-stack-${idx}`} className="w-full flex flex-col">

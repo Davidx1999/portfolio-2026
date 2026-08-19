@@ -4,6 +4,7 @@ import { ArrowLeft, ExternalLink } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { CurtainLink } from '../../context/RouteCurtainContext';
 import { RollingText } from '../RollingText';
+import { resolveLocalized } from '../../utils/i18nField';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -54,32 +55,40 @@ export function CaseEditorialHeader({ caseStudy }) {
     projectTypeLabels.professionalProject[language] ||
     'CASE STUDY';
 
-  const eyebrowText =
+  const rawEyebrow =
     caseStudy.eyebrow ||
     `CASE STUDY // ${typeLabel}`;
+  const eyebrowText = resolveLocalized(rawEyebrow, language);
 
-  const shortDescription =
+  const displayTitle = resolveLocalized(caseStudy.title, language) || 'Untitled Project';
+
+  const rawShortDesc =
     language === 'en' && caseStudy.shortDescription_en
       ? caseStudy.shortDescription_en
       : caseStudy.shortDescription ||
         (language === 'en' && caseStudy.heroSummary_en ? caseStudy.heroSummary_en : caseStudy.heroSummary) ||
         caseStudy.description;
+  const shortDescription = resolveLocalized(rawShortDesc, language);
 
-  const contextText =
+  const rawContextText =
     language === 'en' && caseStudy.longDescription_en
       ? caseStudy.longDescription_en
       : caseStudy.longDescription ||
         (language === 'en' && caseStudy.context_en ? caseStudy.context_en : caseStudy.context) ||
         (language === 'en' && caseStudy.overview_en ? caseStudy.overview_en : caseStudy.overview);
+  const contextText = resolveLocalized(rawContextText, language);
 
-  const disciplines = Array.isArray(caseStudy.disciplines) && caseStudy.disciplines.length > 0
+  const rawDisciplines = Array.isArray(caseStudy.disciplines) && caseStudy.disciplines.length > 0
     ? caseStudy.disciplines
     : null;
+  const disciplines = rawDisciplines
+    ? rawDisciplines.map((d) => resolveLocalized(d, language)).filter(Boolean)
+    : null;
 
-  const role = caseStudy.role || null;
-  const period = caseStudy.period || caseStudy.year || null;
-  const clientOrContext = caseStudy.clientOrContext || caseStudy.client || null;
-  const duration = caseStudy.duration || null;
+  const role = resolveLocalized(caseStudy.role, language) || null;
+  const period = resolveLocalized(caseStudy.period || caseStudy.year, language) || null;
+  const clientOrContext = resolveLocalized(caseStudy.clientOrContext || caseStudy.client, language) || null;
+  const duration = resolveLocalized(caseStudy.duration, language) || null;
   const status = caseStudy.projectStatus && statusLabels[caseStudy.projectStatus]
     ? statusLabels[caseStudy.projectStatus][language] || statusLabels[caseStudy.projectStatus].pt
     : null;
@@ -113,7 +122,7 @@ export function CaseEditorialHeader({ caseStudy }) {
       label: language === 'en' ? 'STATUS' : 'STATUS',
       value: status,
     },
-    disciplines && {
+    disciplines && disciplines.length > 0 && {
       label: language === 'en' ? 'DISCIPLINES' : 'DISCIPLINAS',
       value: isCompact ? disciplines.slice(0, 2).join(' · ') : disciplines.slice(0, 3).join(' · ') + (disciplines.length > 3 ? ` +${disciplines.length - 3}` : ''),
     },
@@ -168,7 +177,7 @@ export function CaseEditorialHeader({ caseStudy }) {
                 : 'text-[2.5rem] sm:text-[3.25rem] md:text-[4rem] lg:text-[4.75rem]'
             } font-normal leading-[1.03] tracking-tight text-[#FAFAF7] mb-6`}
           >
-            {caseStudy.title}
+            {displayTitle}
           </motion.h1>
 
           {/* Descrição Principal */}

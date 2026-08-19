@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { CheckCircle2 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { resolveLocalized } from '../../utils/i18nField';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -13,22 +14,25 @@ export function CaseOverview({ caseStudy }) {
 
   const isIndependent = caseStudy.projectType === 'independentStudy';
 
-  const overview =
+  const rawOverview =
     language === 'en' && caseStudy.overview_en
       ? caseStudy.overview_en
       : caseStudy.overview;
+  const overview = resolveLocalized(rawOverview, language);
 
-  const challenge =
+  const rawChallenge =
     language === 'en' && caseStudy.challenge_en
       ? caseStudy.challenge_en
       : caseStudy.challenge;
+  const challenge = resolveLocalized(rawChallenge, language);
 
-  const responsibilities =
+  const rawResponsibilities =
     language === 'en' && Array.isArray(caseStudy.responsibilities_en) && caseStudy.responsibilities_en.length > 0
       ? caseStudy.responsibilities_en
       : Array.isArray(caseStudy.responsibilities)
       ? caseStudy.responsibilities
       : [];
+  const responsibilities = rawResponsibilities.map((r) => resolveLocalized(r, language)).filter(Boolean);
 
   // If no content exists for this section, do not render an empty section
   if (!overview && !challenge && responsibilities.length === 0) {

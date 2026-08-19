@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../../context/LanguageContext';
+import { resolveLocalized } from '../../../utils/i18nField';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -10,7 +11,8 @@ export function CaseProcessSteps({ block }) {
 
   if (!block || !Array.isArray(block.steps) || block.steps.length === 0) return null;
 
-  const title = language === 'en' && block.title_en ? block.title_en : block.title || 'Processo & Engenharia';
+  const rawTitle = language === 'en' && block.title_en ? block.title_en : block.title || (language === 'en' ? 'Design Process & Engineering' : 'Processo & Engenharia');
+  const title = resolveLocalized(rawTitle, language);
   const isLight = block.theme === 'light';
 
   return (
@@ -38,8 +40,8 @@ export function CaseProcessSteps({ block }) {
         {/* Grade de Etapas */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {block.steps.map((step, idx) => {
-            const stepTitle = language === 'en' && step.title_en ? step.title_en : step.title;
-            const stepDesc = language === 'en' && step.description_en ? step.description_en : step.description;
+            const stepTitle = resolveLocalized(language === 'en' && step.title_en ? step.title_en : step.title, language);
+            const stepDesc = resolveLocalized(language === 'en' && step.description_en ? step.description_en : step.description, language);
             const stepNum = step.index || `0${idx + 1}`;
 
             return (
