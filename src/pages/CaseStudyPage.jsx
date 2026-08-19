@@ -15,15 +15,14 @@ import { CaseSolutionImpact } from '../components/case/CaseSolutionImpact';
 import { CaseReflection } from '../components/case/CaseReflection';
 import { CaseNextProject } from '../components/case/CaseNextProject';
 
-import { resolveField } from '../utils/i18nField';
-
 /**
  * CaseStudyPage
  * Template editorial reutilizável, performático e orientado pelo Sanity CMS.
+ * Renderiza de forma agnóstica qualquer projeto com base em seus dados essenciais e contentBlocks.
  */
 export function CaseStudyPage() {
   const params = useParams();
-  const slug = params.slug || params.projectId || 'mapear';
+  const slug = params.slug || params.projectId;
   const { t } = useTranslation(['case', 'common']);
   const { language } = useLanguage();
   const { caseStudy, nextCase, currentIndex, totalProjects, loading } = useCaseStudy(slug);
@@ -36,29 +35,43 @@ export function CaseStudyPage() {
   // Update Document Title & SEO Meta com fallback universal
   useEffect(() => {
     if (caseStudy) {
-      const seoTitle = resolveField(caseStudy.seo?.title, language);
-      const metaTitle = seoTitle || caseStudy.title || 'Case Study';
-      document.title = `${metaTitle} — David Salviano`;
+      const metaTitle = caseStudy.seo?.title || `${caseStudy.title} — David Salviano`;
+      document.title = metaTitle;
     } else {
       document.title = 'Case Study — David Salviano';
     }
-  }, [caseStudy, language]);
+  }, [caseStudy]);
 
   // Build dynamic Table of Contents sections
   const tocSections = useMemo(() => {
     if (!caseStudy) return [];
     const list = [];
 
-    if (caseStudy.overview || caseStudy.challenge || (caseStudy.responsibilities && caseStudy.responsibilities.length > 0)) {
-      list.push({ id: 'overview-section', label: language === 'en' ? '01. Overview' : '01. Contexto' });
-    }
+    const blocks = Array.isArray(caseStudy.contentBlocks) ? caseStudy.contentBlocks : [];
 
-    if (caseStudy.solution || caseStudy.impact) {
-      list.push({ id: 'solution-section', label: language === 'en' ? '02. Solution' : '02. Solução' });
-    }
-
-    if (caseStudy.reflection) {
-      list.push({ id: 'reflection-section', label: language === 'en' ? '03. Reflection' : '03. Reflexão' });
+    if (blocks.length > 0) {
+      blocks.forEach((block, idx) => {
+        if (block.title || block.sectionTitle || block.headline || block.statement) {
+          const label = block.title || block.sectionTitle || block.headline || block.statement;
+          const shortLabel = label.length > 28 ? `${label.substring(0, 25)}...` : label;
+          const num = String(idx + 1).padStart(2, '0');
+          list.push({
+            id: `block-${block._key || idx}`,
+            label: `${num}. ${shortLabel}`,
+          });
+        }
+      });
+    } else {
+      // Fallback para campos legados se não houver contentBlocks
+      if (caseStudy.overview || caseStudy.challenge || (caseStudy.responsibilities && caseStudy.responsibilities.length > 0)) {
+        list.push({ id: 'overview-section', label: language === 'en' ? '01. Overview' : '01. Contexto' });
+      }
+      if (caseStudy.solution || caseStudy.impact) {
+        list.push({ id: 'solution-section', label: language === 'en' ? '02. Solution' : '02. Solução' });
+      }
+      if (caseStudy.reflection) {
+        list.push({ id: 'reflection-section', label: language === 'en' ? '03. Reflection' : '03. Reflexão' });
+      }
     }
 
     return list;
@@ -106,6 +119,8 @@ export function CaseStudyPage() {
     );
   }
 
+  const hasModularBlocks = Array.isArray(caseStudy.contentBlocks) && caseStudy.contentBlocks.length > 0;
+
   return (
     <article className="w-full bg-[#10110F] text-[#FAFAF7] relative">
       {/* Banner de Tradução Pendente em Português */}
@@ -132,7 +147,7 @@ export function CaseStudyPage() {
       )}
 
       {/* Sumário Flutuante para Cases Extensos */}
-      <CaseTableOfContents sections={tocSections} />
+      {tocSections.length > 1 && <CaseTableOfContents sections={tocSections} />}
 
       {/* ============================================================ */}
       {/* 1. HERO VISUAL STICKY                                        */}
@@ -147,31 +162,29 @@ export function CaseStudyPage() {
         {/* Abertura Editorial: Link Voltar, Eyebrow, Título, Descrição e Metadados */}
         <CaseEditorialHeader caseStudy={caseStudy} />
 
-        {/* Tese / Pergunta Central */}
+        {/* Tese / Pergunta Central (se preenchida) */}
         {caseStudy.thesis && (
           <CaseThesis thesis={caseStudy.thesis} thesis_en={caseStudy.thesis_en} />
         )}
 
-        {/* Visão Geral */}
-        <CaseOverview caseStudy={caseStudy} />
-
-        {/* Blocos Modulares do Sanity */}
-        {Array.isArray(caseStudy.contentBlocks) && caseStudy.contentBlocks.length > 0 && (
+        {/* ── CONTEÚDO MODULAR DA CASE (Renderização Ordenada) ── */}
+        {hasModularBlocks ? (
           <CaseContentRenderer contentBlocks={caseStudy.contentBlocks} />
+        ) : (
+          /* Fallback para projetos com seções legadas antes da migração */
+          <>
+            <CaseOverview caseStudy={caseStudy} />
+            <CaseSolutionImpact caseStudy={caseStudy} />
+            {caseStudy.reflection && (
+              <CaseReflection
+                reflection={caseStudy.reflection}
+                reflection_en={caseStudy.reflection_en}
+              />
+            )}
+          </>
         )}
 
-        {/* Solução Estruturada e Impacto Qualitativo */}
-        <CaseSolutionImpact caseStudy={caseStudy} />
-
-        {/* Reflexão Pessoal */}
-        {caseStudy.reflection && (
-          <CaseReflection
-            reflection={caseStudy.reflection}
-            reflection_en={caseStudy.reflection_en}
-          />
-        )}
-
-        {/* Continue Explorando */}
+        {/* Continue Explorando (Navegação Circular de Cases) */}
         <CaseNextProject
           nextCase={nextCase}
           currentIndex={currentIndex}

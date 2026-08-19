@@ -22,32 +22,43 @@ import { CaseOutcomeSection } from './blocks/CaseOutcomeSection';
 import { CaseImageGallery } from './blocks/CaseImageGallery';
 import { CaseStickyNarrative } from './blocks/CaseStickyNarrative';
 
+/**
+ * Registry de componentes visuais do frontend correspondentes aos schemas do Sanity.
+ */
 const BLOCK_COMPONENTS = {
-  // Novos blocos editoriais e de prototipagem
-  stickyNarrative: CaseStickyNarrative,
-  prototypeVideo: CasePrototypeVideo,
-  decisionSection: CaseDecisionSection,
-  outcomeSection: CaseOutcomeSection,
-  imageGallery: CaseImageGallery,
-
-  // Blocos existentes preservados
-  chapterIntro: CaseChapterIntro,
-  diagonalMediaScene: CaseDiagonalMediaScene,
-  artifactMosaicScene: CaseArtifactMosaic,
-  laggedFullViewportMedia: CaseLaggedFullViewport,
-  verticalMediaStack: CaseVerticalMediaStack,
-  dividerStatement: CaseStatement,
+  // 1. Textos e Narrativa
   textSection: CaseTextSection,
+  stickyNarrative: CaseStickyNarrative,
+  chapterIntro: CaseChapterIntro,
+  dividerStatement: CaseStatement,
+  statementBlock: CaseStatement,
+  quoteBlock: CaseQuote,
+
+  // 2. Mídia e Conteúdo Misto
+  mediaText: CaseMediaText,
   fullMedia: CaseFullMedia,
   splitMedia: CaseSplitMedia,
-  mediaText: CaseMediaText,
-  imageGrid: CaseImageGrid,
-  videoBlock: CaseVideo,
   beforeAfter: CaseBeforeAfter,
+  laggedFullViewportMedia: CaseLaggedFullViewport,
+  diagonalMediaScene: CaseDiagonalMediaScene,
+  verticalMediaStack: CaseVerticalMediaStack,
+
+  // 3. Galerias e Mosaicos
+  imageGallery: CaseImageGallery,
+  artifactMosaicScene: CaseArtifactMosaic,
+  artifactMosaic: CaseArtifactMosaic,
+  imageGrid: CaseImageGrid,
+
+  // 4. Decisões, Processo & Evidências
+  decisionSection: CaseDecisionSection,
+  outcomeSection: CaseOutcomeSection,
   processSteps: CaseProcessSteps,
   artifactShowcase: CaseArtifactShowcase,
-  quoteBlock: CaseQuote,
   impactBlock: CaseImpact,
+
+  // 5. Vídeos e Prototipagem
+  prototypeVideo: CasePrototypeVideo,
+  videoBlock: CaseVideo,
 };
 
 export function CaseContentRenderer({ contentBlocks }) {
@@ -58,14 +69,28 @@ export function CaseContentRenderer({ contentBlocks }) {
   return (
     <div className="w-full flex flex-col">
       {contentBlocks.map((block, idx) => {
-        if (!block || !block._type) return null;
-        const Component = BLOCK_COMPONENTS[block._type];
+        if (!block || typeof block !== 'object') return null;
+        const blockType = block._type || block.blockType;
+        if (!blockType) return null;
+
+        const Component = BLOCK_COMPONENTS[blockType];
+
         if (!Component) {
-          console.warn(`No block renderer found for type: ${block._type}`);
+          if (process.env.NODE_ENV !== 'production') {
+            console.warn(
+              `⚠️ [CaseContentRenderer]: Nenhum componente registrado para o tipo de bloco "${blockType}". O bloco foi ignorado.`
+            );
+          }
           return null;
         }
 
-        return <Component key={block._key || `${block._type}-${idx}`} block={block} />;
+        return (
+          <Component
+            key={block._key || `${blockType}-${idx}`}
+            block={block}
+            {...block}
+          />
+        );
       })}
     </div>
   );

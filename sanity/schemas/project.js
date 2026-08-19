@@ -1,40 +1,49 @@
+import { contentBlockTypes } from './blocks';
+
 export default {
   name: 'project',
   title: 'Estudo de Caso / Projeto',
   type: 'document',
   groups: [
-    { name: 'config', title: '1. Configuração', default: true },
-    { name: 'cardHero', title: '2. Card e Hero' },
-    { name: 'caseContent', title: '3. Conteúdo do Case' },
-    { name: 'galleryNav', title: '4. Galeria e Navegação' },
-    { name: 'seo', title: '5. SEO' },
+    { name: 'projectInfo', title: '1. Informações do Projeto', default: true },
+    { name: 'caseContent', title: '2. Conteúdo da Case' },
+    { name: 'seoConfig', title: '3. SEO e Configurações' },
   ],
   fieldsets: [
     {
-      name: 'overviewChallenge',
-      title: '📋 Overview & Desafio',
-      options: { collapsible: true, collapsed: false },
+      name: 'cardVisuals',
+      title: '🖼️ Visual do Card & Reconstruct',
+      description: 'Defina a imagem de capa (estado inicial) e a imagem de reconstrução (estado final revelado no hover).',
+      options: { columns: 2, collapsible: false },
     },
     {
-      name: 'processSolution',
-      title: '⚙️ Processo & Solução',
-      options: { collapsible: true, collapsed: false },
+      name: 'heroOverride',
+      title: '🎬 Substituição Opcional da Hero',
+      options: { collapsible: true, collapsed: true },
     },
     {
-      name: 'resultsReflection',
-      title: '📈 Resultados & Reflexão',
+      name: 'legacyFields',
+      title: '📦 Campos Legados (Transição / Migração)',
       options: { collapsible: true, collapsed: true },
     },
   ],
   fields: [
     // ============================================================
-    // 1. GRUPO: CONFIGURAÇÃO
+    // 1. GRUPO: INFORMAÇÕES DO PROJETO (projectInfo)
     // ============================================================
+    {
+      name: 'title',
+      title: 'Título Público do Projeto',
+      type: 'localizedString',
+      group: 'projectInfo',
+      validation: (Rule) => Rule.required().error('O título do projeto é obrigatório.'),
+      description: 'Título público exibido nos cards, na hero e na lista de projetos.',
+    },
     {
       name: 'slug',
       title: 'Slug / URL Canônica (Compartilhado)',
       type: 'slug',
-      group: 'config',
+      group: 'projectInfo',
       options: {
         source: 'title.en',
         maxLength: 96,
@@ -51,40 +60,61 @@ export default {
       description: 'Slug único compartilhado por ambos os idiomas (ex: /en/work/mapear e /pt/work/mapear).',
     },
     {
-      name: 'caseDepth',
-      title: 'Profundidade do Case',
-      type: 'string',
-      group: 'config',
-      options: {
-        list: [
-          { title: 'Case Completo (Full Case Study - Narrativa aprofundada)', value: 'full' },
-          { title: 'Case Compacto (Compact Case Study - Síntese visual ágil)', value: 'compact' },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'full',
-      description: 'Define se o estudo de caso renderiza a estrutura completa (ex: Mapear) ou formato compacto.',
+      name: 'shortDescription',
+      title: 'Descrição Curta / Síntese para Cards',
+      type: 'localizedText',
+      group: 'projectInfo',
+      description: 'Texto de síntese exibido abaixo do card na página Work e no Featured Work da Landing.',
     },
     {
-      name: 'projectType',
-      title: 'Classificação do Projeto',
+      name: 'category',
+      title: 'Categoria do Projeto',
+      type: 'localizedString',
+      group: 'projectInfo',
+      description: 'Ex: Product Design, Design System, Branding',
+    },
+    {
+      name: 'disciplines',
+      title: 'Competências e Disciplinas (Tags)',
+      type: 'array',
+      group: 'projectInfo',
+      of: [{ type: 'string' }],
+      options: { layout: 'tags' },
+      description: 'Tags de competência (ex: Design System, UX Research, Product Architecture).',
+    },
+    {
+      name: 'clientOrContext',
+      title: 'Cliente ou Contexto Institucional',
       type: 'string',
-      group: 'config',
-      options: {
-        list: [
-          { title: 'Projeto Profissional (Professional Project)', value: 'professionalProject' },
-          { title: 'Projeto para Cliente (Client Project)', value: 'clientProject' },
-          { title: 'Estudo Independente (Independent Study)', value: 'independentStudy' },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'professionalProject',
+      group: 'projectInfo',
+      description: 'Ex: FGV DGPE / CEnPE / UFC, Atlanta Home Concierge, Escutha',
+    },
+    {
+      name: 'period',
+      title: 'Período',
+      type: 'string',
+      group: 'projectInfo',
+      description: 'Ex: 2022—ATUAL, 2024, 2021—2023',
+    },
+    {
+      name: 'duration',
+      title: 'Duração (Opcional)',
+      type: 'string',
+      group: 'projectInfo',
+      description: 'Ex: Mais de 4 anos, 6 semanas, Contínuo',
+    },
+    {
+      name: 'role',
+      title: 'Função Principal (Role)',
+      type: 'localizedString',
+      group: 'projectInfo',
+      description: 'Ex: Lead Product Designer, Senior UX/UI Designer',
     },
     {
       name: 'projectStatus',
       title: 'Status do Projeto',
       type: 'string',
-      group: 'config',
+      group: 'projectInfo',
       options: {
         list: [
           { title: 'Concluído (Completed)', value: 'completed' },
@@ -95,47 +125,10 @@ export default {
       initialValue: 'completed',
     },
     {
-      name: 'clientOrContext',
-      title: 'Cliente ou Contexto Institucional',
-      type: 'string',
-      group: 'config',
-      description: 'Ex: FGV DGPE / CEnPE / UFC, Atlanta Home Concierge, Escutha',
-    },
-    {
-      name: 'period',
-      title: 'Período',
-      type: 'string',
-      group: 'config',
-      description: 'Ex: 2021—2026, 2024, 2022—atual',
-    },
-    {
-      name: 'duration',
-      title: 'Duração (Opcional)',
-      type: 'string',
-      group: 'config',
-      description: 'Ex: 4 meses, 6 semanas, Contínuo',
-    },
-    {
-      name: 'role',
-      title: 'Função Principal (Role)',
-      type: 'localizedString',
-      group: 'config',
-      description: 'Ex: Lead Product Designer, Senior UX/UI Designer',
-    },
-    {
-      name: 'disciplines',
-      title: 'Competências e Disciplinas',
-      type: 'array',
-      group: 'config',
-      of: [{ type: 'string' }],
-      options: { layout: 'tags' },
-      description: 'Tags de competência (ex: Design System, UX Research, Product Strategy).',
-    },
-    {
       name: 'featuredOnHome',
       title: 'Destacar na Landing Page (Featured Work)',
       type: 'boolean',
-      group: 'config',
+      group: 'projectInfo',
       initialValue: false,
       description: 'Quando ativado, o projeto é exibido na seção Featured Work da home.',
     },
@@ -143,7 +136,7 @@ export default {
       name: 'featuredOrder',
       title: 'Ordem de Exibição / Destaque',
       type: 'number',
-      group: 'config',
+      group: 'projectInfo',
       initialValue: 99,
       description: 'Menor número = maior prioridade (1, 2, 3...).',
     },
@@ -151,19 +144,18 @@ export default {
       name: 'published',
       title: 'Publicado no Site',
       type: 'boolean',
-      group: 'config',
+      group: 'projectInfo',
       initialValue: true,
     },
     {
       name: 'translationStatus',
       title: 'Status de Tradução (Editorial)',
       type: 'string',
-      group: 'config',
+      group: 'projectInfo',
       options: {
         list: [
           { title: 'Original em Inglês (EN)', value: 'original' },
           { title: 'Traduzido via DeepL (needs_review)', value: 'needs_review' },
-          { title: 'Tradução Automática (machine_translated)', value: 'machine_translated' },
           { title: 'Revisado Manualmente (reviewed)', value: 'reviewed' },
           { title: 'Tradução Desatualizada (outdated)', value: 'outdated' },
           { title: 'Pendente / Ausente (missing)', value: 'missing' },
@@ -172,87 +164,60 @@ export default {
       },
       initialValue: 'original',
     },
+
+    // ── Fieldset: Visual do Card & Reconstruct ───────────────────
     {
-      name: 'sourceContentHash',
-      title: 'Hash de Controle de Conteúdo EN',
-      type: 'string',
-      group: 'config',
-      readOnly: true,
-      hidden: true,
-      description: 'Hash SHA-256 dos campos em inglês gerado no momento da tradução para detecção de alterações.',
+      name: 'coverImage',
+      title: '1. Imagem de Capa (Estado Inicial do Card)',
+      type: 'image',
+      group: 'projectInfo',
+      fieldset: 'cardVisuals',
+      options: { hotspot: true },
+      validation: (Rule) => Rule.required().error('A imagem de capa é obrigatória.'),
+      description: 'Exibida no estado inicial do card na landing/work e como fallback da hero.',
+      fields: [
+        {
+          name: 'alt',
+          title: 'Alt Text da Capa',
+          type: 'localizedString',
+        },
+      ],
+    },
+    {
+      name: 'reconstructImage',
+      title: '2. Imagem de Reconstruct (Revelada no Hover)',
+      type: 'image',
+      group: 'projectInfo',
+      fieldset: 'cardVisuals',
+      options: { hotspot: true },
+      description: 'Imagem do produto final refinado revelada através da matriz de reconstrução animada.',
+      fields: [
+        {
+          name: 'alt',
+          title: 'Alt Text do Reconstruct',
+          type: 'localizedString',
+        },
+      ],
     },
 
-    // ============================================================
-    // 2. GRUPO: CARD E HERO
-    // ============================================================
-    {
-      name: 'title',
-      title: 'Título Público do Projeto',
-      type: 'localizedString',
-      group: 'cardHero',
-      validation: (Rule) => Rule.required().error('O título do projeto é obrigatório.'),
-      description: 'Título público exibido nos cards, na hero e na lista de projetos.',
-    },
-    {
-      name: 'shortDescription',
-      title: 'Descrição Curta / Síntese para Cards',
-      type: 'localizedText',
-      group: 'cardHero',
-      description: 'Texto exibido abaixo do card na página Work e no Featured Work.',
-    },
-    {
-      name: 'category',
-      title: 'Categoria do Projeto',
-      type: 'localizedString',
-      group: 'cardHero',
-      description: 'Ex: Product Design, Design System, Branding',
-    },
-    {
-      name: 'mainVisual',
-      title: 'Visual Principal do Projeto (Compartilhado)',
-      type: 'mainVisualMedia',
-      group: 'cardHero',
-      validation: (Rule) => Rule.required().error('O visual principal é obrigatório.'),
-      description: 'Imagem principal compartilhada utilizada no Card do Work, Featured da Landing, fallback da Hero e OpenGraph.',
-    },
-    {
-      name: 'heroEyebrow',
-      title: 'Eyebrow da Hero (Opcional)',
-      type: 'localizedString',
-      group: 'cardHero',
-      description: 'Ex: "01 // SISTEMA & ARQUITETURA", "ESTUDO DE CASO"',
-    },
-    {
-      name: 'heroHeadline',
-      title: 'Headline da Hero (Opcional)',
-      type: 'localizedString',
-      description: 'Se vazio, o Título Público do projeto será utilizado.',
-      group: 'cardHero',
-    },
-    {
-      name: 'heroSummary',
-      title: 'Resumo Editorial da Hero',
-      type: 'localizedText',
-      group: 'cardHero',
-      description: 'Parágrafo de abertura abaixo da headline na Hero do case.',
-    },
+    // ── Fieldset: Substituição Opcional da Hero ─────────────────
     {
       name: 'heroMediaOverride',
-      title: 'Substituição da Mídia da Hero (Opcional)',
+      title: 'Mídia Específica da Hero',
       type: 'object',
-      group: 'cardHero',
-      description: 'Preencha SOMENTE se a hero deste case precisar exibir uma mídia diferente do Visual Principal.',
-      options: { collapsible: true, collapsed: true },
+      group: 'projectInfo',
+      fieldset: 'heroOverride',
+      description: 'Preencha apenas se este case precisar de um vídeo MP4 ou mídia específica na hero diferente da capa.',
       fields: [
         {
           name: 'image',
-          title: 'Imagem Específica da Hero',
+          title: 'Imagem da Hero',
           type: 'image',
           options: { hotspot: true },
         },
         {
           name: 'videoUrl',
-          title: 'Vídeo da Hero (URL MP4)',
+          title: 'Vídeo da Hero (URL MP4 / WebM)',
           type: 'url',
         },
         {
@@ -261,232 +226,103 @@ export default {
           type: 'image',
           options: { hotspot: true },
         },
+        {
+          name: 'eyebrow',
+          title: 'Eyebrow Específico da Hero',
+          type: 'localizedString',
+        },
+        {
+          name: 'headline',
+          title: 'Headline Específica da Hero',
+          type: 'localizedString',
+        },
+        {
+          name: 'summary',
+          title: 'Resumo Editorial da Hero',
+          type: 'localizedText',
+        },
       ],
     },
 
     // ============================================================
-    // 3. GRUPO: CONTEÚDO DO CASE
+    // 2. GRUPO: CONTEÚDO DA CASE (caseContent)
     // ============================================================
-    // Fieldset 1: Overview & Desafio
-    {
-      name: 'overview',
-      title: 'Visão Geral (Overview)',
-      type: 'localizedText',
-      group: 'caseContent',
-      fieldset: 'overviewChallenge',
-      description: 'Contextualização ampla do escopo do projeto.',
-    },
-    {
-      name: 'context',
-      title: 'Contexto do Negócio / Usuários',
-      type: 'localizedText',
-      group: 'caseContent',
-      fieldset: 'overviewChallenge',
-    },
-    {
-      name: 'challenge',
-      title: 'Desafio Central (The Challenge)',
-      type: 'localizedText',
-      group: 'caseContent',
-      fieldset: 'overviewChallenge',
-      description: 'Qual problema central de UX/UI ou arquitetura precisava ser resolvido?',
-    },
-    {
-      name: 'responsibilities',
-      title: 'Papéis e Responsabilidades Exercidas',
-      type: 'array',
-      group: 'caseContent',
-      fieldset: 'overviewChallenge',
-      of: [{ type: 'localizedString' }],
-      description: 'Lista de responsabilidades pontuais (ex: Pesquisa com usuários, Design Tokens, Prototipação).',
-    },
-    {
-      name: 'constraints',
-      title: 'Restrições e Condicionantes do Projeto',
-      type: 'localizedText',
-      group: 'caseContent',
-      fieldset: 'overviewChallenge',
-      description: 'Restrições técnicas, prazos, limitações de legado ou institucionais.',
-    },
-    {
-      name: 'objectives',
-      title: 'Objetivos Principais',
-      type: 'localizedText',
-      group: 'caseContent',
-      fieldset: 'overviewChallenge',
-    },
-
-    // Fieldset 2: Processo & Solução
-    {
-      name: 'processIntro',
-      title: 'Introdução do Processo',
-      type: 'localizedText',
-      group: 'caseContent',
-      fieldset: 'processSolution',
-    },
-    {
-      name: 'processSteps',
-      title: 'Etapas do Processo',
-      type: 'array',
-      group: 'caseContent',
-      fieldset: 'processSolution',
-      of: [{ type: 'localizedString' }],
-      description: 'Etapas de execução do processo de design (ex: 01. Descoberta, 02. Arquitetura, 03. Design System).',
-    },
     {
       name: 'contentBlocks',
-      title: 'Blocos Modulares de Conteúdo (Content Blocks)',
+      title: 'Conteúdo Modular da Case',
       type: 'array',
       group: 'caseContent',
-      fieldset: 'processSolution',
-      of: [{ type: 'contentBlock' }],
-      description: 'Blocos modulares ordenáveis compartilhando layout e imagens, com textos traduzidos.',
-    },
-    {
-      name: 'solutionSummary',
-      title: 'Síntese da Solução Entregue',
-      type: 'localizedText',
-      group: 'caseContent',
-      fieldset: 'processSolution',
-    },
-
-    // Fieldset 3: Resultados & Reflexão
-    {
-      name: 'deliverables',
-      title: 'Entregáveis Principais',
-      type: 'array',
-      group: 'caseContent',
-      fieldset: 'resultsReflection',
-      of: [{ type: 'localizedString' }],
-    },
-    {
-      name: 'impact',
-      title: 'Impacto & Resultados (Qualitativo / Quantitativo)',
-      type: 'localizedText',
-      group: 'caseContent',
-      fieldset: 'resultsReflection',
-      description: 'Resultados alcançados (ex: redução de tempo de preenchimento, adoção do Design System).',
-    },
-    {
-      name: 'metrics',
-      title: 'Métricas Chave (Opcional)',
-      type: 'array',
-      group: 'caseContent',
-      fieldset: 'resultsReflection',
-      of: [
-        {
-          type: 'object',
-          fields: [
-            { name: 'value', title: 'Valor / Indicador (ex: +40%, 0 retrabalho, 4 anos)', type: 'string' },
-            { name: 'label', title: 'Descrição da Métrica', type: 'localizedString' },
-          ],
-        },
-      ],
-    },
-    {
-      name: 'learnings',
-      title: 'Aprendizados do Projeto',
-      type: 'localizedText',
-      group: 'caseContent',
-      fieldset: 'resultsReflection',
-    },
-    {
-      name: 'limitations',
-      title: 'Limitações & Trade-offs',
-      type: 'localizedText',
-      group: 'caseContent',
-      fieldset: 'resultsReflection',
-    },
-    {
-      name: 'nextSteps',
-      title: 'Próximos Passos & Evolução Futura',
-      type: 'localizedText',
-      group: 'caseContent',
-      fieldset: 'resultsReflection',
-    },
-    {
-      name: 'finalReflection',
-      title: 'Reflexão Final do Designer',
-      type: 'localizedText',
-      group: 'caseContent',
-      fieldset: 'resultsReflection',
+      description: 'Adicione e ordene as instâncias dos templates visuais existentes para construir a narrativa da case.',
+      of: contentBlockTypes,
     },
 
     // ============================================================
-    // 4. GRUPO: GALERIA E NAVEGAÇÃO
+    // 3. GRUPO: SEO E CONFIGURAÇÕES (seoConfig)
     // ============================================================
-    {
-      name: 'gallery',
-      title: 'Galeria Complementar de Mídias',
-      type: 'array',
-      group: 'galleryNav',
-      of: [
-        {
-          type: 'object',
-          fields: [
-            {
-              name: 'image',
-              title: 'Imagem Complementar',
-              type: 'image',
-              options: { hotspot: true },
-            },
-            {
-              name: 'caption',
-              title: 'Legenda',
-              type: 'localizedString',
-            },
-            {
-              name: 'alt',
-              title: 'Alt Text',
-              type: 'localizedString',
-            },
-          ],
-          preview: {
-            select: {
-              title: 'caption.en',
-              media: 'image',
-            },
-            prepare({ title, media }) {
-              return {
-                title: title || 'Imagem da Galeria',
-                media,
-              };
-            },
-          },
-        },
-      ],
-    },
     {
       name: 'nextCase',
       title: 'Próximo Estudo de Caso (Navegação)',
       type: 'reference',
       to: [{ type: 'project' }],
-      group: 'galleryNav',
-      description: 'Referência ao próximo estudo de caso sugerido no fechamento.',
+      group: 'seoConfig',
+      description: 'Referência ao próximo estudo de caso sugerido no fechamento da página.',
     },
     {
-      name: 'showBackToTop',
-      title: 'Exibir Botão "Back to Top"',
-      type: 'boolean',
-      group: 'galleryNav',
-      initialValue: true,
+      name: 'seo',
+      title: 'SEO & Metadados de Compartilhamento',
+      type: 'localizedSeo',
+      group: 'seoConfig',
+      description: 'Configurações de SEO. Se vazio, o título, descrição curta e imagem de capa serão usados como fallback automático.',
     },
     {
-      name: 'finalCtaText',
-      title: 'Texto Personalizado do CTA Final (Opcional)',
-      type: 'localizedString',
-      group: 'galleryNav',
-      description: 'Se vazio, o texto padrão da interface será utilizado.',
+      name: 'sourceContentHash',
+      title: 'Hash de Controle de Conteúdo EN',
+      type: 'string',
+      group: 'seoConfig',
+      readOnly: true,
+      hidden: true,
+      description: 'Hash SHA-256 dos campos em inglês gerado no momento da tradução para detecção de alterações.',
     },
 
     // ============================================================
-    // 5. GRUPO: SEO
+    // CAMPOS LEGADOS PARA MIGRAÇÃO NÃO-DESTRUTIVA
     // ============================================================
     {
-      name: 'seo',
-      title: 'Configurações de SEO & Compartilhamento',
-      type: 'localizedSeo',
-      group: 'seo',
+      name: 'mainVisual',
+      title: 'Visual Principal Legado',
+      type: 'mainVisualMedia',
+      group: 'projectInfo',
+      fieldset: 'legacyFields',
+      readOnly: true,
+      hidden: ({ document }) => !document?.mainVisual,
+    },
+    {
+      name: 'overview',
+      title: 'Overview Legado',
+      type: 'localizedText',
+      group: 'caseContent',
+      fieldset: 'legacyFields',
+      readOnly: true,
+      hidden: ({ document }) => !document?.overview,
+    },
+    {
+      name: 'challenge',
+      title: 'Challenge Legado',
+      type: 'localizedText',
+      group: 'caseContent',
+      fieldset: 'legacyFields',
+      readOnly: true,
+      hidden: ({ document }) => !document?.challenge,
+    },
+    {
+      name: 'responsibilities',
+      title: 'Responsibilities Legado',
+      type: 'array',
+      group: 'caseContent',
+      fieldset: 'legacyFields',
+      of: [{ type: 'localizedString' }],
+      readOnly: true,
+      hidden: ({ document }) => !document?.responsibilities,
     },
   ],
 
@@ -495,28 +331,32 @@ export default {
       titleEn: 'title.en',
       titlePt: 'title.ptBR',
       slug: 'slug.current',
-      caseDepth: 'caseDepth',
-      media: 'mainVisual.image',
+      featured: 'featuredOnHome',
+      status: 'projectStatus',
+      cover: 'coverImage',
+      legacyCover: 'mainVisual.image',
       translationStatus: 'translationStatus',
+      blocks: 'contentBlocks',
     },
-    prepare({ titleEn, titlePt, slug, caseDepth, media, translationStatus }) {
+    prepare({ titleEn, titlePt, slug, featured, status, cover, legacyCover, translationStatus, blocks }) {
       const displayTitle = titleEn || titlePt || 'Untitled Project';
-      const depthBadge = caseDepth === 'compact' ? '⚡ Compact' : '📖 Full';
-      const statusEmoji =
+      const blockCount = Array.isArray(blocks) ? blocks.length : 0;
+      const featuredBadge = featured ? '⭐ Destaque' : 'Standard';
+      const statusLabel = status === 'ongoing' ? 'Em andamento' : status === 'concept' ? 'Conceito' : 'Concluído';
+      
+      const translationBadge =
         translationStatus === 'reviewed'
           ? '✅ PT-BR Revisado'
           : translationStatus === 'needs_review'
           ? '⏳ PT-BR Necessita Revisão'
           : translationStatus === 'outdated'
           ? '⚠️ PT-BR Desatualizado'
-          : translationStatus === 'machine_translated'
-          ? '🤖 DeepL Traduzido'
           : '🌐 Apenas EN';
 
       return {
         title: displayTitle,
-        subtitle: `/${slug || 'sem-slug'} · [${depthBadge}] · ${statusEmoji}`,
-        media,
+        subtitle: `/${slug || 'sem-slug'} · [${featuredBadge}] · ${blockCount} blocos · ${statusLabel} · ${translationBadge}`,
+        media: cover || legacyCover,
       };
     },
   },

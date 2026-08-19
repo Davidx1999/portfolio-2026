@@ -3,12 +3,13 @@
  *
  * Arquitetura Field-Level Internationalization:
  * - Traduz recursivamente os campos 'en' para 'ptBR' dentro do MESMO documento.
+ * - Suporta todos os campos essenciais e blocos modulares em `contentBlocks`.
  * - Lê preferencialmente o draft 'drafts.<id>' mais recente (com fallback para publicado).
  * - Suporta dois modos: 'missing_only' (apenas campos vazios) ou 'regenerate_all' (sobrescrever todos).
+ * - Preserva termos protegidos (ex: MAPEAR, CEnPE, UFC, FGV DGPE, TCT, TRI, HTR, Design System).
  * - Calcula hash SHA-256 do conteúdo em inglês (sourceContentHash) para detecção de alterações futuras ('outdated').
  * - Cria/atualiza exclusivamente o draft 'drafts.<id>' no Sanity.
  * - NUNCA cria documentos separados, NUNCA duplica slugs e NUNCA publica automaticamente.
- * - Autenticação segura contra a API oficial do Sanity.
  */
 
 import { createClient } from '@sanity/client';
@@ -18,7 +19,7 @@ import crypto from 'crypto';
 const rateLimitMap = new Map();
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const MAX_REQUESTS_PER_WINDOW = 10;
-const MAX_PAYLOAD_SIZE_BYTES = 350 * 1024; // 350 KB
+const MAX_PAYLOAD_SIZE_BYTES = 500 * 1024; // 500 KB
 
 function isRateLimited(ip) {
   const now = Date.now();
@@ -38,6 +39,46 @@ function isRateLimited(ip) {
   return false;
 }
 
+// Termos e acrônimos que não devem ser traduzidos pelo DeepL
+const PROTECTED_TERMS = [
+  'MAPEAR',
+  'CEnPE',
+  'UFC',
+  'FGV DGPE',
+  'FGV',
+  'DGPE',
+  'TCT',
+  'TRI',
+  'HTR',
+  'Design System',
+  'Design Systems',
+  'Design Tokens',
+  'Figma',
+  'React',
+  'Vite',
+  'Sanity',
+  'GSAP',
+  'ScrollTrigger',
+];
+
+function protectTerms(text) {
+  if (!text || typeof text !== 'string') return text;
+  let protectedText = text;
+  PROTECTED_TERMS.forEach((term) => {
+    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`\\b${escaped}\\b`, 'g');
+    protectedText = protectedText.replace(regex, `<span class="notranslate">${term}</span>`);
+  });
+  return protectedText;
+}
+
+function unprotectTerms(text) {
+  if (!text || typeof text !== 'string') return text;
+  return text
+    .replace(/<span class="notranslate">(.*?)<\/span>/gi, '$1')
+    .replace(/<span class=\\"notranslate\\">(.*?)<\/span>/gi, '$1');
+}
+
 // DeepL API Caller
 async function translateText(text, targetLang = 'PT-BR', sourceLang = 'EN') {
   if (!text || typeof text !== 'string' || text.trim() === '') {
@@ -54,6 +95,8 @@ async function translateText(text, targetLang = 'PT-BR', sourceLang = 'EN') {
     ? 'https://api-free.deepl.com/v2/translate'
     : 'https://api.deepl.com/v2/translate';
 
+  const processedText = protectTerms(text);
+
   const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
@@ -61,7 +104,7 @@ async function translateText(text, targetLang = 'PT-BR', sourceLang = 'EN') {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      text: [text],
+      text: [processedText],
       source_lang: sourceLang,
       target_lang: targetLang,
       preserve_formatting: true,
@@ -75,7 +118,8 @@ async function translateText(text, targetLang = 'PT-BR', sourceLang = 'EN') {
   }
 
   const data = await response.json();
-  return data?.translations?.[0]?.text || text;
+  const rawTranslated = data?.translations?.[0]?.text || text;
+  return unprotectTerms(rawTranslated);
 }
 
 /**
@@ -130,7 +174,7 @@ async function translateFieldLevelObject(node, mode = 'missing_only') {
     return node;
   }
 
-  // Se for um array
+  // Se for um array (ex: contentBlocks, topics, decisions, images, etc.)
   if (Array.isArray(node)) {
     const newArr = [];
     for (const item of node) {
@@ -139,11 +183,11 @@ async function translateFieldLevelObject(node, mode = 'missing_only') {
     return newArr;
   }
 
-  // Se for um objeto regular (ex: contentBlock, mainVisual, seo)
+  // Se for um objeto regular (ex: contentBlock, coverImage, seo)
   const result = { ...node };
   for (const key of Object.keys(result)) {
-    // Ignora campos internos do Sanity
-    if (['_id', '_type', '_rev', '_createdAt', '_updatedAt', 'slug'].includes(key)) {
+    // Ignora metadados e campos estruturais internos do Sanity
+    if (['_id', '_type', '_rev', '_createdAt', '_updatedAt', '_key', 'slug', 'asset', '_ref'].includes(key)) {
       continue;
     }
     result[key] = await translateFieldLevelObject(result[key], mode);
@@ -293,7 +337,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // 7. Tradução recursiva dos campos field-level
+    // 7. Tradução recursiva dos campos field-level (incluindo contentBlocks)
     const translatedDoc = await translateFieldLevelObject(activeDoc, mode);
 
     // 8. Cálculo de hash do conteúdo em inglês
