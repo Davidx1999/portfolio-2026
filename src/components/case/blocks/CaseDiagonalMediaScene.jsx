@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../../context/LanguageContext';
+import { resolveLocalized } from '../../../utils/i18nField';
 
 export function CaseDiagonalMediaScene({ block }) {
   const { language } = useLanguage();
@@ -50,7 +51,7 @@ export function CaseDiagonalMediaScene({ block }) {
 
   if (!block || !block.media) return null;
 
-  const caption = language === 'en' && block.caption_en ? block.caption_en : block.caption;
+  const caption = resolveLocalized(language === 'en' && block.caption_en ? block.caption_en : block.caption, language);
   const isLight = block.theme === 'light';
   const isReduced = prefersReducedMotion;
 

@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Cpu, Layers, FileText, GitBranch, Layout } from 'lucide-react';
 import { useLanguage } from '../../../context/LanguageContext';
+import { resolveLocalized } from '../../../utils/i18nField';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -11,9 +12,9 @@ export function CaseArtifactShowcase({ block }) {
 
   if (!block || !block.media) return null;
 
-  const title = language === 'en' && block.title_en ? block.title_en : block.title;
-  const description = language === 'en' && block.description_en ? block.description_en : block.description;
-  const caption = language === 'en' && block.caption_en ? block.caption_en : block.caption;
+  const title = resolveLocalized(language === 'en' && block.title_en ? block.title_en : block.title, language);
+  const description = resolveLocalized(language === 'en' && block.description_en ? block.description_en : block.description, language);
+  const caption = resolveLocalized(language === 'en' && block.caption_en ? block.caption_en : block.caption, language);
 
   const artifactIcons = {
     designSystem: Cpu,

@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../../context/LanguageContext';
+import { resolveLocalized } from '../../../utils/i18nField';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -11,9 +12,9 @@ export function CaseChapterIntro({ block }) {
   if (!block) return null;
 
   const chapterNum = block.chapterNumber || '01';
-  const title = language === 'en' && block.title_en ? block.title_en : block.title;
-  const subtitle = language === 'en' && block.subtitle_en ? block.subtitle_en : block.subtitle;
-  const summary = language === 'en' && block.summary_en ? block.summary_en : block.summary;
+  const title = resolveLocalized(language === 'en' && block.title_en ? block.title_en : block.title, language);
+  const subtitle = resolveLocalized(language === 'en' && block.subtitle_en ? block.subtitle_en : block.subtitle, language);
+  const summary = resolveLocalized(language === 'en' && block.summary_en ? block.summary_en : block.summary, language);
   const isLight = block.theme === 'light';
 
   return (

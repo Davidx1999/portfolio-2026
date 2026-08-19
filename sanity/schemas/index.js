@@ -5,6 +5,8 @@ import localizedSeo from './objects/localizedSeo';
 import mainVisualMedia from './objects/mainVisualMedia';
 import contentBlock from './objects/contentBlock';
 
+import { blockSchemas } from './blocks';
+
 import project from './project';
 import playgroundProject from './playgroundProject';
 import aboutPage from './aboutPage';
@@ -17,8 +19,11 @@ export const schemaTypes = [
   localizedSeo,
   mainVisualMedia,
   contentBlock,
+  ...blockSchemas,
   project,
   playgroundProject,
   aboutPage,
   letsTalkPage,
 ];
+
+export default schemaTypes;

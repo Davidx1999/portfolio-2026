@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { sanityClient, urlFor } from '../services/sanityClient';
+import { sanityClient } from '../services/sanityClient';
 import { useLanguage } from '../context/LanguageContext';
+import { normalizeProject, resolveImageUrl } from '../utils/normalizeProject';
 
 export function useAbout() {
   const { locale, language } = useLanguage();
@@ -23,22 +24,13 @@ export function useAbout() {
             { targetLocale }
           ),
           sanityClient.fetch(
-            `*[_type == "project" && !(_id in path("drafts.**")) && coalesce(language, "en") == $targetLocale && (showInAbout == true || category match "Brand*" || category match "Identidade*")] | order(aboutOrder asc, orderRank asc, _createdAt desc)[0...3]{
-              _id,
-              title,
-              "slug": slug.current,
-              clientOrContext,
-              category,
-              period,
-              heroSummary,
-              heroSummary_en,
-              overview,
-              overview_en,
-              coverImage,
-              cardCoverImage,
-              tags
-            }`,
-            { targetLocale }
+            `*[_type == "project" && !(_id in path("drafts.**")) && published != false] | order(featuredOrder asc, _createdAt desc)[0...3]{
+              ...,
+              "slug": coalesce(slug.current, id.current, id, _id),
+              "coverImageUrl": coverImage.asset->url,
+              "reconstructImageUrl": reconstructImage.asset->url,
+              "mainVisualImageUrl": mainVisual.image.asset->url
+            }`
           ),
         ]);
 
@@ -46,27 +38,25 @@ export function useAbout() {
           if (data) {
             setAboutData({
               ...data,
-              portraitUrl: data.portrait ? urlFor(data.portrait).url() : null,
+              portraitUrl: data.portrait ? resolveImageUrl(data.portrait) : null,
               resumeUrl: data.resumeFileUrl || data.resumeUrl || null,
               lattesUrl: data.lattesUrl || 'http://lattes.cnpq.br/2300088312341296',
             });
           }
 
           if (Array.isArray(brandingData)) {
-            const formattedBranding = brandingData.map((item) => ({
-              id: item._id,
-              slug: item.slug,
-              title: item.title,
-              area: item.category || 'Identidade Visual',
-              context: item.heroSummary || item.overview || item.clientOrContext || '',
-              context_en: item.heroSummary_en || item.overview_en || item.clientOrContext || '',
-              imageUrl: item.cardCoverImage
-                ? urlFor(item.cardCoverImage).width(800).url()
-                : item.coverImage
-                ? urlFor(item.coverImage).width(800).url()
-                : null,
-              tag: item.tags?.[0] || 'BRANDING',
-            }));
+            const formattedBranding = brandingData.map((item) => {
+              const norm = normalizeProject(item, targetLocale);
+              return {
+                id: norm.id,
+                slug: norm.slug,
+                title: norm.title,
+                area: norm.category || (targetLocale === 'en' ? 'Brand & Visual Systems' : 'Identidade Visual & Sistemas'),
+                context: norm.shortDescription || norm.clientOrContext || '',
+                imageUrl: norm.reconstructImage || norm.coverImage || norm.image,
+                tag: norm.tags?.[0] || 'BRANDING',
+              };
+            });
             setBrandingProjects(formattedBranding);
           }
         }

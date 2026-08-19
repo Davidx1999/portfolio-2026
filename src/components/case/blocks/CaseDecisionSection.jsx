@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../../context/LanguageContext';
+import { resolveLocalized } from '../../../utils/i18nField';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -16,17 +17,20 @@ export function CaseDecisionSection({ block }) {
     return null;
   }
 
-  const eyebrow =
+  const rawEyebrow =
     language === 'en' && block.eyebrow_en
       ? block.eyebrow_en
       : block.eyebrow || (language === 'en' ? 'DESIGN DECISIONS // ARCHITECTURE' : 'DECISÕES DE DESIGN // ARQUITETURA');
+  const eyebrow = resolveLocalized(rawEyebrow, language);
 
-  const title =
+  const rawTitle =
     language === 'en' && block.title_en
       ? block.title_en
       : block.title || (language === 'en' ? 'Critical Design Decisions & Trade-Offs' : 'Decisões Críticas de Design & Trade-Offs');
+  const title = resolveLocalized(rawTitle, language);
 
-  const intro = language === 'en' && block.intro_en ? block.intro_en : block.intro;
+  const rawIntro = language === 'en' && block.intro_en ? block.intro_en : block.intro;
+  const intro = resolveLocalized(rawIntro, language);
   const isLight = block.theme === 'light';
 
   return (
@@ -64,10 +68,10 @@ export function CaseDecisionSection({ block }) {
         <div className="space-y-8 md:space-y-12">
           {block.decisions.map((item, idx) => {
             const num = item.number || String(idx + 1).padStart(2, '0');
-            const challenge = language === 'en' && item.challenge_en ? item.challenge_en : item.challenge;
-            const decision = language === 'en' && item.decision_en ? item.decision_en : item.decision;
-            const rationale = language === 'en' && item.rationale_en ? item.rationale_en : item.rationale;
-            const caption = language === 'en' && item.artifactCaption_en ? item.artifactCaption_en : item.artifactCaption;
+            const challenge = resolveLocalized(language === 'en' && item.challenge_en ? item.challenge_en : item.challenge, language);
+            const decision = resolveLocalized(language === 'en' && item.decision_en ? item.decision_en : item.decision, language);
+            const rationale = resolveLocalized(language === 'en' && item.rationale_en ? item.rationale_en : item.rationale, language);
+            const caption = resolveLocalized(language === 'en' && item.artifactCaption_en ? item.artifactCaption_en : item.artifactCaption, language);
 
             return (
               <motion.div

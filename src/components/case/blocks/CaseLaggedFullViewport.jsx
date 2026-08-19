@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../../context/LanguageContext';
+import { resolveLocalized } from '../../../utils/i18nField';
 
 export function CaseLaggedFullViewport({ block }) {
   const { language } = useLanguage();
@@ -27,8 +28,8 @@ export function CaseLaggedFullViewport({ block }) {
 
   if (!block || (!block.image && !block.videoUrl)) return null;
 
-  const headline = language === 'en' && block.headline_en ? block.headline_en : block.headline;
-  const caption = language === 'en' && block.caption_en ? block.caption_en : block.caption;
+  const headline = resolveLocalized(language === 'en' && block.headline_en ? block.headline_en : block.headline, language);
+  const caption = resolveLocalized(language === 'en' && block.caption_en ? block.caption_en : block.caption, language);
   const isVideo = block.mediaType === 'video' && block.videoUrl;
   const isLight = block.theme === 'light';
   const isReduced = prefersReducedMotion;

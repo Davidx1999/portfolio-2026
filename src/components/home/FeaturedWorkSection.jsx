@@ -26,8 +26,8 @@ export function FeaturedWorkSection() {
         description: p.shortDescription || p.heroSummary || p.description || '',
         link: `/${language}/work/${slug}`,
         wallpaperSrc: p.coverImage || p.finalImage || p.image,
-        mediaThumbSrc: p.processImage || p.image || p.coverImage,
-        mediaExpandedSrc: p.finalImage || p.image || p.coverImage,
+        mediaThumbSrc: p.coverImage || p.processImage || p.image,
+        mediaExpandedSrc: p.reconstructImage || p.finalImage || p.coverImage || p.image,
       };
     });
   }, [featuredProjects, language]);

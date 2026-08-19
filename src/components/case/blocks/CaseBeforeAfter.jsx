@@ -2,6 +2,7 @@ import React, { useState, useRef, useCallback } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Columns, Sliders } from 'lucide-react';
 import { useLanguage } from '../../../context/LanguageContext';
+import { resolveLocalized } from '../../../utils/i18nField';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -22,11 +23,15 @@ export function CaseBeforeAfter({ block }) {
 
   if (!block || !block.beforeImage || !block.afterImage) return null;
 
-  const beforeLabel =
-    language === 'en' && block.beforeLabel_en ? block.beforeLabel_en : block.beforeLabel || 'Antes';
-  const afterLabel =
-    language === 'en' && block.afterLabel_en ? block.afterLabel_en : block.afterLabel || 'Depois';
-  const caption = language === 'en' && block.caption_en ? block.caption_en : block.caption;
+  const rawBefore =
+    language === 'en' && block.beforeLabel_en ? block.beforeLabel_en : block.beforeLabel || (language === 'en' ? 'Before' : 'Antes');
+  const beforeLabel = resolveLocalized(rawBefore, language) || (language === 'en' ? 'Before' : 'Antes');
+
+  const rawAfter =
+    language === 'en' && block.afterLabel_en ? block.afterLabel_en : block.afterLabel || (language === 'en' ? 'After' : 'Depois');
+  const afterLabel = resolveLocalized(rawAfter, language) || (language === 'en' ? 'After' : 'Depois');
+
+  const caption = resolveLocalized(language === 'en' && block.caption_en ? block.caption_en : block.caption, language);
   const isLight = block.theme === 'light';
 
   const handleTouchMove = (e) => {

@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../../context/LanguageContext';
+import { resolveLocalized } from '../../../utils/i18nField';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -10,13 +11,18 @@ export function CaseStatement({ block }) {
 
   if (!block || (!block.statement && !block.statement_pt)) return null;
 
-  const eyebrow = language === 'en' && block.eyebrow_en ? block.eyebrow_en : block.eyebrow;
-  const statement =
+  const rawEyebrow = language === 'en' && block.eyebrow_en ? block.eyebrow_en : block.eyebrow;
+  const eyebrow = resolveLocalized(rawEyebrow, language);
+
+  const rawStatement =
     language === 'en' && block.statement_en
       ? block.statement_en
       : block.statement || block.statement_pt;
-  const supportingText =
+  const statement = resolveLocalized(rawStatement, language);
+
+  const rawSupporting =
     language === 'en' && block.supportingText_en ? block.supportingText_en : block.supportingText;
+  const supportingText = resolveLocalized(rawSupporting, language);
 
   const isCenter = block.alignment === 'center';
   const isLight = block.theme === 'light';

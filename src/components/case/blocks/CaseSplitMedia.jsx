@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../../context/LanguageContext';
+import { resolveLocalized } from '../../../utils/i18nField';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -10,8 +11,8 @@ export function CaseSplitMedia({ block }) {
 
   if (!block || (!block.mediaLeft && !block.mediaRight)) return null;
 
-  const captionLeft = language === 'en' && block.captionLeft_en ? block.captionLeft_en : block.captionLeft;
-  const captionRight = language === 'en' && block.captionRight_en ? block.captionRight_en : block.captionRight;
+  const captionLeft = resolveLocalized(language === 'en' && block.captionLeft_en ? block.captionLeft_en : block.captionLeft, language);
+  const captionRight = resolveLocalized(language === 'en' && block.captionRight_en ? block.captionRight_en : block.captionRight, language);
   const isLight = block.theme === 'light';
 
   const colLeftClass =

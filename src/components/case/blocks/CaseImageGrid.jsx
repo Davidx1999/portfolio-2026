@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../../context/LanguageContext';
+import { resolveLocalized } from '../../../utils/i18nField';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -28,7 +29,7 @@ export function CaseImageGrid({ block }) {
           } gap-6 lg:gap-8`}
         >
           {block.items.map((item, idx) => {
-            const caption = language === 'en' && item.caption_en ? item.caption_en : item.caption;
+            const caption = resolveLocalized(language === 'en' && item.caption_en ? item.caption_en : item.caption, language);
             return (
               <motion.div
                 key={idx}

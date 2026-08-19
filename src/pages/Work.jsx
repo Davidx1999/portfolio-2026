@@ -351,8 +351,8 @@ export function Work() {
                       {/* 1. MÍDIA FULL-BLEED COM RECONSTRUCTMEDIA */}
                       <div className="absolute inset-0 w-full h-full">
                         <ReconstructMedia
-                          initialImage={project.processImage || project.image}
-                          finalImage={project.finalImage || project.image}
+                          initialImage={project.coverImage || project.processImage || project.image}
+                          finalImage={project.reconstructImage || project.finalImage || project.coverImage || project.image}
                           alt={project.alt || project.title}
                           isHovered={isHovered}
                           aspectRatio="w-full h-full"

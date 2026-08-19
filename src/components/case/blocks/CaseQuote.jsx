@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../../context/LanguageContext';
+import { resolveLocalized } from '../../../utils/i18nField';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -10,10 +11,11 @@ export function CaseQuote({ block }) {
 
   if (!block || (!block.quote && !block.quote_pt)) return null;
 
-  const quote =
+  const rawQuote =
     language === 'en' && block.quote_en
       ? block.quote_en
       : block.quote || block.quote_pt;
+  const quote = resolveLocalized(rawQuote, language);
 
   return (
     <section className="w-full py-20 lg:py-28 border-b border-[rgba(244,243,238,0.14)] bg-[#10110F] text-[#FAFAF7]">

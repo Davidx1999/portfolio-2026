@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../../context/LanguageContext';
+import { resolveLocalized } from '../../../utils/i18nField';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -10,8 +11,9 @@ export function CaseFullMedia({ block }) {
 
   if (!block || (!block.image && !block.videoUrl)) return null;
 
-  const caption = language === 'en' && block.caption_en ? block.caption_en : block.caption;
-  const alt = language === 'en' && block.alt_en ? block.alt_en : block.alt || caption || 'Case media';
+  const caption = resolveLocalized(language === 'en' && block.caption_en ? block.caption_en : block.caption, language);
+  const rawAlt = language === 'en' && block.alt_en ? block.alt_en : block.alt || caption || 'Case media';
+  const alt = resolveLocalized(rawAlt, language);
   const isVideo = block.mediaType === 'video' && block.videoUrl;
   const isLight = block.theme === 'light';
 

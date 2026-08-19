@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../context/LanguageContext';
 import { CurtainLink } from '../../context/RouteCurtainContext';
 import { RollingText } from '../RollingText';
+import { resolveLocalized } from '../../utils/i18nField';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -20,12 +21,13 @@ export function CaseNextProject({
 
   const targetSlug = nextCase.slug?.current || nextCase.slug || nextCase.id;
   const targetUrl = `/${language}/work/${targetSlug}`;
-  const title = nextCase.title || (language === 'en' ? 'Next Project' : 'Próximo Projeto');
+  const title = resolveLocalized(nextCase.title, language) || (language === 'en' ? 'Next Project' : 'Próximo Projeto');
   
-  const summary =
+  const rawSummary =
     language === 'en' && nextCase.heroSummary_en
       ? nextCase.heroSummary_en
       : nextCase.heroSummary || nextCase.shortDescription || nextCase.description;
+  const summary = resolveLocalized(rawSummary, language);
 
   const coverSrc = nextCase.coverImage || nextCase.image;
 

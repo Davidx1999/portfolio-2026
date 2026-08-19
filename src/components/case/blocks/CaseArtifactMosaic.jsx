@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../../context/LanguageContext';
 import { useHeaderMetrics } from '../../../hooks/useHeaderMetrics';
+import { resolveLocalized } from '../../../utils/i18nField';
 
 // Standard 4-column spatial coordinates from the official 11-row pattern:
 // [1, 0, 1, 0] -> row 1: col 1, col 3
@@ -82,7 +83,7 @@ function FullBleedMosaicCell({ item, slot, index, _isLight }) {
 
   const transformOrigin = originMap[item.transformOrigin || slot.origin || 'center'];
 
-  const caption = language === 'en' && item.caption_en ? item.caption_en : item.caption;
+  const caption = resolveLocalized(language === 'en' && item.caption_en ? item.caption_en : item.caption, language);
   const isContain = item.fitMode === 'contain';
   const isReduced = prefersReducedMotion;
 
@@ -135,8 +136,8 @@ export function CaseArtifactMosaic({ block }) {
     return null;
   }
 
-  const eyebrow = language === 'en' && block.eyebrow_en ? block.eyebrow_en : block.eyebrow;
-  const title = language === 'en' && block.title_en ? block.title_en : block.title;
+  const eyebrow = resolveLocalized(language === 'en' && block.eyebrow_en ? block.eyebrow_en : block.eyebrow, language);
+  const title = resolveLocalized(language === 'en' && block.title_en ? block.title_en : block.title, language);
   const isLight = block.theme === 'light';
 
   const items = block.items;
