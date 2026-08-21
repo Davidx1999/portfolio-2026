@@ -25,259 +25,259 @@ export function AboutMe() {
   // Trajetória Oficial: 6 Momentos Cronológicos
   const trajectoryMoments = isPt
     ? [
-        {
-          num: '01',
-          period: '2019—2023',
-          title: 'Ilustração & Narrativa Visual',
-          desc: 'Início da trajetória em ilustração autoral, explorando composição, metáforas gráficas e ritmo visual.',
-          repertoire: 'Composição · Narrativa · Ritmo Visual',
-        },
-        {
-          num: '02',
-          period: '2021—2022',
-          title: 'UI, Ilustração & Identidade',
-          desc: 'Atuação como bolsista em UI, ilustração e identidade visual; participação na criação dos manuais de marca do Programe_CE e do CEnPE.',
-          repertoire: 'Manuais de Marca · Programe_CE · CEnPE',
-        },
-        {
-          num: '03',
-          period: '2022',
-          title: 'Identidade CEnPE & Embrião Mapear',
-          desc: 'Criação da identidade visual do CEnPE e início do trabalho no projeto educacional que viria a evoluir e se tornar o Mapear.',
-          repertoire: 'Identidade CEnPE · Concepção · Mapear',
-        },
-        {
-          num: '04',
-          period: '2022—2024',
-          title: 'Evolução UX/UI & Produto',
-          desc: 'Evolução da atuação para UX/UI e Product Design no contexto do CEnPE/UFC e no desenvolvimento da plataforma Mapear.',
-          repertoire: 'UX/UI · Arquitetura · CEnPE / UFC',
-        },
-        {
-          num: '05',
-          period: '2025+',
-          title: 'Product Design, Systems & IA',
-          desc: 'Maior responsabilidade em Product Design, Design Systems, arquitetura de informação, documentação, handoff e prototipagem funcional com IA e vibe coding.',
-          repertoire: 'Design Systems · Handoff · Vibe Coding & IA',
-        },
-        {
-          num: '06',
-          period: '2026',
-          title: 'Freelance Selecionado',
-          desc: 'Atuação independente em projetos selecionados: manual de marca, produção digital e modernização web para Atlanta Home Concierge e redesign para Escutha.',
-          repertoire: 'Atlanta Home Concierge · Escutha · Web',
-        },
-      ]
+      {
+        num: '01',
+        period: '2019—2023',
+        title: 'Ilustração & Narrativa Visual',
+        desc: 'Início da trajetória em ilustração autoral, explorando composição, metáforas gráficas e ritmo visual.',
+        repertoire: 'Composição · Narrativa · Ritmo Visual',
+      },
+      {
+        num: '02',
+        period: '2021—2022',
+        title: 'UI, Ilustração & Identidade',
+        desc: 'Atuação como bolsista em UI, ilustração e identidade visual; participação na criação dos manuais de marca do Programe_CE e do CEnPE.',
+        repertoire: 'Manuais de Marca · Programe_CE · CEnPE',
+      },
+      {
+        num: '03',
+        period: '2022',
+        title: 'Identidade CEnPE & Embrião Mapear',
+        desc: 'Criação da identidade visual do CEnPE e início do trabalho no projeto educacional que viria a evoluir e se tornar o Mapear.',
+        repertoire: 'Identidade CEnPE · Concepção · Mapear',
+      },
+      {
+        num: '04',
+        period: '2022—2024',
+        title: 'Evolução UX/UI & Produto',
+        desc: 'Evolução da atuação para UX/UI e Product Design no contexto do CEnPE/UFC e no desenvolvimento da plataforma Mapear.',
+        repertoire: 'UX/UI · Arquitetura · CEnPE / UFC',
+      },
+      {
+        num: '05',
+        period: '2025+',
+        title: 'Product Design, Systems & IA',
+        desc: 'Maior responsabilidade em Product Design, Design Systems, arquitetura de informação, documentação, handoff e prototipagem funcional com IA e vibe coding.',
+        repertoire: 'Design Systems · Handoff · Vibe Coding & IA',
+      },
+      {
+        num: '06',
+        period: '2026',
+        title: 'Freelance Selecionado',
+        desc: 'Atuação independente em projetos selecionados: manual de marca, produção digital e modernização web para Atlanta Home Concierge e redesign para Escutha.',
+        repertoire: 'Atlanta Home Concierge · Escutha · Web',
+      },
+    ]
     : [
-        {
-          num: '01',
-          period: '2019—2023',
-          title: 'Illustration & Visual Storytelling',
-          desc: 'Early focus on bespoke illustration, exploring composition, graphic metaphors, and visual pacing.',
-          repertoire: 'Composition · Storytelling · Visual Rhythm',
-        },
-        {
-          num: '02',
-          period: '2021—2022',
-          title: 'UI, Illustration & Identity',
-          desc: 'Fellowship role in UI, illustration, and brand identity; contributing to brand guidelines for Programe_CE and CEnPE.',
-          repertoire: 'Brand Guidelines · Programe_CE · CEnPE',
-        },
-        {
-          num: '03',
-          period: '2022',
-          title: 'CEnPE Identity & Mapear Conception',
-          desc: 'Brand identity design for CEnPE and early conception of the educational software that evolved into Mapear.',
-          repertoire: 'CEnPE Identity · Product Inception · Mapear',
-        },
-        {
-          num: '04',
-          period: '2022—2024',
-          title: 'UX/UI & Product Evolution',
-          desc: 'Advancement into UX/UI and Product Design within CEnPE/UFC, scaling the core Mapear platform architecture.',
-          repertoire: 'UX/UI · Architecture · CEnPE / UFC',
-        },
-        {
-          num: '05',
-          period: '2025+',
-          title: 'Product Design, Systems & AI',
-          desc: 'End-to-end product design, scalable Design Systems, technical documentation, design-to-code handoff, and AI-accelerated functional prototyping.',
-          repertoire: 'Design Systems · Handoff · AI Prototyping & Code',
-        },
-        {
-          num: '06',
-          period: '2026',
-          title: 'Selected Independent Practice',
-          desc: 'Consulting on selected engagements: brand manual and web modernization for Atlanta Home Concierge, and redesign for Escutha.',
-          repertoire: 'Atlanta Home Concierge · Escutha · Web',
-        },
-      ];
+      {
+        num: '01',
+        period: '2019—2023',
+        title: 'Illustration & Visual Storytelling',
+        desc: 'Early focus on bespoke illustration, exploring composition, graphic metaphors, and visual pacing.',
+        repertoire: 'Composition · Storytelling · Visual Rhythm',
+      },
+      {
+        num: '02',
+        period: '2021—2022',
+        title: 'UI, Illustration & Identity',
+        desc: 'Fellowship role in UI, illustration, and brand identity; contributing to brand guidelines for Programe_CE and CEnPE.',
+        repertoire: 'Brand Guidelines · Programe_CE · CEnPE',
+      },
+      {
+        num: '03',
+        period: '2022',
+        title: 'CEnPE Identity & Mapear Conception',
+        desc: 'Brand identity design for CEnPE and early conception of the educational software that evolved into Mapear.',
+        repertoire: 'CEnPE Identity · Product Inception · Mapear',
+      },
+      {
+        num: '04',
+        period: '2022—2024',
+        title: 'UX/UI & Product Evolution',
+        desc: 'Advancement into UX/UI and Product Design within CEnPE/UFC, scaling the core Mapear platform architecture.',
+        repertoire: 'UX/UI · Architecture · CEnPE / UFC',
+      },
+      {
+        num: '05',
+        period: '2025+',
+        title: 'Product Design, Systems & AI',
+        desc: 'End-to-end product design, scalable Design Systems, technical documentation, design-to-code handoff, and AI-accelerated functional prototyping.',
+        repertoire: 'Design Systems · Handoff · AI Prototyping & Code',
+      },
+      {
+        num: '06',
+        period: '2026',
+        title: 'Selected Independent Practice',
+        desc: 'Consulting on selected engagements: brand manual and web modernization for Atlanta Home Concierge, and redesign for Escutha.',
+        repertoire: 'Atlanta Home Concierge · Escutha · Web',
+      },
+    ];
 
   // Princípios de trabalho
   const workPrinciples = isPt
     ? [
-        {
-          num: '01',
-          title: 'Entendo antes de simplificar.',
-          desc: 'Investigo contexto, regras e dependências antes de reduzir o problema.',
-        },
-        {
-          num: '02',
-          title: 'Documento para que decisões sobrevivam ao handoff.',
-          desc: 'Componentes, tokens e especificações devem continuar compreensíveis fora do Figma.',
-        },
-        {
-          num: '03',
-          title: 'Aproximo design e desenvolvimento.',
-          desc: 'Trato restrições técnicas como parte da solução, não como uma etapa posterior.',
-        },
-        {
-          num: '04',
-          title: 'Construo sistemas, não apenas telas.',
-          desc: 'Procuro decisões que permaneçam consistentes entre módulos, fluxos e equipes.',
-        },
-      ]
+      {
+        num: '01',
+        title: 'Entendo antes de simplificar.',
+        desc: 'Investigo contexto, regras e dependências antes de reduzir o problema.',
+      },
+      {
+        num: '02',
+        title: 'Documento para que decisões sobrevivam ao handoff.',
+        desc: 'Componentes, tokens e especificações devem continuar compreensíveis fora do Figma.',
+      },
+      {
+        num: '03',
+        title: 'Aproximo design e desenvolvimento.',
+        desc: 'Trato restrições técnicas como parte da solução, não como uma etapa posterior.',
+      },
+      {
+        num: '04',
+        title: 'Construo sistemas, não apenas telas.',
+        desc: 'Procuro decisões que permaneçam consistentes entre módulos, fluxos e equipes.',
+      },
+    ]
     : [
-        {
-          num: '01',
-          title: 'Understand deeply before simplifying.',
-          desc: 'I map context, business constraints, and system dependencies before reducing complexity.',
-        },
-        {
-          num: '02',
-          title: 'Document so decisions outlast handoff.',
-          desc: 'Components, tokens, and specifications must remain crystal clear beyond Figma files.',
-        },
-        {
-          num: '03',
-          title: 'Bridge design and engineering.',
-          desc: 'Technical constraints are inputs to design solutions, never afterthoughts.',
-        },
-        {
-          num: '04',
-          title: 'Build systems, not just screens.',
-          desc: 'I establish coherent design decisions that scale across modules, squads, and time.',
-        },
-      ];
+      {
+        num: '01',
+        title: 'Understand deeply before simplifying.',
+        desc: 'I map context, business constraints, and system dependencies before reducing complexity.',
+      },
+      {
+        num: '02',
+        title: 'Document so decisions outlast handoff.',
+        desc: 'Components, tokens, and specifications must remain crystal clear beyond Figma files.',
+      },
+      {
+        num: '03',
+        title: 'Bridge design and engineering.',
+        desc: 'Technical constraints are inputs to design solutions, never afterthoughts.',
+      },
+      {
+        num: '04',
+        title: 'Build systems, not just screens.',
+        desc: 'I establish coherent design decisions that scale across modules, squads, and time.',
+      },
+    ];
 
   // Espectro de atuação principal
   const primarySpectrum = isPt
     ? [
-        { id: 'p1', name: 'Pesquisa & Imersão', desc: 'Mapeamento de contexto, regras de negócio e usuários' },
-        { id: 'p2', name: 'Estrutura & Arquitetura', desc: 'Arquitetura de informação, fluxos de navegação e taxonomia' },
-        { id: 'p3', name: 'Interface & Usabilidade', desc: 'Design de telas, microinterações e estados funcionais' },
-        { id: 'p4', name: 'Design System & Tokens', desc: 'Componentes modulares, tokens semânticos e variantes' },
-        { id: 'p5', name: 'Documentação Técnica', desc: 'Guias de uso, regras técnicas e acessibilidade WCAG' },
-        { id: 'p6', name: 'Handoff & Validação', desc: 'Alinhamento com engenharia, prototipagem com IA e QA' },
-      ]
+      { id: 'p1', name: 'Pesquisa & Imersão', desc: 'Mapeamento de contexto, regras de negócio e usuários' },
+      { id: 'p2', name: 'Estrutura & Arquitetura', desc: 'Arquitetura de informação, fluxos de navegação e taxonomia' },
+      { id: 'p3', name: 'Interface & Usabilidade', desc: 'Design de telas, microinterações e estados funcionais' },
+      { id: 'p4', name: 'Design System & Tokens', desc: 'Componentes modulares, tokens semânticos e variantes' },
+      { id: 'p5', name: 'Documentação Técnica', desc: 'Guias de uso, regras técnicas e acessibilidade WCAG' },
+      { id: 'p6', name: 'Handoff & Validação', desc: 'Alinhamento com engenharia, prototipagem com IA e QA' },
+    ]
     : [
-        { id: 'p1', name: 'Research & Immersion', desc: 'Context mapping, business logic, and user requirements' },
-        { id: 'p2', name: 'Structure & Architecture', desc: 'Information architecture, user flows, and product taxonomy' },
-        { id: 'p3', name: 'Interface & Usability', desc: 'UI screen design, micro-interactions, and functional states' },
-        { id: 'p4', name: 'Design System & Tokens', desc: 'Modular components, semantic tokens, and scalable variants' },
-        { id: 'p5', name: 'Technical Documentation', desc: 'Usage guidelines, engineering specs, and WCAG accessibility' },
-        { id: 'p6', name: 'Handoff & Validation', desc: 'Engineering alignment, AI prototyping, and design QA' },
-      ];
+      { id: 'p1', name: 'Research & Immersion', desc: 'Context mapping, business logic, and user requirements' },
+      { id: 'p2', name: 'Structure & Architecture', desc: 'Information architecture, user flows, and product taxonomy' },
+      { id: 'p3', name: 'Interface & Usability', desc: 'UI screen design, micro-interactions, and functional states' },
+      { id: 'p4', name: 'Design System & Tokens', desc: 'Modular components, semantic tokens, and scalable variants' },
+      { id: 'p5', name: 'Technical Documentation', desc: 'Usage guidelines, engineering specs, and WCAG accessibility' },
+      { id: 'p6', name: 'Handoff & Validation', desc: 'Engineering alignment, AI prototyping, and design QA' },
+    ];
 
   // Espectro complementar
   const complementarySpectrum = isPt
     ? [
-        { id: 'c1', name: 'Identidade & Marca', desc: 'Direção de arte, manuais de marca e consistência visual' },
-        { id: 'c2', name: 'Motion & Interação', desc: 'Microinterações, timing, respostas táteis e fluidez' },
-        { id: 'c3', name: 'Ilustração & Narrativa', desc: 'Metáforas visuais, composição e ícones autorais' },
-      ]
+      { id: 'c1', name: 'Identidade & Marca', desc: 'Direção de arte, manuais de marca e consistência visual' },
+      { id: 'c2', name: 'Motion & Interação', desc: 'Microinterações, timing, respostas táteis e fluidez' },
+      { id: 'c3', name: 'Ilustração & Narrativa', desc: 'Metáforas visuais, composição e ícones autorais' },
+    ]
     : [
-        { id: 'c1', name: 'Identity & Brand Systems', desc: 'Art direction, brand guidelines, and visual consistency' },
-        { id: 'c2', name: 'Motion & Interaction', desc: 'Micro-interactions, timing curves, tactile feedback, and fluid transitions' },
-        { id: 'c3', name: 'Illustration & Storytelling', desc: 'Visual metaphors, editorial composition, and custom iconography' },
-      ];
+      { id: 'c1', name: 'Identity & Brand Systems', desc: 'Art direction, brand guidelines, and visual consistency' },
+      { id: 'c2', name: 'Motion & Interaction', desc: 'Micro-interactions, timing curves, tactile feedback, and fluid transitions' },
+      { id: 'c3', name: 'Illustration & Storytelling', desc: 'Visual metaphors, editorial composition, and custom iconography' },
+    ];
 
   // 5 Formatos de Colaboração Comercial
   const collaborationModes = isPt
     ? [
-        {
-          num: '01',
-          icon: Layers,
-          title: 'Design de Produto & Interfaces',
-          tag: 'PRODUTO END-TO-END',
-          desc: 'Concepção completa de interfaces e produtos digitais: desde a arquitetura de fluxos e wireframes até o visual design refinado e validação de usabilidade.',
-          tools: 'Figma · Arquitetura · Prototipagem IA · Handoff',
-        },
-        {
-          num: '02',
-          icon: ShieldCheck,
-          title: 'Auditoria & Direção UX/UI',
-          tag: 'DIAGNÓSTICO & DIREÇÃO',
-          desc: 'Auditoria heurística aprofundada, mapeamento de gargalos de conversão/usabilidade e direcionamento estratégico de interface para produtos em produção.',
-          tools: 'Auditoria Heurística · Relatório de Ação · Benchmarks',
-        },
-        {
-          num: '03',
-          icon: Cpu,
-          title: 'Design Systems',
-          tag: 'SISTEMAS & ESCALA',
-          desc: 'Criação, governança e documentação técnica de Design Systems, tokens semânticos e bibliotecas escaláveis alinhadas com a equipe de engenharia.',
-          tools: 'Design Tokens · Variantes · Documentação Viva',
-        },
-        {
-          num: '04',
-          icon: Globe,
-          title: 'Presença Digital & Web',
-          tag: 'PRESENÇA DIGITAL',
-          desc: 'Criação e modernização de websites e experiências digitais com alto padrão visual, microinterações, narrativa editorial e foco em autoridade.',
-          tools: 'Direção Web · Vibe Coding & Motion · Identidade Digital',
-        },
-        {
-          num: '05',
-          icon: RefreshCw,
-          title: 'Suporte Contínuo de Design',
-          tag: 'SQUADS & CONTINUIDADE',
-          desc: 'Apoio contínuo e integrado a squads de produto para evolução de features, manutenção de consistência e handoff ágil para desenvolvimento.',
-          tools: 'Apoio Recorrente · Parceria com Engenharia · Iteração',
-        },
-      ]
+      {
+        num: '01',
+        icon: Layers,
+        title: 'Design de Produto & Interfaces',
+        tag: 'PRODUTO END-TO-END',
+        desc: 'Concepção completa de interfaces e produtos digitais: desde a arquitetura de fluxos e wireframes até o visual design refinado e validação de usabilidade.',
+        tools: 'Figma · Arquitetura · Prototipagem IA · Handoff',
+      },
+      {
+        num: '02',
+        icon: ShieldCheck,
+        title: 'Auditoria & Direção UX/UI',
+        tag: 'DIAGNÓSTICO & DIREÇÃO',
+        desc: 'Auditoria heurística aprofundada, mapeamento de gargalos de conversão/usabilidade e direcionamento estratégico de interface para produtos em produção.',
+        tools: 'Auditoria Heurística · Relatório de Ação · Benchmarks',
+      },
+      {
+        num: '03',
+        icon: Cpu,
+        title: 'Design Systems',
+        tag: 'SISTEMAS & ESCALA',
+        desc: 'Criação, governança e documentação técnica de Design Systems, tokens semânticos e bibliotecas escaláveis alinhadas com a equipe de engenharia.',
+        tools: 'Design Tokens · Variantes · Documentação Viva',
+      },
+      {
+        num: '04',
+        icon: Globe,
+        title: 'Presença Digital & Web',
+        tag: 'PRESENÇA DIGITAL',
+        desc: 'Criação e modernização de websites e experiências digitais com alto padrão visual, microinterações, narrativa editorial e foco em autoridade.',
+        tools: 'Direção Web · Vibe Coding & Motion · Identidade Digital',
+      },
+      {
+        num: '05',
+        icon: RefreshCw,
+        title: 'Suporte Contínuo de Design',
+        tag: 'SQUADS & CONTINUIDADE',
+        desc: 'Apoio contínuo e integrado a squads de produto para evolução de features, manutenção de consistência e handoff ágil para desenvolvimento.',
+        tools: 'Apoio Recorrente · Parceria com Engenharia · Iteração',
+      },
+    ]
     : [
-        {
-          num: '01',
-          icon: Layers,
-          title: 'Product & Interface Design',
-          tag: 'END-TO-END PRODUCT',
-          desc: 'Complete digital product design: from user flow architecture and wireframes to polished visual execution and usability validation.',
-          tools: 'Figma · Architecture · AI Prototyping · Handoff',
-        },
-        {
-          num: '02',
-          icon: ShieldCheck,
-          title: 'UX/UI Audit & Direction',
-          tag: 'DIAGNOSTIC & STRATEGY',
-          desc: 'Comprehensive heuristic evaluation, usability bottleneck mapping, and actionable strategic interface roadmaps for live products.',
-          tools: 'Heuristic Audit · Actionable Report · Benchmarking',
-        },
-        {
-          num: '03',
-          icon: Cpu,
-          title: 'Design Systems',
-          tag: 'SYSTEMS & SCALE',
-          desc: 'Architecture, governance, and technical documentation of Design Systems, semantic tokens, and reusable component libraries synced with code.',
-          tools: 'Design Tokens · Component Variants · Living Specs',
-        },
-        {
-          num: '04',
-          icon: Globe,
-          title: 'Digital Web Presence',
-          tag: 'DIGITAL PRESENCE',
-          desc: 'Design and modernization of web experiences with high visual standards, micro-interactions, editorial storytelling, and brand authority.',
-          tools: 'Web Direction · Motion & Prototyping · Digital Identity',
-        },
-        {
-          num: '05',
-          icon: RefreshCw,
-          title: 'Ongoing Product Design Support',
-          tag: 'SQUADS & CONTINUITY',
-          desc: 'Embedded design support for engineering squads to evolve features, maintain UI consistency, and streamline continuous delivery.',
-          tools: 'Retained Partnership · Dev Collaboration · Iteration',
-        },
-      ];
+      {
+        num: '01',
+        icon: Layers,
+        title: 'Product & Interface Design',
+        tag: 'END-TO-END PRODUCT',
+        desc: 'Complete digital product design: from user flow architecture and wireframes to polished visual execution and usability validation.',
+        tools: 'Figma · Architecture · AI Prototyping · Handoff',
+      },
+      {
+        num: '02',
+        icon: ShieldCheck,
+        title: 'UX/UI Audit & Direction',
+        tag: 'DIAGNOSTIC & STRATEGY',
+        desc: 'Comprehensive heuristic evaluation, usability bottleneck mapping, and actionable strategic interface roadmaps for live products.',
+        tools: 'Heuristic Audit · Actionable Report · Benchmarking',
+      },
+      {
+        num: '03',
+        icon: Cpu,
+        title: 'Design Systems',
+        tag: 'SYSTEMS & SCALE',
+        desc: 'Architecture, governance, and technical documentation of Design Systems, semantic tokens, and reusable component libraries synced with code.',
+        tools: 'Design Tokens · Component Variants · Living Specs',
+      },
+      {
+        num: '04',
+        icon: Globe,
+        title: 'Digital Web Presence',
+        tag: 'DIGITAL PRESENCE',
+        desc: 'Design and modernization of web experiences with high visual standards, micro-interactions, editorial storytelling, and brand authority.',
+        tools: 'Web Direction · Motion & Prototyping · Digital Identity',
+      },
+      {
+        num: '05',
+        icon: RefreshCw,
+        title: 'Ongoing Product Design Support',
+        tag: 'SQUADS & CONTINUITY',
+        desc: 'Embedded design support for engineering squads to evolve features, maintain UI consistency, and streamline continuous delivery.',
+        tools: 'Retained Partnership · Dev Collaboration · Iteration',
+      },
+    ];
 
   const portraitImage =
     aboutData?.portraitUrl || `${import.meta.env.BASE_URL}assets/profile/profile3.png`;
@@ -290,7 +290,7 @@ export function AboutMe() {
       <section className="relative w-full pt-20 md:pt-24 lg:pt-28 pb-12 md:pb-16 border-b border-[rgba(244,243,238,0.16)] bg-[#10110F] flex items-center lg:min-h-[clamp(540px,68svh,720px)]">
         <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
-            
+
             {/* Coluna Esquerda: Conteúdo Editorial e Metadados (~62%) */}
             <div className="lg:col-span-7 flex flex-col justify-center">
               {/* Eyebrow */}
@@ -328,7 +328,7 @@ export function AboutMe() {
               >
                 {t(
                   'about:hero_text',
-                  "For more than four years, I've worked across strategy, architecture, interface, and Design Systems — turning complex decisions into experiences teams can build and people can use."
+                  "For more than four years, I've worked across strategy, architecture, interface, and Design Systems | turning complex decisions into experiences teams can build and people can use."
                 )}
               </motion.p>
 
@@ -367,10 +367,10 @@ export function AboutMe() {
               <div className="relative w-full max-w-[380px] lg:max-w-[420px] aspect-[4/5] rounded-[18px] overflow-hidden border border-[rgba(244,243,238,0.18)] bg-[#151613] shadow-2xl">
                 <img
                   src={portraitImage}
-                  alt="David Salviano — Product Designer"
+                  alt="David Salviano | Product Designer"
                   className="w-full h-full object-cover object-center filter saturate-[0.92] contrast-[1.02]"
                 />
-                
+
                 <div className="absolute inset-0 bg-gradient-to-t from-[#10110F]/80 via-transparent to-transparent pointer-events-none" />
 
                 <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between pointer-events-none">
@@ -391,7 +391,7 @@ export function AboutMe() {
       {/* ============================================================ */}
       <section id="trajectory-section" className="w-full py-20 lg:py-28 border-b border-[rgba(244,243,238,0.16)] bg-[#10110F]">
         <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
-          
+
           <div className="max-w-4xl mb-14 lg:mb-18">
             <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#C4FF00] block mb-3">
               {t('about:trajectory_eyebrow', 'OFFICIAL TIMELINE')}
@@ -458,7 +458,7 @@ export function AboutMe() {
       <section className="w-full py-20 lg:py-28 border-b border-[rgba(244,243,238,0.16)] bg-[#10110F]">
         <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-            
+
             <div className="lg:col-span-7 flex flex-col justify-center">
               <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#C4FF00] block mb-3">
                 {isPt ? 'PROFUNDIDADE INSTITUCIONAL' : 'INSTITUTIONAL DEPTH'}
@@ -471,7 +471,7 @@ export function AboutMe() {
               <p className="font-sans text-sm sm:text-base lg:text-lg text-[#F4F3EE]/80 leading-relaxed mb-8">
                 {isPt
                   ? 'O Mapear nasceu no contexto institucional do CEnPE/UFC e da FGV DGPE como um projeto educacional de larga escala. Ao longo de mais de quatro anos como experiência profissional principal, acompanhei sua evolução entre novos módulos, regras de negócio, acessibilidade e integrações. Decisões de design sólidas não terminam no handoff: precisam continuar escalando no tempo.'
-                  : 'Mapear was conceived within the institutional framework of CEnPE/UFC and FGV DGPE as a large-scale educational platform. Across more than four years as my primary product engagement, I guided its evolution across new modules, business rules, accessibility, and integrations. Rigorous design decisions do not end at handoff — they must scale seamlessly over time.'}
+                  : 'Mapear was conceived within the institutional framework of CEnPE/UFC and FGV DGPE as a large-scale educational platform. Across more than four years as my primary product engagement, I guided its evolution across new modules, business rules, accessibility, and integrations. Rigorous design decisions do not end at handoff | they must scale seamlessly over time.'}
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
@@ -517,7 +517,7 @@ export function AboutMe() {
                     {isPt ? 'ESTUDO PRINCIPAL' : 'FEATURED CASE'}
                   </div>
                 </div>
-                
+
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center justify-between gap-2">
                     <span className="font-mono text-[10px] uppercase font-bold tracking-widest text-[#C4FF00]">
@@ -551,7 +551,7 @@ export function AboutMe() {
       {/* ============================================================ */}
       <section className="w-full py-20 lg:py-28 border-b border-[rgba(244,243,238,0.16)] bg-[#10110F]">
         <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
-          
+
           <div className="max-w-4xl mb-14 lg:mb-18">
             <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#C4FF00] block mb-3">
               {t('about:methods_eyebrow', 'METHODS & PRINCIPLES')}
@@ -611,7 +611,7 @@ export function AboutMe() {
       {/* ============================================================ */}
       <section className="w-full py-20 lg:py-28 border-b border-[rgba(244,243,238,0.16)] bg-[#10110F]">
         <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
-          
+
           <div className="max-w-4xl mb-14">
             <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#C4FF00] block mb-3">
               {isPt ? 'ESPECTRO DE ATUAÇÃO' : 'CORE PRACTICE & SCOPE'}
@@ -700,7 +700,7 @@ export function AboutMe() {
       {brandingProjects && brandingProjects.length > 0 && (
         <section className="w-full py-20 lg:py-28 border-b border-[rgba(244,243,238,0.16)] bg-[#10110F]">
           <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
-            
+
             <div className="max-w-4xl mb-14">
               <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#C4FF00] block mb-3">
                 {t('about:visual_identity_eyebrow', 'VISUAL REPERTOIRE')}
@@ -733,7 +733,7 @@ export function AboutMe() {
                       </div>
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#151613] via-transparent to-transparent opacity-60 pointer-events-none" />
-                    
+
                     <div className="absolute top-3.5 right-3.5 px-2 py-0.5 bg-[#10110F]/80 backdrop-blur-sm border border-white/10 rounded-[6px] font-mono text-[9px] uppercase tracking-wider text-white/70">
                       {piece.tag || 'BRANDING'}
                     </div>
@@ -770,7 +770,7 @@ export function AboutMe() {
       {/* ============================================================ */}
       <section className="w-full py-20 lg:py-28 border-b border-[rgba(244,243,238,0.16)] bg-[#10110F]">
         <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
-          
+
           <div className="max-w-4xl mb-14">
             <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#C4FF00] block mb-3">
               {isPt ? 'FICHA PROFISSIONAL' : 'PROFESSIONAL PROFILE'}
@@ -783,7 +783,7 @@ export function AboutMe() {
           </div>
 
           <div className="bg-[#151613] border border-[rgba(244,243,238,0.16)] rounded-[18px] p-8 sm:p-12 divide-y divide-[rgba(244,243,238,0.12)]">
-            
+
             {/* Linha 1: Formação */}
             <div className="pb-8 grid grid-cols-1 md:grid-cols-12 gap-4 items-start">
               <div className="md:col-span-4 font-mono text-xs uppercase font-bold tracking-wider text-white/50">
@@ -892,7 +892,7 @@ export function AboutMe() {
       {/* ============================================================ */}
       <section className="w-full py-20 lg:py-28 border-b border-[rgba(244,243,238,0.16)] bg-[#10110F]">
         <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
-          
+
           <div className="max-w-4xl mb-6">
             <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-[#C4FF00] block mb-3">
               {isPt ? 'POSICIONAMENTO COMERCIAL' : 'COMMERCIAL ENGAGEMENT'}

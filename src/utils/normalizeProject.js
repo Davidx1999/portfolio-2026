@@ -300,7 +300,7 @@ export function normalizeProject(rawProject, locale = 'en') {
     .filter(Boolean);
 
   // ── Fallbacks de SEO ───────────────────────────────────────────────────────
-  const seoTitle = resolveLocalized(rawProject.seo?.title, locale) || `${displayTitle} — David Salviano`;
+  const seoTitle = resolveLocalized(rawProject.seo?.title, locale) || `${displayTitle} | David Salviano`;
   const seoDescription = resolveLocalized(rawProject.seo?.description, locale) || displayDesc;
   const seoOgImage = rawProject.seo?.ogImage ? resolveImageUrl(rawProject.seo.ogImage) : coverUrl;
 

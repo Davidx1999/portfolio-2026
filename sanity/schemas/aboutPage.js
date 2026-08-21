@@ -57,14 +57,14 @@ export default {
       title: 'Hero Description (PT)',
       type: 'text',
       rows: 3,
-      initialValue: 'Há mais de quatro anos trabalho entre estratégia, arquitetura, interface e Design Systems — transformando decisões complexas em experiências que equipes conseguem construir e pessoas conseguem usar.',
+      initialValue: 'Há mais de quatro anos trabalho entre estratégia, arquitetura, interface e Design Systems | transformando decisões complexas em experiências que equipes conseguem construir e pessoas conseguem usar.',
     },
     {
       name: 'heroDescription_en',
       title: 'Hero Description (EN)',
       type: 'text',
       rows: 3,
-      initialValue: 'For more than four years, I’ve worked across strategy, architecture, interface and Design Systems — turning complex decisions into experiences teams can build and people can use.',
+      initialValue: 'For more than four years, I’ve worked across strategy, architecture, interface and Design Systems | turning complex decisions into experiences teams can build and people can use.',
     },
     {
       name: 'portrait',
@@ -78,13 +78,13 @@ export default {
       name: 'portraitAlt',
       title: 'Alt Text da Foto (PT)',
       type: 'string',
-      initialValue: 'David Salviano — Product Designer',
+      initialValue: 'David Salviano | Product Designer',
     },
     {
       name: 'portraitAlt_en',
       title: 'Alt Text da Foto (EN)',
       type: 'string',
-      initialValue: 'David Salviano — Product Designer',
+      initialValue: 'David Salviano | Product Designer',
     },
     {
       name: 'location',

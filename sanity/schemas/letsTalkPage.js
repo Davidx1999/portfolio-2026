@@ -111,13 +111,13 @@ export default {
       name: 'profileImageAlt',
       title: 'Alt Text da Foto (PT)',
       type: 'string',
-      initialValue: 'David Salviano — Product Designer',
+      initialValue: 'David Salviano | Product Designer',
     },
     {
       name: 'profileImageAlt_en',
       title: 'Alt Text da Foto (EN)',
       type: 'string',
-      initialValue: 'David Salviano — Product Designer',
+      initialValue: 'David Salviano | Product Designer',
     },
     {
       name: 'responseTime',

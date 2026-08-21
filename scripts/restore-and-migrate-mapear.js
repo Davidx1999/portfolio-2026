@@ -92,8 +92,8 @@ async function restoreMapear() {
     },
     heroHeadline: {
       _type: 'localizedString',
-      en: 'Mapear — Educational Assessment Platform',
-      ptBR: 'Mapear — Plataforma de Avaliação Educacional',
+      en: 'Mapear | Educational Assessment Platform',
+      ptBR: 'Mapear | Plataforma de Avaliação Educacional',
     },
     heroSummary: {
       _type: 'localizedText',
@@ -161,8 +161,8 @@ async function restoreMapear() {
       _type: 'localizedSeo',
       title: {
         _type: 'localizedString',
-        en: 'Mapear Case Study — David Salviano',
-        ptBR: 'Estudo de Caso Mapear — David Salviano',
+        en: 'Mapear Case Study | David Salviano',
+        ptBR: 'Estudo de Caso Mapear | David Salviano',
       },
       description: {
         _type: 'localizedText',

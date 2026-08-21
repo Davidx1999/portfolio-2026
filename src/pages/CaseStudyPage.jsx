@@ -37,10 +37,10 @@ export function CaseStudyPage() {
   useEffect(() => {
     if (caseStudy) {
       const displayTitle = resolveLocalized(caseStudy.title, language) || 'Untitled Project';
-      const metaTitle = resolveLocalized(caseStudy.seo?.title, language) || `${displayTitle} — David Salviano`;
+      const metaTitle = resolveLocalized(caseStudy.seo?.title, language) || `${displayTitle} | David Salviano`;
       document.title = metaTitle;
     } else {
-      document.title = 'Case Study — David Salviano';
+      document.title = 'Case Study | David Salviano';
     }
   }, [caseStudy, language]);
 
@@ -167,7 +167,7 @@ export function CaseStudyPage() {
       {/* 2. FOLHA EDITORIAL FRONTAL                                   */}
       {/* ============================================================ */}
       <div className="relative z-10 w-full bg-[#10110F] rounded-t-[28px] sm:rounded-t-[36px] shadow-[0_-20px_50px_rgba(0,0,0,0.6)] border-t border-[rgba(244,243,238,0.12)]">
-        
+
         {/* Abertura Editorial: Link Voltar, Eyebrow, Título, Descrição e Metadados */}
         <CaseEditorialHeader caseStudy={caseStudy} />
 

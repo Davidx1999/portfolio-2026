@@ -36,7 +36,7 @@ export function CaseReflection({ reflection, reflection_en }) {
           </p>
 
           <span className="font-mono text-xs text-white/50 uppercase tracking-wider block">
-            — David Salviano · Product Design
+            | David Salviano · Product Design
           </span>
         </motion.div>
       </div>

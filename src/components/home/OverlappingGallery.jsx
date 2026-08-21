@@ -10,11 +10,11 @@ gsap.registerPlugin(ScrollTrigger);
    ──────────────────────────────────────────────────────────── */
 const DISPERSALS = [
   { x: -35, y: -30, rotate: -14, scale: 0.82 },  // top-left
-  { x: 10,  y: -40, rotate: 8,   scale: 0.78 },  // top-center
-  { x: 40,  y: -25, rotate: 16,  scale: 0.85 },  // top-right
-  { x: -30, y: 35,  rotate: 12,  scale: 0.80 },  // bottom-left
-  { x: 15,  y: 40,  rotate: -6,  scale: 0.76 },  // bottom-center
-  { x: 35,  y: 35,  rotate: -18, scale: 0.83 },  // bottom-right
+  { x: 10, y: -40, rotate: 8, scale: 0.78 },  // top-center
+  { x: 40, y: -25, rotate: 16, scale: 0.85 },  // top-right
+  { x: -30, y: 35, rotate: 12, scale: 0.80 },  // bottom-left
+  { x: 15, y: 40, rotate: -6, scale: 0.76 },  // bottom-center
+  { x: 35, y: 35, rotate: -18, scale: 0.83 },  // bottom-right
 ];
 
 export function OverlappingGallery({ items }) {
@@ -32,7 +32,7 @@ export function OverlappingGallery({ items }) {
   const row2 = useMemo(() => artifacts.slice(3, 6), [artifacts]);
 
   /* ──────────────────────────────────────────────────────────
-     GSAP ScrollTrigger — dispersal → convergence
+     GSAP ScrollTrigger | dispersal → convergence
      ────────────────────────────────────────────────────────── */
   useEffect(() => {
     const section = sectionRef.current;

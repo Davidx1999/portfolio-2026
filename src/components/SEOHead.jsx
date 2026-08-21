@@ -17,7 +17,7 @@ export function SEOHead() {
     document.documentElement.lang = htmlLang;
 
     // 2. Derive Title and Description based on route
-    let pageTitle = t('common:site_title', 'David Salviano — Product Designer');
+    let pageTitle = t('common:site_title', 'David Salviano | Product Designer');
     let pageDescription = t(
       'common:site_description',
       'Portfolio of David Salviano, Product Designer specialized in complex digital products and Design Systems.'
@@ -25,29 +25,29 @@ export function SEOHead() {
 
     if (unPrefixed === '' || unPrefixed === '/') {
       pageTitle = lang === 'en'
-        ? 'David Salviano — Product Designer'
-        : 'David Salviano — Product Designer & Design Systems';
+        ? 'David Salviano | Product Designer'
+        : 'David Salviano | Product Designer & Design Systems';
       pageDescription = lang === 'en'
         ? 'David Salviano is a Product Designer crafting the architecture, interfaces, and Design Systems behind complex digital platforms.'
         : 'David Salviano é Product Designer focado em arquitetura de informação, interfaces e Design Systems para produtos complexos.';
     } else if (unPrefixed.startsWith('/work')) {
       pageTitle = lang === 'en'
-        ? 'Selected Work — David Salviano'
-        : 'Trabalhos Selecionados — David Salviano';
+        ? 'Selected Work | David Salviano'
+        : 'Trabalhos Selecionados | David Salviano';
       pageDescription = lang === 'en'
         ? 'Index of selected digital product case studies, design systems, and software architectures.'
         : 'Índice de estudos de caso selecionados de produtos digitais, design systems e arquitetura de software.';
     } else if (unPrefixed.startsWith('/about')) {
       pageTitle = lang === 'en'
-        ? 'About — David Salviano'
-        : 'Sobre Mim — David Salviano';
+        ? 'About | David Salviano'
+        : 'Sobre Mim | David Salviano';
       pageDescription = lang === 'en'
         ? 'Learn about David Salviano’s background in illustration, visual systems, UX/UI, and product design.'
         : 'Conheça a trajetória de David Salviano em ilustração, sistemas visuais, UX/UI e design de produto.';
     } else if (unPrefixed.startsWith('/contact')) {
       pageTitle = lang === 'en'
-        ? "Let's Talk — David Salviano"
-        : 'Contato — David Salviano';
+        ? "Let's Talk | David Salviano"
+        : 'Contato | David Salviano';
       pageDescription = lang === 'en'
         ? 'Start a project, inquire about consulting, or discuss collaboration on digital products.'
         : 'Inicie uma conversa sobre novos projetos, consultoria ou colaboração em produtos digitais.';

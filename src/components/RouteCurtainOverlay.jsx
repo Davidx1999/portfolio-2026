@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { animate } from 'animejs';
 import { useRouteCurtain } from '../context/RouteCurtainContext';
 
-// Forma diagonal do painel — percentuais relativos à PRÓPRIA caixa do
+// Forma diagonal do painel | percentuais relativos à PRÓPRIA caixa do
 // painel (130vw de largura). Isso é o que dá o corte em diagonal.
 const CLIP_PANEL_FWD = 'polygon(0% 0%, calc(100% - 10vw) 0%, 100% 100%, 10vw 100%)';
 const CLIP_PANEL_BWD = 'polygon(10vw 0%, 100% 0%, calc(100% - 10vw) 100%, 0% 100%)';
@@ -51,7 +51,7 @@ export function RouteCurtainOverlay() {
     }
   }, [curtainState, isBackward]);
 
-  // 2. TRANSIÇÃO DA CORTINA — Painel (transform) + Máscara dinâmica (clip-path absoluto)
+  // 2. TRANSIÇÃO DA CORTINA | Painel (transform) + Máscara dinâmica (clip-path absoluto)
   useEffect(() => {
     if (!panelRef.current || !maskRef.current) return;
 
@@ -109,9 +109,8 @@ export function RouteCurtainOverlay() {
         data-curtain-state={curtainState}
         data-curtain-direction={curtainData?.direction || 'forward'}
         aria-hidden={!isCurtainActive}
-        className={`page-curtain fixed inset-0 w-full h-[100dvh] overflow-hidden select-none z-[200] ${
-          isCurtainActive ? 'pointer-events-auto visible' : 'pointer-events-none invisible'
-        }`}
+        className={`page-curtain fixed inset-0 w-full h-[100dvh] overflow-hidden select-none z-[200] ${isCurtainActive ? 'pointer-events-auto visible' : 'pointer-events-none invisible'
+          }`}
       >
         {/* Painel sólido lilás */}
         <div

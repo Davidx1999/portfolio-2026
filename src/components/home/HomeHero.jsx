@@ -35,14 +35,14 @@ export function HomeHero() {
       video
         .play()
         .then(() => setIsPlaying(true))
-        .catch(() => {});
+        .catch(() => { });
     } else {
       video.pause();
       setIsPlaying(false);
     }
   };
 
-  // Attach listeners on mount — handles both fresh-load and cached video
+  // Attach listeners on mount | handles both fresh-load and cached video
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -178,8 +178,8 @@ export function HomeHero() {
                     ? 'Pause process video'
                     : 'Pausar vídeo de processo'
                   : language === 'en'
-                  ? 'Play process video'
-                  : 'Reproduzir vídeo de processo'
+                    ? 'Play process video'
+                    : 'Reproduzir vídeo de processo'
               }
             >
               <motion.div

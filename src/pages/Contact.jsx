@@ -179,7 +179,7 @@ export function Contact() {
     );
 
     const emailBody = encodeURIComponent(
-`Hello David,
+      `Hello David,
 
 I would like to discuss a project. Here are the details:
 
@@ -365,14 +365,14 @@ Sent via official portfolio (davidsalviano.com)
             {/* LADO ESQUERDO: Painel de Disponibilidade e Contato (5 Cols)   */}
             {/* ============================================================ */}
             <aside className="lg:col-span-5 flex flex-col gap-4 sm:gap-5 lg:sticky lg:top-[calc(var(--header-safe-offset)+1rem)]">
-              
+
               <div className="border border-[#10110F]/12 bg-white p-5 sm:p-6 rounded-[16px] shadow-sm flex flex-col gap-4">
-                
+
                 {talkData?.profileImageUrl && (
                   <div className="w-full aspect-[16/8] max-h-[165px] rounded-[10px] overflow-hidden border border-[#10110F]/10 bg-[#10110F]/5">
                     <img
                       src={talkData.profileImageUrl}
-                      alt={talkData.profileImageAlt || 'David Salviano — Product Designer'}
+                      alt={talkData.profileImageAlt || 'David Salviano | Product Designer'}
                       className="w-full h-full object-cover object-center"
                     />
                   </div>
@@ -501,7 +501,7 @@ Sent via official portfolio (davidsalviano.com)
             {/* ============================================================ */}
             <main className="lg:col-span-7 flex flex-col gap-10">
               <form onSubmit={handleSubmit} className="flex flex-col gap-10">
-                
+
                 <input
                   type="text"
                   name="honeypot"
@@ -527,10 +527,9 @@ Sent via official portfolio (davidsalviano.com)
                           className={`
                             group inline-flex items-center gap-2 px-4 py-2.5 rounded-[12px] font-sans text-xs sm:text-sm font-semibold
                             transition-all duration-200 cursor-pointer select-none border focus-within:ring-2 focus-within:ring-[#4056F4]
-                            ${
-                              isSelected
-                                ? 'bg-[#10110F] text-[#FAFAF7] border-[#10110F] shadow-sm'
-                                : 'bg-white text-[#10110F]/80 border-[#10110F]/15 hover:border-[#10110F]/40 hover:text-[#10110F]'
+                            ${isSelected
+                              ? 'bg-[#10110F] text-[#FAFAF7] border-[#10110F] shadow-sm'
+                              : 'bg-white text-[#10110F]/80 border-[#10110F]/15 hover:border-[#10110F]/40 hover:text-[#10110F]'
                             }
                           `}
                         >
@@ -541,9 +540,8 @@ Sent via official portfolio (davidsalviano.com)
                             className="sr-only"
                           />
                           <span
-                            className={`w-2 h-2 rounded-full transition-colors ${
-                              isSelected ? 'bg-[#C4FF00]' : 'bg-[#10110F]/20 group-hover:bg-[#10110F]/40'
-                            }`}
+                            className={`w-2 h-2 rounded-full transition-colors ${isSelected ? 'bg-[#C4FF00]' : 'bg-[#10110F]/20 group-hover:bg-[#10110F]/40'
+                              }`}
                           />
                           <span>{service}</span>
                         </label>
@@ -567,10 +565,9 @@ Sent via official portfolio (davidsalviano.com)
                           className={`
                             group inline-flex items-center gap-2 px-4 py-2.5 rounded-[12px] font-sans text-xs sm:text-sm font-semibold
                             transition-all duration-200 cursor-pointer select-none border focus-within:ring-2 focus-within:ring-[#4056F4]
-                            ${
-                              isSelected
-                                ? 'bg-[#10110F] text-[#FAFAF7] border-[#10110F] shadow-sm'
-                                : 'bg-white text-[#10110F]/80 border-[#10110F]/15 hover:border-[#10110F]/40 hover:text-[#10110F]'
+                            ${isSelected
+                              ? 'bg-[#10110F] text-[#FAFAF7] border-[#10110F] shadow-sm'
+                              : 'bg-white text-[#10110F]/80 border-[#10110F]/15 hover:border-[#10110F]/40 hover:text-[#10110F]'
                             }
                           `}
                         >
@@ -583,9 +580,8 @@ Sent via official portfolio (davidsalviano.com)
                             className="sr-only"
                           />
                           <span
-                            className={`w-2 h-2 rounded-full transition-colors ${
-                              isSelected ? 'bg-[#C4FF00]' : 'bg-[#10110F]/20 group-hover:bg-[#10110F]/40'
-                            }`}
+                            className={`w-2 h-2 rounded-full transition-colors ${isSelected ? 'bg-[#C4FF00]' : 'bg-[#10110F]/20 group-hover:bg-[#10110F]/40'
+                              }`}
                           />
                           <span>{format}</span>
                         </label>
@@ -609,10 +605,9 @@ Sent via official portfolio (davidsalviano.com)
                           className={`
                             group inline-flex items-center gap-2 px-4 py-2.5 rounded-[12px] font-sans text-xs sm:text-sm font-semibold
                             transition-all duration-200 cursor-pointer select-none border focus-within:ring-2 focus-within:ring-[#4056F4]
-                            ${
-                              isSelected
-                                ? 'bg-[#10110F] text-[#FAFAF7] border-[#10110F] shadow-sm'
-                                : 'bg-white text-[#10110F]/80 border-[#10110F]/15 hover:border-[#10110F]/40 hover:text-[#10110F]'
+                            ${isSelected
+                              ? 'bg-[#10110F] text-[#FAFAF7] border-[#10110F] shadow-sm'
+                              : 'bg-white text-[#10110F]/80 border-[#10110F]/15 hover:border-[#10110F]/40 hover:text-[#10110F]'
                             }
                           `}
                         >
@@ -625,9 +620,8 @@ Sent via official portfolio (davidsalviano.com)
                             className="sr-only"
                           />
                           <span
-                            className={`w-2 h-2 rounded-full transition-colors ${
-                              isSelected ? 'bg-[#C4FF00]' : 'bg-[#10110F]/20 group-hover:bg-[#10110F]/40'
-                            }`}
+                            className={`w-2 h-2 rounded-full transition-colors ${isSelected ? 'bg-[#C4FF00]' : 'bg-[#10110F]/20 group-hover:bg-[#10110F]/40'
+                              }`}
                           />
                           <span>{timeline}</span>
                         </label>
@@ -660,10 +654,9 @@ Sent via official portfolio (davidsalviano.com)
                           className={`
                             group inline-flex items-center gap-2 px-4 py-2.5 rounded-[12px] font-sans text-xs sm:text-sm font-semibold
                             transition-all duration-200 cursor-pointer select-none border focus-within:ring-2 focus-within:ring-[#4056F4]
-                            ${
-                              isSelected
-                                ? 'bg-[#10110F] text-[#FAFAF7] border-[#10110F] shadow-sm'
-                                : 'bg-white text-[#10110F]/80 border-[#10110F]/15 hover:border-[#10110F]/40 hover:text-[#10110F]'
+                            ${isSelected
+                              ? 'bg-[#10110F] text-[#FAFAF7] border-[#10110F] shadow-sm'
+                              : 'bg-white text-[#10110F]/80 border-[#10110F]/15 hover:border-[#10110F]/40 hover:text-[#10110F]'
                             }
                           `}
                         >
@@ -676,9 +669,8 @@ Sent via official portfolio (davidsalviano.com)
                             className="sr-only"
                           />
                           <span
-                            className={`w-2 h-2 rounded-full transition-colors ${
-                              isSelected ? 'bg-[#C4FF00]' : 'bg-[#10110F]/20 group-hover:bg-[#10110F]/40'
-                            }`}
+                            className={`w-2 h-2 rounded-full transition-colors ${isSelected ? 'bg-[#C4FF00]' : 'bg-[#10110F]/20 group-hover:bg-[#10110F]/40'
+                              }`}
                           />
                           <span>{budget}</span>
                         </label>

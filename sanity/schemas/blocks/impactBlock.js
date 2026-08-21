@@ -50,7 +50,7 @@ export default {
             },
             prepare({ val, label }) {
               return {
-                title: `${val || ''} — ${label || 'Métrica'}`,
+                title: `${val || ''} | ${label || 'Métrica'}`,
               };
             },
           },

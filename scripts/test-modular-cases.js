@@ -31,7 +31,7 @@ async function runTests() {
       console.log(`  ✅ PASS: ${testName}`);
       passed++;
     } else {
-      console.error(`  ❌ FAIL: ${testName} — ${details}`);
+      console.error(`  ❌ FAIL: ${testName} | ${details}`);
       failed++;
     }
   }
