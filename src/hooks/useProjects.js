@@ -28,8 +28,10 @@ export function useProjects() {
         "reconstructImageUrl": reconstructImage.asset->url,
         "mainVisualImageUrl": mainVisual.image.asset->url,
         "mainVisualPosterUrl": mainVisual.videoPoster.asset->url,
+        "mainVisualVideoFileUrl": mainVisual.videoFile.asset->url,
         "heroMediaImage": heroMediaOverride.image.asset->url,
         "heroMediaPoster": heroMediaOverride.videoPoster.asset->url,
+        "heroMediaVideoFileUrl": heroMediaOverride.videoFile.asset->url,
         "slug": coalesce(slug.current, id.current, id, _id)
       }`;
 

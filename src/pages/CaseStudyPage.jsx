@@ -53,11 +53,17 @@ export function CaseStudyPage() {
 
     if (blocks.length > 0) {
       blocks.forEach((block, idx) => {
-        const rawLabel = block.title || block.sectionTitle || block.headline || block.statement;
+        const rawLabel =
+          block.title ||
+          block.sectionTitle ||
+          block.headline ||
+          block.statement ||
+          block.openingStatement ||
+          block.eyebrow;
         const label = resolveLocalized(rawLabel, language);
         if (label) {
           const shortLabel = label.length > 28 ? `${label.substring(0, 25)}...` : label;
-          const num = String(idx + 1).padStart(2, '0');
+          const num = String(list.length + 1).padStart(2, '0');
           list.push({
             id: `block-${block._key || idx}`,
             label: `${num}. ${shortLabel}`,

@@ -2,6 +2,8 @@ import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../../context/LanguageContext';
 import { resolveLocalized } from '../../../utils/i18nField';
+import { SmartVideoPlayer } from '../../common/SmartVideoPlayer';
+import { isVideoMedia } from '../../../utils/mediaUtils';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -49,12 +51,24 @@ export function CaseSplitMedia({ block }) {
               className={colLeftClass}
             >
               <div className="aspect-[4/3] rounded-[16px] overflow-hidden border border-[rgba(244,243,238,0.18)] bg-[#151613] shadow-lg">
-                <img
-                  src={block.mediaLeft}
-                  alt={captionLeft || 'Split media left'}
-                  loading="lazy"
-                  className="w-full h-full object-cover"
-                />
+                {isVideoMedia(block.mediaLeft) ? (
+                  <SmartVideoPlayer
+                    src={block.mediaLeft}
+                    autoplay={true}
+                    muted={true}
+                    loop={true}
+                    showControls={true}
+                    title={captionLeft || 'Split media left'}
+                    className="w-full h-full"
+                  />
+                ) : (
+                  <img
+                    src={block.mediaLeft}
+                    alt={captionLeft || 'Split media left'}
+                    loading="lazy"
+                    className="w-full h-full object-cover"
+                  />
+                )}
               </div>
               {captionLeft && (
                 <span className="font-mono text-[11px] text-[#F4F3EE]/50 uppercase tracking-wider block mt-3">
@@ -74,12 +88,24 @@ export function CaseSplitMedia({ block }) {
               className={colRightClass}
             >
               <div className="aspect-[4/3] rounded-[16px] overflow-hidden border border-[rgba(244,243,238,0.18)] bg-[#151613] shadow-lg">
-                <img
-                  src={block.mediaRight}
-                  alt={captionRight || 'Split media right'}
-                  loading="lazy"
-                  className="w-full h-full object-cover"
-                />
+                {isVideoMedia(block.mediaRight) ? (
+                  <SmartVideoPlayer
+                    src={block.mediaRight}
+                    autoplay={true}
+                    muted={true}
+                    loop={true}
+                    showControls={true}
+                    title={captionRight || 'Split media right'}
+                    className="w-full h-full"
+                  />
+                ) : (
+                  <img
+                    src={block.mediaRight}
+                    alt={captionRight || 'Split media right'}
+                    loading="lazy"
+                    className="w-full h-full object-cover"
+                  />
+                )}
               </div>
               {captionRight && (
                 <span className="font-mono text-[11px] text-[#F4F3EE]/50 uppercase tracking-wider block mt-3">

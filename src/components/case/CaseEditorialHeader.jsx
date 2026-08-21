@@ -129,7 +129,7 @@ export function CaseEditorialHeader({ caseStudy }) {
   ].filter(Boolean);
 
   return (
-    <header className="w-full pt-10 sm:pt-14 md:pt-16 pb-10 md:pb-14 border-b border-[rgba(244,243,238,0.14)] bg-[#10110F] text-[#FAFAF7]">
+    <header className="w-full pt-5 sm:pt-6 md:pt-7 pb-10 md:pb-14 border-b border-[rgba(244,243,238,0.14)] bg-[#10110F] text-[#FAFAF7]">
       <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
 
         {/* Link discreto de retorno para /work */}
@@ -137,7 +137,7 @@ export function CaseEditorialHeader({ caseStudy }) {
           initial={prefersReducedMotion ? false : { opacity: 0, x: -8 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.4, ease: EASING }}
-          className="mb-8 md:mb-10"
+          className="mb-3.5 md:mb-4"
         >
           <CurtainLink
             to={`/${language}/work`}
@@ -158,7 +158,7 @@ export function CaseEditorialHeader({ caseStudy }) {
             initial={prefersReducedMotion ? false : { opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, ease: EASING }}
-            className="flex items-center gap-3 mb-4"
+            className="flex items-center gap-3 mb-2"
           >
             <span className="w-2 h-2 rounded-full bg-[#C4FF00]" />
             <span className="font-mono text-xs font-bold uppercase tracking-[0.22em] text-[#C4FF00]">

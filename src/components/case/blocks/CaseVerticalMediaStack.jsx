@@ -3,6 +3,8 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useLanguage } from '../../../context/LanguageContext';
 import { resolveLocalized } from '../../../utils/i18nField';
+import { SmartVideoPlayer } from '../../common/SmartVideoPlayer';
+import { isVideoMedia } from '../../../utils/mediaUtils';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -236,12 +238,24 @@ export function CaseVerticalMediaStack({ block }) {
                   ref={(el) => (cardsRef.current[idx] = el)}
                   className="w-full h-full rounded-[18px] lg:rounded-[22px] overflow-hidden border border-[rgba(244,243,238,0.22)] bg-[#151613] shadow-2xl relative pointer-events-auto"
                 >
-                  <img
-                    src={item.media}
-                    alt={caption || `Stack item ${idx + 1}`}
-                    loading={idx === 0 ? 'eager' : 'lazy'}
-                    className="w-full h-full object-cover filter saturate-[0.98] contrast-[1.02] block"
-                  />
+                  {isVideoMedia(item.media) ? (
+                    <SmartVideoPlayer
+                      src={item.media}
+                      autoplay={true}
+                      muted={true}
+                      loop={true}
+                      showControls={false}
+                      title={caption || `Stack item ${idx + 1}`}
+                      className="w-full h-full"
+                    />
+                  ) : (
+                    <img
+                      src={item.media}
+                      alt={caption || `Stack item ${idx + 1}`}
+                      loading={idx === 0 ? 'eager' : 'lazy'}
+                      className="w-full h-full object-cover filter saturate-[0.98] contrast-[1.02] block"
+                    />
+                  )}
 
                   {(caption || supportingText) && (
                     <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5 lg:p-6 bg-gradient-to-t from-black/90 via-black/50 to-transparent flex items-end justify-between font-mono text-xs text-[#FAFAF7]">
@@ -302,12 +316,24 @@ export function CaseVerticalMediaStack({ block }) {
             return (
               <div key={item._key || `mobile-stack-${idx}`} className="w-full flex flex-col">
                 <div className="w-full aspect-[16/10] rounded-[18px] overflow-hidden border border-white/15 bg-[#151613] shadow-xl">
-                  <img
-                    src={item.media}
-                    alt={caption || `Stack item ${idx + 1}`}
-                    loading="lazy"
-                    className="w-full h-full object-cover"
-                  />
+                  {isVideoMedia(item.media) ? (
+                    <SmartVideoPlayer
+                      src={item.media}
+                      autoplay={true}
+                      muted={true}
+                      loop={true}
+                      showControls={false}
+                      title={caption || `Stack item ${idx + 1}`}
+                      className="w-full h-full"
+                    />
+                  ) : (
+                    <img
+                      src={item.media}
+                      alt={caption || `Stack item ${idx + 1}`}
+                      loading="lazy"
+                      className="w-full h-full object-cover"
+                    />
+                  )}
                 </div>
                 {(caption || supportingText) && (
                   <div className="mt-3 flex flex-col gap-1 font-mono text-xs text-[#FAFAF7]">

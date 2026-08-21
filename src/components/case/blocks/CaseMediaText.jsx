@@ -2,6 +2,8 @@ import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../../context/LanguageContext';
 import { resolveLocalized } from '../../../utils/i18nField';
+import { SmartVideoPlayer } from '../../common/SmartVideoPlayer';
+import { isVideoMedia } from '../../../utils/mediaUtils';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -37,12 +39,25 @@ export function CaseMediaText({ block }) {
           >
             <div className="aspect-[4/3] rounded-[18px] overflow-hidden border border-[rgba(244,243,238,0.18)] bg-[#151613] shadow-xl">
               {block.media && (
-                <img
-                  src={block.media}
-                  alt={title || 'Media showcase'}
-                  loading="lazy"
-                  className="w-full h-full object-cover"
-                />
+                isVideoMedia(block.media) ? (
+                  <SmartVideoPlayer
+                    src={block.media}
+                    poster={block.poster}
+                    autoplay={true}
+                    muted={true}
+                    loop={true}
+                    showControls={true}
+                    title={title || 'Media showcase'}
+                    className="w-full h-full"
+                  />
+                ) : (
+                  <img
+                    src={block.media}
+                    alt={title || 'Media showcase'}
+                    loading="lazy"
+                    className="w-full h-full object-cover"
+                  />
+                )
               )}
             </div>
           </motion.div>

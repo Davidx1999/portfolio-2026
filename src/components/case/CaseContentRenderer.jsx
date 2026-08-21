@@ -84,12 +84,20 @@ export function CaseContentRenderer({ contentBlocks }) {
           return null;
         }
 
+        const blockId = `block-${block._key || idx}`;
+
         return (
-          <Component
+          <div
             key={block._key || `${blockType}-${idx}`}
-            block={block}
-            {...block}
-          />
+            id={blockId}
+            data-block-type={blockType}
+            className="w-full scroll-mt-24"
+          >
+            <Component
+              block={block}
+              {...block}
+            />
+          </div>
         );
       })}
     </div>

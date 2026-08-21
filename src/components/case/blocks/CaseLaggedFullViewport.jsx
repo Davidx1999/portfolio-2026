@@ -2,6 +2,8 @@ import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../../context/LanguageContext';
 import { resolveLocalized } from '../../../utils/i18nField';
+import { SmartVideoPlayer } from '../../common/SmartVideoPlayer';
+import { isVideoMedia } from '../../../utils/mediaUtils';
 
 export function CaseLaggedFullViewport({ block }) {
   const { language } = useLanguage();
@@ -26,11 +28,20 @@ export function CaseLaggedFullViewport({ block }) {
   const y = useTransform(smoothProgress, [0, 1], [startY, endY]);
   const scale = useTransform(smoothProgress, [0, 1], [1.06, 1]);
 
-  if (!block || (!block.image && !block.videoUrl)) return null;
+  if (!block || (!block.image && !block.videoUrl && !block.media && !block.videoFile)) return null;
 
   const headline = resolveLocalized(language === 'en' && block.headline_en ? block.headline_en : block.headline, language);
   const caption = resolveLocalized(language === 'en' && block.caption_en ? block.caption_en : block.caption, language);
-  const isVideo = block.mediaType === 'video' && block.videoUrl;
+
+  const isVideo =
+    block.mediaType === 'video' ||
+    !!block.videoUrl ||
+    !!block.videoFile ||
+    isVideoMedia(block.media) ||
+    isVideoMedia(block.image);
+
+  const videoSrc = block.videoUrl || block.videoFile || (isVideo ? block.media || block.image : null);
+  const imageSrc = block.image || block.media;
   const isLight = block.theme === 'light';
   const isReduced = prefersReducedMotion;
 
@@ -48,19 +59,20 @@ export function CaseLaggedFullViewport({ block }) {
         style={isReduced ? {} : { y, scale }}
         className="absolute inset-0 w-full h-[120%] -top-[10%] pointer-events-none"
       >
-        {isVideo ? (
-          <video
-            src={block.videoUrl}
+        {isVideo && videoSrc ? (
+          <SmartVideoPlayer
+            src={videoSrc}
             poster={block.poster}
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="w-full h-full object-cover"
+            autoplay={true}
+            muted={true}
+            loop={true}
+            showControls={false}
+            title={headline || caption || 'Full viewport video'}
+            className="w-full h-full"
           />
         ) : (
           <img
-            src={block.image}
+            src={imageSrc}
             alt={headline || caption || 'Full viewport media'}
             loading="lazy"
             className="w-full h-full object-cover object-center filter saturate-[0.98] contrast-[1.02]"

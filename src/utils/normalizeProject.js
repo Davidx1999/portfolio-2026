@@ -1,12 +1,21 @@
 import { urlFor } from '../services/sanityClient.js';
 import { resolveLocalized } from './i18nField.js';
+import { resolveFileUrl, isVideoMedia } from './mediaUtils.js';
+
+export { resolveFileUrl, isVideoMedia };
 
 /**
  * Helper to safely extract an image URL from a Sanity image object or asset reference.
  */
 export function resolveImageUrl(imageSource) {
   if (!imageSource) return null;
-  if (typeof imageSource === 'string') return imageSource;
+  if (typeof imageSource === 'string') {
+    const trimmed = imageSource.trim();
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('/') || trimmed.startsWith('./')) {
+      return trimmed;
+    }
+    return trimmed;
+  }
   if (imageSource.asset?.url) return imageSource.asset.url;
   try {
     const res = urlFor(imageSource);
@@ -26,11 +35,11 @@ export function resolveImageUrl(imageSource) {
  * Normaliza recursivamente os blocos modulares de conteúdo para o idioma ativo.
  * Trata todos os 22 tipos de contentBlocks definidos no schema do Sanity.
  */
-export function normalizeContentBlock(block, locale = 'en') {
+export function normalizeContentBlock(block, locale = 'en', idx) {
   if (!block || typeof block !== 'object') return block;
 
   const normalized = {
-    _key: block._key || `block-${Math.random().toString(36).substring(2, 9)}`,
+    _key: block._key || (idx !== undefined ? `block-${idx}` : `block-${Math.random().toString(36).substring(2, 9)}`),
     _type: block._type || 'textSection',
     theme: block.theme || 'dark',
   };
@@ -69,32 +78,50 @@ export function normalizeContentBlock(block, locale = 'en') {
   if (block.artifactType !== undefined) normalized.artifactType = block.artifactType;
   if (block.autoplay !== undefined) normalized.autoplay = block.autoplay;
   if (block.loop !== undefined) normalized.loop = block.loop;
+  normalized.showBorder = block.showBorder ?? block.hasBorder ?? true;
 
-  // 2. Resolução de mídias únicas
+  // 2. Resolução de mídias e vídeos
+  const rawVideo =
+    block.videoUrl ||
+    block.externalVideo ||
+    block.videoFile ||
+    block.videoFileUrl ||
+    block.video ||
+    (isVideoMedia(block.media) ? block.media : null) ||
+    (isVideoMedia(block.image) ? block.image : null);
+
+  const resolvedVideo = resolveFileUrl(rawVideo);
+  if (resolvedVideo) {
+    normalized.videoUrl = resolvedVideo;
+    normalized.externalVideo = resolvedVideo;
+    normalized.videoFile = resolvedVideo;
+  }
+
   if (block.image) {
-    normalized.image = resolveImageUrl(block.image);
+    normalized.image = isVideoMedia(block.image) ? resolveFileUrl(block.image) : resolveImageUrl(block.image);
     normalized.media = normalized.image;
   }
   if (block.media && !normalized.image) {
-    normalized.media = resolveImageUrl(block.media);
+    normalized.media = isVideoMedia(block.media) ? resolveFileUrl(block.media) : resolveImageUrl(block.media);
     normalized.image = normalized.media;
   }
-  if (block.poster) {
-    normalized.poster = resolveImageUrl(block.poster);
+  if (block.poster || block.posterUrl || block.videoPoster) {
+    normalized.poster = resolveImageUrl(block.poster || block.posterUrl || block.videoPoster);
   }
-  if (block.videoUrl) normalized.videoUrl = block.videoUrl;
-  if (block.externalVideo) normalized.externalVideo = block.externalVideo;
-  if (block.videoFile?.asset?.url) normalized.videoFile = block.videoFile.asset.url;
-  else if (typeof block.videoFile === 'string') normalized.videoFile = block.videoFile;
 
   if (block.caption !== undefined) normalized.caption = resolveLocalized(block.caption, locale);
   if (block.alt !== undefined) normalized.alt = resolveLocalized(block.alt, locale);
 
   // 3. Mídia dupla (splitMedia)
-  if (block.mediaLeft) normalized.mediaLeft = resolveImageUrl(block.mediaLeft);
+  if (block.mediaLeft) {
+    normalized.mediaLeft = isVideoMedia(block.mediaLeft) ? resolveFileUrl(block.mediaLeft) : resolveImageUrl(block.mediaLeft);
+  }
   if (block.captionLeft !== undefined) normalized.captionLeft = resolveLocalized(block.captionLeft, locale);
   if (block.altLeft !== undefined) normalized.altLeft = resolveLocalized(block.altLeft, locale);
-  if (block.mediaRight) normalized.mediaRight = resolveImageUrl(block.mediaRight);
+
+  if (block.mediaRight) {
+    normalized.mediaRight = isVideoMedia(block.mediaRight) ? resolveFileUrl(block.mediaRight) : resolveImageUrl(block.mediaRight);
+  }
   if (block.captionRight !== undefined) normalized.captionRight = resolveLocalized(block.captionRight, locale);
   if (block.altRight !== undefined) normalized.altRight = resolveLocalized(block.altRight, locale);
 
@@ -243,8 +270,23 @@ export function normalizeProject(rawProject, locale = 'en') {
 
   // ── Resolução da Hero Media (Vídeo ou Imagem) ──────────────────────────────
   const heroOverride = rawProject.heroMediaOverride || {};
-  const hasHeroVideo = !!(heroOverride.videoUrl || rawProject.mainVisual?.videoUrl || rawProject.videoUrl);
-  const heroVideoUrl = heroOverride.videoUrl || rawProject.mainVisual?.videoUrl || rawProject.videoUrl || null;
+  const rawHeroVideo =
+    heroOverride.videoUrl ||
+    heroOverride.videoFile ||
+    heroOverride.externalVideo ||
+    heroOverride.video ||
+    rawProject.mainVisual?.videoUrl ||
+    rawProject.mainVisual?.videoFile ||
+    rawProject.mainVisual?.externalVideo ||
+    rawProject.mainVisual?.video ||
+    rawProject.videoUrl ||
+    rawProject.videoFile ||
+    rawProject.video ||
+    rawProject.heroMediaVideoFileUrl ||
+    rawProject.mainVisualVideoFileUrl;
+
+  const heroVideoUrl = resolveFileUrl(rawHeroVideo);
+  const hasHeroVideo = !!heroVideoUrl || heroOverride.mediaType === 'video' || rawProject.mainVisual?.mediaType === 'video';
   const heroPosterUrl = heroOverride.videoPoster
     ? resolveImageUrl(heroOverride.videoPoster)
     : rawProject.mainVisualPosterUrl || coverUrl;
@@ -254,7 +296,7 @@ export function normalizeProject(rawProject, locale = 'en') {
   // ── Resolução dos Blocos Modulares de Conteúdo ─────────────────────────────
   const rawBlocks = Array.isArray(rawProject.contentBlocks) ? rawProject.contentBlocks : [];
   const normalizedBlocks = rawBlocks
-    .map((b) => normalizeContentBlock(b, locale))
+    .map((b, idx) => normalizeContentBlock(b, locale, idx))
     .filter(Boolean);
 
   // ── Fallbacks de SEO ───────────────────────────────────────────────────────

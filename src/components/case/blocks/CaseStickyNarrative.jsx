@@ -43,7 +43,6 @@ export function CaseStickyNarrative({ block }) {
 
   return (
     <section
-      id="overview-section"
       className={`w-full py-16 md:py-24 border-b ${
         isLight
           ? 'bg-[#FAFAF7] text-[#10110F] border-[#10110F]/10'

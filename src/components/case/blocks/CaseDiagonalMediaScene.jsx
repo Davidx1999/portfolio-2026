@@ -2,6 +2,8 @@ import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../../context/LanguageContext';
 import { resolveLocalized } from '../../../utils/i18nField';
+import { SmartVideoPlayer } from '../../common/SmartVideoPlayer';
+import { isVideoMedia } from '../../../utils/mediaUtils';
 
 export function CaseDiagonalMediaScene({ block }) {
   const { language } = useLanguage();
@@ -88,12 +90,25 @@ export function CaseDiagonalMediaScene({ block }) {
             style={isReduced ? {} : { scale, x, y, opacity }}
             className="w-full h-full rounded-[18px] overflow-hidden border border-[rgba(244,243,238,0.2)] bg-[#151613] shadow-2xl z-10"
           >
-            <img
-              src={block.media}
-              alt={caption || 'Diagonal Media Scene'}
-              loading="lazy"
-              className="w-full h-full object-cover"
-            />
+            {isVideoMedia(block.media) ? (
+              <SmartVideoPlayer
+                src={block.media}
+                poster={block.poster}
+                autoplay={true}
+                muted={true}
+                loop={true}
+                showControls={false}
+                title={caption || 'Diagonal Media Scene'}
+                className="w-full h-full"
+              />
+            ) : (
+              <img
+                src={block.media}
+                alt={caption || 'Diagonal Media Scene'}
+                loading="lazy"
+                className="w-full h-full object-cover"
+              />
+            )}
           </motion.div>
         </div>
 

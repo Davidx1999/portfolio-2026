@@ -45,6 +45,13 @@ export default {
       type: 'boolean',
       initialValue: true,
     },
+    {
+      name: 'showBorder',
+      title: 'Exibir Borda / Stroke no Container',
+      type: 'boolean',
+      description: 'Ativado por padrão. Desative para vídeos que já possuem a cor exata do fundo para criar um visual invisível/sem borda (preserva o border-radius).',
+      initialValue: true,
+    },
   ],
   preview: {
     select: {

@@ -15,7 +15,7 @@ export function CaseReflection({ reflection, reflection_en }) {
   if (!text) return null;
 
   return (
-    <section id="reflection-section" className="w-full py-16 md:py-24 border-b border-[rgba(244,243,238,0.16)] bg-[#10110F] text-[#FAFAF7]">
+    <section id="reflection-section" className="w-full py-16 md:py-24 border-b border-[rgba(244,243,238,0.16)] bg-[#10110F] text-[#FAFAF7] scroll-mt-24">
       <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
         <motion.div
           initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}

@@ -29,7 +29,7 @@ export function CaseSolutionImpact({ caseStudy }) {
   if (!solution && !impact) return null;
 
   return (
-    <section id="solution-section" className="w-full py-16 md:py-24 border-b border-[rgba(244,243,238,0.16)] bg-[#10110F] text-[#FAFAF7]">
+    <section id="solution-section" className="w-full py-16 md:py-24 border-b border-[rgba(244,243,238,0.16)] bg-[#10110F] text-[#FAFAF7] scroll-mt-24">
       <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16">
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">

@@ -2,6 +2,8 @@ import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../../context/LanguageContext';
 import { resolveLocalized } from '../../../utils/i18nField';
+import { SmartVideoPlayer } from '../../common/SmartVideoPlayer';
+import { isVideoMedia } from '../../../utils/mediaUtils';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -9,13 +11,23 @@ export function CaseFullMedia({ block }) {
   const { language } = useLanguage();
   const prefersReducedMotion = useReducedMotion();
 
-  if (!block || (!block.image && !block.videoUrl)) return null;
+  if (!block || (!block.image && !block.videoUrl && !block.media && !block.videoFile)) return null;
 
   const caption = resolveLocalized(language === 'en' && block.caption_en ? block.caption_en : block.caption, language);
   const rawAlt = language === 'en' && block.alt_en ? block.alt_en : block.alt || caption || 'Case media';
   const alt = resolveLocalized(rawAlt, language);
-  const isVideo = block.mediaType === 'video' && block.videoUrl;
+
+  const isVideo =
+    block.mediaType === 'video' ||
+    !!block.videoUrl ||
+    !!block.videoFile ||
+    isVideoMedia(block.media) ||
+    isVideoMedia(block.image);
+
+  const videoSrc = block.videoUrl || block.videoFile || (isVideo ? block.media || block.image : null);
+  const imageSrc = block.image || block.media;
   const isLight = block.theme === 'light';
+  const showBorder = block.showBorder ?? block.hasBorder ?? true;
 
   const aspectClass =
     block.aspectRatio === '21/9'
@@ -43,23 +55,26 @@ export function CaseFullMedia({ block }) {
           className="w-full"
         >
           <div
-            className={`w-full ${aspectClass} rounded-[16px] md:rounded-[20px] overflow-hidden border ${
-              isLight ? 'border-[#10110F]/15 bg-white' : 'border-[rgba(244,243,238,0.18)] bg-[#151613]'
-            } shadow-xl relative`}
+            className={`w-full ${aspectClass} rounded-[16px] md:rounded-[20px] overflow-hidden ${
+              showBorder
+                ? `border ${isLight ? 'border-[#10110F]/15 bg-white' : 'border-[rgba(244,243,238,0.18)] bg-[#151613]'} shadow-xl`
+                : 'border-0 bg-transparent'
+            } relative`}
           >
-            {isVideo ? (
-              <video
-                src={block.videoUrl}
+            {isVideo && videoSrc ? (
+              <SmartVideoPlayer
+                src={videoSrc}
                 poster={block.poster}
-                autoPlay
-                muted
-                loop
-                playsInline
-                className="w-full h-full object-cover"
+                autoplay={block.autoplay ?? true}
+                muted={true}
+                loop={block.loop ?? true}
+                showControls={true}
+                title={alt}
+                className="w-full h-full"
               />
             ) : (
               <img
-                src={block.image}
+                src={imageSrc}
                 alt={alt}
                 loading="lazy"
                 className="w-full h-full object-cover object-top filter saturate-[0.98] contrast-[1.02]"

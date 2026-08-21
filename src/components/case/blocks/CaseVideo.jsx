@@ -1,45 +1,37 @@
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
 import { useLanguage } from '../../../context/LanguageContext';
 import { resolveLocalized } from '../../../utils/i18nField';
+import { SmartVideoPlayer } from '../../common/SmartVideoPlayer';
 
 const EASING = [0.22, 1, 0.36, 1];
 
 export function CaseVideo({ block }) {
   const { language } = useLanguage();
   const prefersReducedMotion = useReducedMotion();
-  const videoRef = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(block?.autoplay ?? true);
-  const [isMuted, setIsMuted] = useState(true);
 
-  if (!block || (!block.externalVideo && !block.videoFile)) return null;
+  if (!block) return null;
 
-  const videoSrc = block.externalVideo || block.videoFile;
+  const videoSrc =
+    block.videoUrl ||
+    block.videoFile ||
+    block.externalVideo ||
+    block.video ||
+    block.url ||
+    block.media;
+
+  if (!videoSrc) return null;
+
   const caption = resolveLocalized(language === 'en' && block.caption_en ? block.caption_en : block.caption, language);
-
-  const togglePlay = () => {
-    if (!videoRef.current) return;
-    if (videoRef.current.paused) {
-      videoRef.current.play();
-      setIsPlaying(true);
-    } else {
-      videoRef.current.pause();
-      setIsPlaying(false);
-    }
-  };
-
-  const toggleMute = () => {
-    if (!videoRef.current) return;
-    videoRef.current.muted = !videoRef.current.muted;
-    setIsMuted(videoRef.current.muted);
-  };
+  const showBorder = block.showBorder ?? block.hasBorder ?? true;
 
   const aspectClass =
     block.aspectRatio === '16/10'
       ? 'aspect-[16/10]'
       : block.aspectRatio === '4/3'
       ? 'aspect-[4/3]'
+      : block.aspectRatio === '21/9'
+      ? 'aspect-[21/9]'
       : 'aspect-[16/9]';
 
   return (
@@ -53,39 +45,22 @@ export function CaseVideo({ block }) {
           className="w-full"
         >
           <div
-            className={`relative w-full ${aspectClass} rounded-[18px] overflow-hidden border border-[rgba(244,243,238,0.18)] bg-[#151613] shadow-2xl group`}
+            className={`relative w-full ${aspectClass} rounded-[18px] overflow-hidden ${
+              showBorder
+                ? 'border border-[rgba(244,243,238,0.18)] bg-[#151613] shadow-2xl'
+                : 'border-0 bg-transparent'
+            } group`}
           >
-            <video
-              ref={videoRef}
+            <SmartVideoPlayer
               src={videoSrc}
               poster={block.poster}
-              autoPlay={block.autoplay ?? true}
-              muted={isMuted}
-              loop
-              playsInline
-              className="w-full h-full object-cover"
+              autoplay={block.autoplay ?? true}
+              muted={true}
+              loop={block.loop ?? true}
+              showControls={true}
+              title={caption || 'Case Video'}
+              className="w-full h-full"
             />
-
-            {/* Custom Overlaid Micro Controls */}
-            <div className="absolute bottom-4 right-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
-              <button
-                type="button"
-                onClick={togglePlay}
-                aria-label={isPlaying ? 'Pausar vídeo' : 'Reproduzir vídeo'}
-                className="p-2.5 bg-[#10110F]/80 backdrop-blur-md border border-white/20 rounded-full text-white hover:text-[#C4FF00] transition-colors focus-visible:outline-2 focus-visible:outline-[#C4FF00]"
-              >
-                {isPlaying ? <Pause size={14} /> : <Play size={14} />}
-              </button>
-
-              <button
-                type="button"
-                onClick={toggleMute}
-                aria-label={isMuted ? 'Ativar som' : 'Silenciar vídeo'}
-                className="p-2.5 bg-[#10110F]/80 backdrop-blur-md border border-white/20 rounded-full text-white hover:text-[#C4FF00] transition-colors focus-visible:outline-2 focus-visible:outline-[#C4FF00]"
-              >
-                {isMuted ? <VolumeX size={14} /> : <Volume2 size={14} />}
-              </button>
-            </div>
           </div>
 
           {caption && (
@@ -101,3 +76,4 @@ export function CaseVideo({ block }) {
 }
 
 export default CaseVideo;
+
