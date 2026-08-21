@@ -13,9 +13,6 @@ const TOTAL_EXIT_DURATION = 1.35;
  * Atualiza estilos diretamente na GPU sem re-renderizações do React.
  */
 function ModularTile({ tile, progress, sourceFinal, cols, rows }) {
-  const bgPosX = cols > 1 ? (tile.c / (cols - 1)) * 100 : 0;
-  const bgPosY = rows > 1 ? (tile.r / (rows - 1)) * 100 : 0;
-
   const { startP, settleP, endP } = tile;
 
   // Keyframes derivados do progress central [0, 1]:
@@ -60,29 +57,42 @@ function ModularTile({ tile, progress, sourceFinal, cols, rows }) {
     <div
       className="w-full h-full relative overflow-hidden pointer-events-none"
       style={{
-        margin: '-1px', // Overlap contra sub-pixel gap em telas de alta densidade
-        width: 'calc(100% + 2px)',
-        height: 'calc(100% + 2px)',
+        margin: '-0.5px', // Overlap contra sub-pixel gap em telas de alta densidade
+        width: 'calc(100% + 1px)',
+        height: 'calc(100% + 1px)',
         transform: 'translateZ(0)',
         backfaceVisibility: 'hidden',
       }}
     >
       <motion.div
-        className="w-full h-full pointer-events-none"
+        className="w-full h-full relative overflow-hidden pointer-events-none"
         style={{
           opacity,
           scale,
           x,
           y,
           rotate,
-          backgroundImage: `url(${sourceFinal})`,
-          backgroundSize: `${cols * 100}% ${rows * 100}%`,
-          backgroundPosition: `${bgPosX}% ${bgPosY}%`,
-          backgroundRepeat: 'no-repeat',
           transform: 'translateZ(0)',
           backfaceVisibility: 'hidden',
         }}
-      />
+      >
+        <div
+          className="absolute pointer-events-none select-none"
+          style={{
+            width: `${cols * 100}%`,
+            height: `${rows * 100}%`,
+            top: `-${tile.r * 100}%`,
+            left: `-${tile.c * 100}%`,
+          }}
+        >
+          <img
+            src={sourceFinal}
+            alt=""
+            aria-hidden="true"
+            className="w-full h-full object-cover select-none pointer-events-none"
+          />
+        </div>
+      </motion.div>
     </div>
   );
 }
