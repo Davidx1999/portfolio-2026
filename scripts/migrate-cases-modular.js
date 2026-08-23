@@ -9,7 +9,11 @@ const __dirname = path.dirname(__filename);
 const projectId = process.env.SANITY_PROJECT_ID || process.env.VITE_SANITY_PROJECT_ID || 'pjq90dr2';
 const dataset = process.env.SANITY_DATASET || process.env.VITE_SANITY_DATASET || 'production';
 const apiVersion = '2024-01-01';
-const token = process.env.SANITY_API_WRITE_TOKEN || '***REMOVED***';
+const token = process.env.SANITY_API_WRITE_TOKEN || process.env.SANITY_AUTH_TOKEN;
+
+if (!token) {
+  throw new Error('SANITY_API_WRITE_TOKEN is required to run this script.');
+}
 
 const isExecute = process.argv.includes('--execute');
 
