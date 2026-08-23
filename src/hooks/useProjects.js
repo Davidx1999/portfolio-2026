@@ -25,6 +25,7 @@ export function useProjects() {
       const query = `*[_type == "project" && !(_id in path("drafts.**")) && published != false] | order(featuredOrder asc, _createdAt desc){
         ...,
         "coverImageUrl": coverImage.asset->url,
+        "landingBackgroundImageUrl": landingBackgroundImage.asset->url,
         "reconstructImageUrl": reconstructImage.asset->url,
         "mainVisualImageUrl": mainVisual.image.asset->url,
         "mainVisualPosterUrl": mainVisual.videoPoster.asset->url,

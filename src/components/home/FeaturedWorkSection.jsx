@@ -25,7 +25,7 @@ export function FeaturedWorkSection() {
         category: p.category || p.context || 'Digital Product',
         description: p.shortDescription || p.heroSummary || p.description || '',
         link: `/${language}/work/${slug}`,
-        wallpaperSrc: p.coverImage || p.image,
+        wallpaperSrc: p.landingBackgroundImage || p.wallpaperImage || p.coverImage || p.image,
         mediaThumbSrc: p.coverImage || p.image,
         mediaExpandedSrc: p.coverImage || p.image,
       };

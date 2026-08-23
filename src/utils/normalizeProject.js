@@ -247,11 +247,13 @@ export function normalizeProject(rawProject, locale = 'en') {
       ? rawProject.slug.current
       : (rawProject.slug || rawProject.id?.current || rawProject.id || rawProject._id);
 
-  // ── Resolução de Mídias de Capa e Reconstruct ──────────────────────────────
+  // ── Resolução de Mídias de Capa, Fundo da Landing e Reconstruct ─────────────
   const rawCover = rawProject.coverImage || rawProject.mainVisual?.image || rawProject.image;
+  const rawLandingBg = rawProject.landingBackgroundImage || rawProject.wallpaperImage || rawProject.backgroundImage;
   const rawReconstruct = rawProject.reconstructImage || rawProject.finalImage;
 
   const coverUrl = rawProject.coverImageUrl || resolveImageUrl(rawCover);
+  const landingBgUrl = rawProject.landingBackgroundImageUrl || (rawLandingBg ? resolveImageUrl(rawLandingBg) : null);
   const reconstructUrl = rawProject.reconstructImageUrl || (rawReconstruct ? resolveImageUrl(rawReconstruct) : null);
 
   // ── Resolução de Campos Textuais com Fallback ───────────────────────────────
@@ -340,6 +342,8 @@ export function normalizeProject(rawProject, locale = 'en') {
 
     // Imagens explícitas
     coverImage: coverUrl,
+    landingBackgroundImage: landingBgUrl || coverUrl,
+    wallpaperImage: landingBgUrl || coverUrl,
     reconstructImage: reconstructUrl,
     image: reconstructUrl || coverUrl,
     processImage: coverUrl,

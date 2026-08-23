@@ -12,9 +12,9 @@ export default {
   fieldsets: [
     {
       name: 'cardVisuals',
-      title: '🖼️ Visual do Card',
-      description: 'Imagem principal do projeto exibida no card (com zoom suave no hover) e como fallback da hero.',
-      options: { collapsible: false },
+      title: '🖼️ Visual do Card & Fundo da Landing',
+      description: 'Imagem de capa do card e imagem de fundo (wallpaper) opcional para o parallax da Landing Page.',
+      options: { columns: 2, collapsible: false },
     },
     {
       name: 'heroOverride',
@@ -170,10 +170,10 @@ export default {
       initialValue: 'original',
     },
 
-    // ── Fieldset: Visual do Card ─────────────────────────────────
+    // ── Fieldset: Visual do Card & Fundo da Landing ─────────────
     {
       name: 'coverImage',
-      title: 'Imagem de Capa do Card',
+      title: '1. Imagem de Capa do Card',
       type: 'image',
       group: 'projectInfo',
       fieldset: 'cardVisuals',
@@ -184,6 +184,22 @@ export default {
         {
           name: 'alt',
           title: 'Alt Text da Capa',
+          type: 'localizedString',
+        },
+      ],
+    },
+    {
+      name: 'landingBackgroundImage',
+      title: '2. Imagem de Fundo da Landing (Wallpaper)',
+      type: 'image',
+      group: 'projectInfo',
+      fieldset: 'cardVisuals',
+      options: { hotspot: true },
+      description: 'Opcional. Exibida como wallpaper em tela cheia com efeito parallax na página inicial. Se vazia, a capa será usada.',
+      fields: [
+        {
+          name: 'alt',
+          title: 'Alt Text do Fundo',
           type: 'localizedString',
         },
       ],

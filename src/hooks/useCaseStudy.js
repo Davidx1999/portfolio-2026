@@ -34,6 +34,7 @@ export function useCaseStudy(slug) {
       const query = `*[_type == "project" && !(_id in path("drafts.**")) && published != false && (lower(slug.current) == lower($slug) || slug.current == $slug || id.current == $slug || id == $slug || _id == $slug)][0]{
         ...,
         "coverImageUrl": coverImage.asset->url,
+        "landingBackgroundImageUrl": landingBackgroundImage.asset->url,
         "reconstructImageUrl": reconstructImage.asset->url,
         "mainVisualImageUrl": mainVisual.image.asset->url,
         "mainVisualPosterUrl": mainVisual.videoPoster.asset->url,
