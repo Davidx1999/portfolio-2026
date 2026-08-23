@@ -142,10 +142,15 @@ export default {
     },
     {
       name: 'published',
-      title: 'Publicado no Site',
+      title: 'Publicado no Site / Visibilidade',
       type: 'boolean',
       group: 'projectInfo',
       initialValue: true,
+      options: {
+        layout: 'switch',
+      },
+      description:
+        'Ligue (ON) para deixar o projeto publicado e visível no site. Desligue (OFF) para mantê-lo como Rascunho / Oculto no site, mesmo se o documento estiver publicado no Sanity Studio.',
     },
     {
       name: 'translationStatus',
@@ -332,15 +337,18 @@ export default {
       titlePt: 'title.ptBR',
       slug: 'slug.current',
       featured: 'featuredOnHome',
+      published: 'published',
       status: 'projectStatus',
       cover: 'coverImage',
       legacyCover: 'mainVisual.image',
       translationStatus: 'translationStatus',
       blocks: 'contentBlocks',
     },
-    prepare({ titleEn, titlePt, slug, featured, status, cover, legacyCover, translationStatus, blocks }) {
+    prepare({ titleEn, titlePt, slug, featured, published, status, cover, legacyCover, translationStatus, blocks }) {
       const displayTitle = titleEn || titlePt || 'Untitled Project';
       const blockCount = Array.isArray(blocks) ? blocks.length : 0;
+      const isPublished = published !== false;
+      const publishedBadge = isPublished ? '🟢 Publicado' : '🔴 Rascunho / Oculto';
       const featuredBadge = featured ? '⭐ Destaque' : 'Standard';
       const statusLabel = status === 'ongoing' ? 'Em andamento' : status === 'concept' ? 'Conceito' : 'Concluído';
       
@@ -354,8 +362,8 @@ export default {
           : '🌐 Apenas EN';
 
       return {
-        title: displayTitle,
-        subtitle: `/${slug || 'sem-slug'} · [${featuredBadge}] · ${blockCount} blocos · ${statusLabel} · ${translationBadge}`,
+        title: `${!isPublished ? '[RASCUNHO] ' : ''}${displayTitle}`,
+        subtitle: `/${slug || 'sem-slug'} · [${publishedBadge}] · [${featuredBadge}] · ${blockCount} blocos · ${statusLabel} · ${translationBadge}`,
         media: cover || legacyCover,
       };
     },

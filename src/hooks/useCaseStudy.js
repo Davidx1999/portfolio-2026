@@ -31,7 +31,7 @@ export function useCaseStudy(slug) {
 
     try {
       // 1. Busca o documento canônico único pelo slug compartilhado
-      const query = `*[_type == "project" && !(_id in path("drafts.**")) && (lower(slug.current) == lower($slug) || slug.current == $slug || id.current == $slug || id == $slug || _id == $slug)][0]{
+      const query = `*[_type == "project" && !(_id in path("drafts.**")) && published != false && (lower(slug.current) == lower($slug) || slug.current == $slug || id.current == $slug || id == $slug || _id == $slug)][0]{
         ...,
         "coverImageUrl": coverImage.asset->url,
         "reconstructImageUrl": reconstructImage.asset->url,

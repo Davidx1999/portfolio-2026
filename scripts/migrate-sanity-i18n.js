@@ -60,7 +60,7 @@ async function migrateDocuments() {
   console.log('\n🌐 [MIGRAÇÃO] Iniciando análise de internacionalização document-level...');
   console.log(`   Modo: ${isDryRun ? 'DRY-RUN (Simulação segura, nenhuma alteração será gravada)' : 'APPLY (Modo de gravação)'}`);
 
-  const documents = await client.fetch(`*[_type in ["project", "aboutPage", "letsTalkPage", "playgroundProject"]]`);
+  const documents = await client.fetch(`*[_type in ["project", "aboutPage", "letsTalkPage"]]`);
   console.log(`   Total de documentos encontrados para migração: ${documents.length}`);
 
   if (documents.length === 0) {
