@@ -82,11 +82,10 @@ export function FeaturedProjectItem({
           className="relative block transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] rounded-[16px] sm:rounded-[20px] shadow-2xl overflow-hidden border border-white/20 group cursor-pointer w-[86vw] sm:w-[82vw] max-w-[820px] aspect-[4/3] sm:aspect-[16/10]"
           style={{ transform: isHovered ? 'scale(1)' : 'scale(0.97)' }}
         >
-          {/* Mídia com Reconstrução da Estrutura ao Produto Final */}
+          {/* Mídia com Zoom Suave de 25% no Hover */}
           <div className="absolute inset-0 w-full h-full">
             <ReconstructMedia
-              initialImage={mediaThumbSrc}
-              finalImage={mediaExpandedSrc || mediaThumbSrc}
+              image={mediaThumbSrc || mediaExpandedSrc}
               alt={title}
               isHovered={isHovered}
               aspectRatio="w-full h-full"

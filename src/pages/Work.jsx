@@ -348,11 +348,10 @@ export function Work() {
                       className="absolute inset-0 w-full h-full block focus-visible:outline-2 focus-visible:outline-[#C4FF00] focus-visible:outline-offset-2"
                       aria-label={`${project.title} - ${project.category}`}
                     >
-                      {/* 1. MÍDIA FULL-BLEED COM RECONSTRUCTMEDIA */}
+                      {/* 1. MÍDIA FULL-BLEED COM ZOOM SUAVE NO HOVER */}
                       <div className="absolute inset-0 w-full h-full">
                         <ReconstructMedia
-                          initialImage={project.coverImage || project.processImage || project.image}
-                          finalImage={project.reconstructImage || project.finalImage || project.coverImage || project.image}
+                          image={project.coverImage || project.image}
                           alt={project.alt || project.title}
                           isHovered={isHovered}
                           aspectRatio="w-full h-full"

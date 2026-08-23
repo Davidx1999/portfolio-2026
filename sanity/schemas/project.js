@@ -12,9 +12,9 @@ export default {
   fieldsets: [
     {
       name: 'cardVisuals',
-      title: '🖼️ Visual do Card & Reconstruct',
-      description: 'Defina a imagem de capa (estado inicial) e a imagem de reconstrução (estado final revelado no hover).',
-      options: { columns: 2, collapsible: false },
+      title: '🖼️ Visual do Card',
+      description: 'Imagem principal do projeto exibida no card (com zoom suave no hover) e como fallback da hero.',
+      options: { collapsible: false },
     },
     {
       name: 'heroOverride',
@@ -170,16 +170,16 @@ export default {
       initialValue: 'original',
     },
 
-    // ── Fieldset: Visual do Card & Reconstruct ───────────────────
+    // ── Fieldset: Visual do Card ─────────────────────────────────
     {
       name: 'coverImage',
-      title: '1. Imagem de Capa (Estado Inicial do Card)',
+      title: 'Imagem de Capa do Card',
       type: 'image',
       group: 'projectInfo',
       fieldset: 'cardVisuals',
       options: { hotspot: true },
       validation: (Rule) => Rule.required().error('A imagem de capa é obrigatória.'),
-      description: 'Exibida no estado inicial do card na landing/work e como fallback da hero.',
+      description: 'Exibida no card na landing/work (com efeito de zoom no hover) e como fallback da hero.',
       fields: [
         {
           name: 'alt',
@@ -190,19 +190,9 @@ export default {
     },
     {
       name: 'reconstructImage',
-      title: '2. Imagem de Reconstruct (Revelada no Hover)',
+      title: 'Imagem Secundária Legada',
       type: 'image',
-      group: 'projectInfo',
-      fieldset: 'cardVisuals',
-      options: { hotspot: true },
-      description: 'Imagem do produto final refinado revelada através da matriz de reconstrução animada.',
-      fields: [
-        {
-          name: 'alt',
-          title: 'Alt Text do Reconstruct',
-          type: 'localizedString',
-        },
-      ],
+      hidden: true,
     },
 
     // ── Fieldset: Substituição Opcional da Hero ─────────────────

@@ -25,9 +25,9 @@ export function FeaturedWorkSection() {
         category: p.category || p.context || 'Digital Product',
         description: p.shortDescription || p.heroSummary || p.description || '',
         link: `/${language}/work/${slug}`,
-        wallpaperSrc: p.coverImage || p.finalImage || p.image,
-        mediaThumbSrc: p.coverImage || p.processImage || p.image,
-        mediaExpandedSrc: p.reconstructImage || p.finalImage || p.coverImage || p.image,
+        wallpaperSrc: p.coverImage || p.image,
+        mediaThumbSrc: p.coverImage || p.image,
+        mediaExpandedSrc: p.coverImage || p.image,
       };
     });
   }, [featuredProjects, language]);
