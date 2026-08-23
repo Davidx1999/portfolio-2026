@@ -3,7 +3,11 @@ import { createClient } from '@sanity/client';
 const projectId = 'pjq90dr2';
 const dataset = 'production';
 const apiVersion = '2024-01-01';
-const token = '***REMOVED***';
+const token = process.env.SANITY_API_WRITE_TOKEN || process.env.SANITY_AUTH_TOKEN;
+
+if (!token) {
+  throw new Error('SANITY_API_WRITE_TOKEN is required to run this script.');
+}
 
 const client = createClient({
   projectId,
