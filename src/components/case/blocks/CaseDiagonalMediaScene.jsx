@@ -55,6 +55,7 @@ export function CaseDiagonalMediaScene({ block }) {
 
   const caption = resolveLocalized(language === 'en' && block.caption_en ? block.caption_en : block.caption, language);
   const isLight = block.theme === 'light';
+  const showBorder = block.showBorder ?? block.hasBorder ?? true;
   const isReduced = prefersReducedMotion;
 
   return (
@@ -88,7 +89,11 @@ export function CaseDiagonalMediaScene({ block }) {
           {/* Mídia Diagonal Animada */}
           <motion.div
             style={isReduced ? {} : { scale, x, y, opacity }}
-            className="w-full h-full rounded-[18px] overflow-hidden border border-[rgba(244,243,238,0.2)] bg-[#151613] shadow-2xl z-10"
+            className={`w-full h-full rounded-[18px] overflow-hidden ${
+              showBorder
+                ? `border ${isLight ? 'border-[#10110F]/15 bg-white' : 'border-[rgba(244,243,238,0.2)] bg-[#151613]'} shadow-2xl`
+                : 'border-0 bg-transparent'
+            } z-10`}
           >
             {isVideoMedia(block.media) ? (
               <SmartVideoPlayer

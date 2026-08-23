@@ -33,6 +33,7 @@ export function CaseBeforeAfter({ block }) {
 
   const caption = resolveLocalized(language === 'en' && block.caption_en ? block.caption_en : block.caption, language);
   const isLight = block.theme === 'light';
+  const showBorder = block.showBorder ?? block.hasBorder ?? true;
 
   const handleTouchMove = (e) => {
     if (e.touches.length > 0) {
@@ -86,7 +87,13 @@ export function CaseBeforeAfter({ block }) {
           {isSideBySide ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="flex flex-col">
-                <div className="aspect-[16/10] rounded-[16px] overflow-hidden border border-[rgba(244,243,238,0.18)] bg-[#151613]">
+                <div
+                  className={`aspect-[16/10] rounded-[16px] overflow-hidden ${
+                    showBorder
+                      ? `border ${isLight ? 'border-[#10110F]/15' : 'border-[rgba(244,243,238,0.18)]'} bg-[#151613]`
+                      : 'border-0 bg-transparent'
+                  }`}
+                >
                   <img
                     src={block.beforeImage}
                     alt={beforeLabel}
@@ -99,7 +106,13 @@ export function CaseBeforeAfter({ block }) {
               </div>
 
               <div className="flex flex-col">
-                <div className="aspect-[16/10] rounded-[16px] overflow-hidden border border-[#C4FF00]/40 bg-[#151613]">
+                <div
+                  className={`aspect-[16/10] rounded-[16px] overflow-hidden ${
+                    showBorder
+                      ? `border ${isLight ? 'border-[#4056F4]/50' : 'border-[#C4FF00]/40'} bg-[#151613]`
+                      : 'border-0 bg-transparent'
+                  }`}
+                >
                   <img
                     src={block.afterImage}
                     alt={afterLabel}
@@ -117,7 +130,11 @@ export function CaseBeforeAfter({ block }) {
               ref={containerRef}
               onMouseMove={handleMouseMove}
               onTouchMove={handleTouchMove}
-              className="relative w-full aspect-[16/10] rounded-[18px] overflow-hidden border border-[rgba(244,243,238,0.18)] bg-[#151613] shadow-2xl select-none cursor-ew-resize group"
+              className={`relative w-full aspect-[16/10] rounded-[18px] overflow-hidden ${
+                showBorder
+                  ? `border ${isLight ? 'border-[#10110F]/15' : 'border-[rgba(244,243,238,0.18)]'} bg-[#151613] shadow-2xl`
+                  : 'border-0 bg-transparent'
+              } select-none cursor-ew-resize group`}
             >
               {/* Imagem Depois (Base) */}
               <img

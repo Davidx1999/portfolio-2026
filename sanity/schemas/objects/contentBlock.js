@@ -58,6 +58,13 @@ export default {
       type: 'localizedString',
     },
     {
+      name: 'showBorder',
+      title: 'Exibir Borda / Stroke no Container de Mídia',
+      type: 'boolean',
+      description: 'Ativado por padrão. Desative para mídias que já possuem o fundo exato da página (preserva o border-radius).',
+      initialValue: true,
+    },
+    {
       name: 'secondaryImage',
       title: 'Segunda Imagem (Opcional - para comparações e grids)',
       type: 'image',

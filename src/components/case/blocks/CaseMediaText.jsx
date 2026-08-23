@@ -18,6 +18,7 @@ export function CaseMediaText({ block }) {
   const body = resolveLocalized(language === 'en' && block.body_en ? block.body_en : block.body, language);
   const isMediaRight = block.mediaPosition === 'right';
   const isLight = block.theme === 'light';
+  const showBorder = block.showBorder ?? block.hasBorder ?? true;
 
   return (
     <section
@@ -37,7 +38,13 @@ export function CaseMediaText({ block }) {
             transition={{ duration: 0.6, ease: EASING }}
             className={`lg:col-span-6 ${isMediaRight ? 'lg:order-2' : 'lg:order-1'}`}
           >
-            <div className="aspect-[4/3] rounded-[18px] overflow-hidden border border-[rgba(244,243,238,0.18)] bg-[#151613] shadow-xl">
+            <div
+              className={`aspect-[4/3] rounded-[18px] overflow-hidden ${
+                showBorder
+                  ? `border ${isLight ? 'border-[#10110F]/15 bg-white' : 'border-[rgba(244,243,238,0.18)] bg-[#151613]'} shadow-xl`
+                  : 'border-0 bg-transparent'
+              }`}
+            >
               {block.media && (
                 isVideoMedia(block.media) ? (
                   <SmartVideoPlayer

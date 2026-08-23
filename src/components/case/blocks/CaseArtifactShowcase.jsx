@@ -15,6 +15,7 @@ export function CaseArtifactShowcase({ block }) {
   const title = resolveLocalized(language === 'en' && block.title_en ? block.title_en : block.title, language);
   const description = resolveLocalized(language === 'en' && block.description_en ? block.description_en : block.description, language);
   const caption = resolveLocalized(language === 'en' && block.caption_en ? block.caption_en : block.caption, language);
+  const showBorder = block.showBorder ?? block.hasBorder ?? true;
 
   const artifactIcons = {
     designSystem: Cpu,
@@ -58,7 +59,11 @@ export function CaseArtifactShowcase({ block }) {
           </div>
 
           {/* Visualização Principal do Artefato */}
-          <div className="w-full aspect-[16/10] rounded-[14px] overflow-hidden border border-white/10 bg-[#10110F] mb-4">
+          <div
+            className={`w-full aspect-[16/10] rounded-[14px] overflow-hidden ${
+              showBorder ? 'border border-white/10 bg-[#10110F]' : 'border-0 bg-transparent'
+            } mb-4`}
+          >
             <img
               src={block.media}
               alt={title || 'Design artifact showcase'}

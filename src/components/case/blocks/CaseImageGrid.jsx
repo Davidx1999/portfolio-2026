@@ -13,6 +13,7 @@ export function CaseImageGrid({ block }) {
 
   const is3Cols = block.columns === '3';
   const isLight = block.theme === 'light';
+  const showBorder = block.showBorder ?? block.hasBorder ?? true;
 
   return (
     <section
@@ -39,7 +40,13 @@ export function CaseImageGrid({ block }) {
                 transition={{ duration: 0.5, delay: idx * 0.08, ease: EASING }}
                 className="flex flex-col"
               >
-                <div className="aspect-[4/3] rounded-[16px] overflow-hidden border border-[rgba(244,243,238,0.18)] bg-[#151613] shadow-lg">
+                <div
+                  className={`aspect-[4/3] rounded-[16px] overflow-hidden ${
+                    showBorder
+                      ? `border ${isLight ? 'border-[#10110F]/15 bg-white' : 'border-[rgba(244,243,238,0.18)] bg-[#151613]'} shadow-lg`
+                      : 'border-0 bg-transparent'
+                  }`}
+                >
                   {item.image && (
                     <img
                       src={item.image}

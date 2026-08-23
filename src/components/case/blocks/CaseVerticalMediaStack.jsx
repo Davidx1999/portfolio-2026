@@ -173,6 +173,7 @@ export function CaseVerticalMediaStack({ block }) {
   const closing =
     language === 'en' && block.closingStatement_en ? block.closingStatement_en : block.closingStatement;
   const isLight = block.theme === 'light';
+  const showBorder = block.showBorder ?? block.hasBorder ?? true;
 
   return (
     <section
@@ -236,7 +237,11 @@ export function CaseVerticalMediaStack({ block }) {
               >
                 <div
                   ref={(el) => (cardsRef.current[idx] = el)}
-                  className="w-full h-full rounded-[18px] lg:rounded-[22px] overflow-hidden border border-[rgba(244,243,238,0.22)] bg-[#151613] shadow-2xl relative pointer-events-auto"
+                  className={`w-full h-full rounded-[18px] lg:rounded-[22px] overflow-hidden ${
+                    showBorder
+                      ? `border ${isLight ? 'border-[#10110F]/15 bg-white' : 'border-[rgba(244,243,238,0.22)] bg-[#151613]'} shadow-2xl`
+                      : 'border-0 bg-transparent'
+                  } relative pointer-events-auto`}
                 >
                   {isVideoMedia(item.media) ? (
                     <SmartVideoPlayer
@@ -315,7 +320,13 @@ export function CaseVerticalMediaStack({ block }) {
 
             return (
               <div key={item._key || `mobile-stack-${idx}`} className="w-full flex flex-col">
-                <div className="w-full aspect-[16/10] rounded-[18px] overflow-hidden border border-white/15 bg-[#151613] shadow-xl">
+                <div
+                  className={`w-full aspect-[16/10] rounded-[18px] overflow-hidden ${
+                    showBorder
+                      ? `border ${isLight ? 'border-[#10110F]/15 bg-white' : 'border-white/15 bg-[#151613]'} shadow-xl`
+                      : 'border-0 bg-transparent'
+                  }`}
+                >
                   {isVideoMedia(item.media) ? (
                     <SmartVideoPlayer
                       src={item.media}

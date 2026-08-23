@@ -61,6 +61,13 @@ export default {
       initialValue: 'default',
     },
     {
+      name: 'showBorder',
+      title: 'Exibir Borda / Stroke Divisório de Seção',
+      type: 'boolean',
+      description: 'Ativado por padrão. Exibe o stroke sutil na borda inferior da cena.',
+      initialValue: true,
+    },
+    {
       name: 'theme',
       title: 'Tema Visual',
       type: 'string',

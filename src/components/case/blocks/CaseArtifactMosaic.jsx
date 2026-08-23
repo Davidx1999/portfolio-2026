@@ -36,7 +36,7 @@ const DEFAULT_SPATIAL_SLOTS = [
   { row: 11, col: 3, origin: 'center' },
 ];
 
-function FullBleedMosaicCell({ item, slot, index, _isLight }) {
+function FullBleedMosaicCell({ item, slot, index, _isLight, showBorder = true }) {
   const { language } = useLanguage();
   const { headerBottom = 54 } = useHeaderMetrics();
   const prefersReducedMotion = useReducedMotion();
@@ -94,7 +94,9 @@ function FullBleedMosaicCell({ item, slot, index, _isLight }) {
     <div
       ref={cellRef}
       style={{ gridRow: row, gridColumn: col }}
-      className="relative w-full h-[50svh] overflow-hidden border border-[rgba(244,243,238,0.08)] bg-[#10110F] z-10"
+      className={`relative w-full h-[50svh] overflow-hidden ${
+        showBorder ? 'border border-[rgba(244,243,238,0.08)] bg-[#10110F]' : 'border-0 bg-transparent'
+      } z-10`}
     >
       {/* Mídia em Escala Total (25vw × 50svh) */}
       <motion.div
@@ -139,6 +141,7 @@ export function CaseArtifactMosaic({ block }) {
   const eyebrow = resolveLocalized(language === 'en' && block.eyebrow_en ? block.eyebrow_en : block.eyebrow, language);
   const title = resolveLocalized(language === 'en' && block.title_en ? block.title_en : block.title, language);
   const isLight = block.theme === 'light';
+  const showBorder = block.showBorder ?? block.hasBorder ?? true;
 
   const items = block.items;
 
@@ -205,6 +208,7 @@ export function CaseArtifactMosaic({ block }) {
               slot={slot}
               index={idx}
               isLight={isLight}
+              showBorder={showBorder}
             />
           );
         })}
@@ -224,7 +228,9 @@ export function CaseArtifactMosaic({ block }) {
         {items.map((item, idx) => (
           <div
             key={item._key || `mosaic-m-${idx}`}
-            className="relative w-[50vw] h-[36svh] sm:h-[45svh] overflow-hidden border border-[rgba(244,243,238,0.08)] bg-[#10110F]"
+            className={`relative w-[50vw] h-[36svh] sm:h-[45svh] overflow-hidden ${
+              showBorder ? 'border border-[rgba(244,243,238,0.08)] bg-[#10110F]' : 'border-0 bg-transparent'
+            }`}
           >
             <img
               src={item.media}

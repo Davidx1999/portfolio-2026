@@ -32,6 +32,7 @@ export function CaseDecisionSection({ block }) {
   const rawIntro = language === 'en' && block.intro_en ? block.intro_en : block.intro;
   const intro = resolveLocalized(rawIntro, language);
   const isLight = block.theme === 'light';
+  const showBorder = block.showBorder ?? block.hasBorder ?? true;
 
   return (
     <section
@@ -138,7 +139,15 @@ export function CaseDecisionSection({ block }) {
                   {/* Coluna de Mídia / Artefato */}
                   {item.artifactMedia && (
                     <div className="lg:col-span-5 flex flex-col">
-                      <div className="w-full aspect-[4/3] rounded-[14px] overflow-hidden border border-white/10 bg-[#10110F]">
+                      <div
+                        className={`w-full aspect-[4/3] rounded-[14px] overflow-hidden ${
+                          showBorder
+                            ? isLight
+                              ? 'border border-[#10110F]/15 bg-white'
+                              : 'border border-white/10 bg-[#10110F]'
+                            : 'border-0 bg-transparent'
+                        }`}
+                      >
                         <img
                           src={item.artifactMedia}
                           alt={caption || challenge || 'Artefato de Decisão'}

@@ -41,6 +41,13 @@ export default {
       title: 'Legenda Técnica (Opcional)',
       type: 'localizedString',
     },
+    {
+      name: 'showBorder',
+      title: 'Exibir Borda / Stroke no Container do Artefato',
+      type: 'boolean',
+      description: 'Ativado por padrão. Desative para mídias que já possuem o fundo exato da página (preserva o border-radius).',
+      initialValue: true,
+    },
   ],
   preview: {
     select: {

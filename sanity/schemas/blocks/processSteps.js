@@ -10,6 +10,13 @@ export default {
       initialValue: { en: 'Process & Engineering', ptBR: 'Processo & Engenharia' },
     },
     {
+      name: 'showBorder',
+      title: 'Exibir Borda / Stroke nas Miniaturas das Etapas',
+      type: 'boolean',
+      description: 'Ativado por padrão. Desative para imagens que já possuem o fundo exato da página.',
+      initialValue: true,
+    },
+    {
       name: 'theme',
       title: 'Tema Visual',
       type: 'string',

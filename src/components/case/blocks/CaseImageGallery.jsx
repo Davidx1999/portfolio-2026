@@ -20,6 +20,7 @@ export function CaseImageGallery({ block }) {
   const eyebrow = resolveLocalized(language === 'en' && block.eyebrow_en ? block.eyebrow_en : block.eyebrow, language);
   const title = resolveLocalized(language === 'en' && block.title_en ? block.title_en : block.title, language);
   const isLight = block.theme === 'light';
+  const showBorder = block.showBorder ?? block.hasBorder ?? true;
 
   const gridColsClass =
     block.columns === '4'
@@ -88,9 +89,11 @@ export function CaseImageGallery({ block }) {
                 className="flex flex-col"
               >
                 <div
-                  className={`w-full ${aspectClass} rounded-[16px] overflow-hidden border ${
-                    isLight ? 'border-[#10110F]/15 bg-white' : 'border-[rgba(244,243,238,0.16)] bg-[#151613]'
-                  } shadow-md group`}
+                  className={`w-full ${aspectClass} rounded-[16px] overflow-hidden ${
+                    showBorder
+                      ? `border ${isLight ? 'border-[#10110F]/15 bg-white' : 'border-[rgba(244,243,238,0.16)] bg-[#151613]'} shadow-md`
+                      : 'border-0 bg-transparent'
+                  } group`}
                 >
                   <img
                     src={item.image}

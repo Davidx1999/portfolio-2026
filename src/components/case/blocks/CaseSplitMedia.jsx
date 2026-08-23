@@ -16,6 +16,7 @@ export function CaseSplitMedia({ block }) {
   const captionLeft = resolveLocalized(language === 'en' && block.captionLeft_en ? block.captionLeft_en : block.captionLeft, language);
   const captionRight = resolveLocalized(language === 'en' && block.captionRight_en ? block.captionRight_en : block.captionRight, language);
   const isLight = block.theme === 'light';
+  const showBorder = block.showBorder ?? block.hasBorder ?? true;
 
   const colLeftClass =
     block.ratio === '60-40'
@@ -50,7 +51,13 @@ export function CaseSplitMedia({ block }) {
               transition={{ duration: 0.55, ease: EASING }}
               className={colLeftClass}
             >
-              <div className="aspect-[4/3] rounded-[16px] overflow-hidden border border-[rgba(244,243,238,0.18)] bg-[#151613] shadow-lg">
+              <div
+                className={`aspect-[4/3] rounded-[16px] overflow-hidden ${
+                  showBorder
+                    ? `border ${isLight ? 'border-[#10110F]/15 bg-white' : 'border-[rgba(244,243,238,0.18)] bg-[#151613]'} shadow-lg`
+                    : 'border-0 bg-transparent'
+                }`}
+              >
                 {isVideoMedia(block.mediaLeft) ? (
                   <SmartVideoPlayer
                     src={block.mediaLeft}
@@ -87,7 +94,13 @@ export function CaseSplitMedia({ block }) {
               transition={{ duration: 0.55, delay: 0.1, ease: EASING }}
               className={colRightClass}
             >
-              <div className="aspect-[4/3] rounded-[16px] overflow-hidden border border-[rgba(244,243,238,0.18)] bg-[#151613] shadow-lg">
+              <div
+                className={`aspect-[4/3] rounded-[16px] overflow-hidden ${
+                  showBorder
+                    ? `border ${isLight ? 'border-[#10110F]/15 bg-white' : 'border-[rgba(244,243,238,0.18)] bg-[#151613]'} shadow-lg`
+                    : 'border-0 bg-transparent'
+                }`}
+              >
                 {isVideoMedia(block.mediaRight) ? (
                   <SmartVideoPlayer
                     src={block.mediaRight}

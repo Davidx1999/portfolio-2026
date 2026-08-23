@@ -14,6 +14,7 @@ export function CaseProcessSteps({ block }) {
   const rawTitle = language === 'en' && block.title_en ? block.title_en : block.title || (language === 'en' ? 'Design Process & Engineering' : 'Processo & Engenharia');
   const title = resolveLocalized(rawTitle, language);
   const isLight = block.theme === 'light';
+  const showBorder = block.showBorder ?? block.hasBorder ?? true;
 
   return (
     <section
@@ -80,7 +81,15 @@ export function CaseProcessSteps({ block }) {
                 </div>
 
                 {step.media && (
-                  <div className="mt-5 pt-4 border-t border-white/10 aspect-[16/9] rounded-[8px] overflow-hidden">
+                  <div
+                    className={`mt-5 pt-4 ${
+                      showBorder
+                        ? isLight
+                          ? 'border-t border-[#10110F]/10'
+                          : 'border-t border-white/10'
+                        : 'border-t-0'
+                    } aspect-[16/9] rounded-[8px] overflow-hidden`}
+                  >
                     <img
                       src={step.media}
                       alt={stepTitle}

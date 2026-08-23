@@ -52,6 +52,13 @@ export default {
       initialValue: '50-50',
     },
     {
+      name: 'showBorder',
+      title: 'Exibir Borda / Stroke nos Containers de Mídia',
+      type: 'boolean',
+      description: 'Ativado por padrão. Desative para mídias que já possuem o fundo exato da página (preserva o border-radius).',
+      initialValue: true,
+    },
+    {
       name: 'theme',
       title: 'Tema Visual',
       type: 'string',

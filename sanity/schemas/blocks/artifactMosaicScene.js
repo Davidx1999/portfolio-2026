@@ -7,6 +7,13 @@ export default {
   description: 'Galeria cinemática de scroll contínuo com comportamento de crescimento e redução (zoom progressivo 0.08 a 1.0).',
   fields: [
     {
+      name: 'showBorder',
+      title: 'Exibir Borda / Stroke nos Artefatos do Mosaico',
+      type: 'boolean',
+      description: 'Ativado por padrão. Desative para mídias que já possuem o fundo exato da página.',
+      initialValue: true,
+    },
+    {
       name: 'items',
       title: 'Artefatos do Mosaico',
       type: 'array',
