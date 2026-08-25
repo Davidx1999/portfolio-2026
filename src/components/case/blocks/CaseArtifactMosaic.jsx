@@ -159,15 +159,15 @@ export function CaseArtifactMosaic({ block }) {
 
   return (
     <section
-      className={`w-full py-20 lg:py-28 border-b ${
+      className={`w-full border-b ${
         isLight
           ? 'bg-[#FAFAF7] text-[#10110F] border-[#10110F]/10'
           : 'bg-[#10110F] text-[#FAFAF7] border-[rgba(244,243,238,0.14)]'
       }`}
     >
-      {/* Header Editorial (Centralizado com padding para leitura) */}
+      {/* Header Editorial (Opcional, com padding próprio apenas quando existir texto) */}
       {(eyebrow || title) && (
-        <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16 mb-12 lg:mb-16">
+        <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16 pt-16 sm:pt-20 lg:pt-24 pb-8 sm:pb-12">
           {eyebrow && (
             <span
               className={`font-mono text-xs font-bold uppercase tracking-[0.2em] block mb-3 ${
