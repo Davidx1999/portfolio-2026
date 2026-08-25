@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useProjects } from '../../hooks/useProjects';
 import { useLanguage } from '../../context/LanguageContext';
+import { useHeaderMetrics } from '../../hooks/useHeaderMetrics';
 import { FeaturedProjectItem } from './FeaturedProjectItem';
 import { ContextualCursor } from './ContextualCursor';
 
@@ -9,6 +10,7 @@ export function FeaturedWorkSection() {
   const { t } = useTranslation(['home']);
   const { language } = useLanguage();
   const { featuredProjects } = useProjects();
+  const { headerBottom = 54 } = useHeaderMetrics();
   const [cursorVisible, setCursorVisible] = useState(false);
 
   const displayCases = useMemo(() => {
@@ -40,22 +42,23 @@ export function FeaturedWorkSection() {
   return (
     <section
       id="featured-work"
-      className="relative w-full bg-[#111210] text-[#FAFAF7] overflow-visible"
+      className="relative z-10 w-full bg-[#111210] text-[#FAFAF7] overflow-visible"
     >
       <div className="absolute z-[9999] pointer-events-none">
         <ContextualCursor isVisible={cursorVisible} label={t('home:cursor_view_case', 'VIEW CASE')} />
       </div>
 
       {/* ============================================================ */}
-      {/* STICKY SECTION TITLE (Stays pinned during the cases)          */}
+      {/* STICKY SECTION TITLE (In-flow sticky from start to end)      */}
       {/* ============================================================ */}
-      <div className="absolute inset-0 z-20 pointer-events-none">
-        <div className="sticky top-[54px] w-full py-6 mix-blend-difference">
-          <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16 flex items-center justify-center text-[#FAFAF7]">
-            <h4 className="font-mono text-base sm:text-lg font-bold uppercase tracking-[0.2em] drop-shadow-md m-0 text-center">
-              {t('home:featured_work_title', 'FEATURED WORK')}
-            </h4>
-          </div>
+      <div
+        style={{ top: `${headerBottom}px`, mixBlendMode: 'difference' }}
+        className="sticky z-20 w-full py-6 mb-[-72px] flex items-center justify-center pointer-events-none mix-blend-difference"
+      >
+        <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16 flex items-center justify-center">
+          <h4 className="font-mono text-base sm:text-lg font-bold uppercase tracking-[0.2em] text-white select-none m-0 text-center">
+            {t('home:featured_work_title', 'FEATURED WORK')}
+          </h4>
         </div>
       </div>
 

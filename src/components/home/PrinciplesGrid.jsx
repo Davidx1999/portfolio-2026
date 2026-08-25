@@ -69,7 +69,7 @@ export function PrinciplesGrid() {
     <section
       ref={sectionRef}
       id="positioning-capabilities"
-      className="relative w-full bg-[#10110F] text-[#FAFAF7] py-20 sm:py-32 lg:py-40 border-b border-white/10 select-none overflow-hidden"
+      className="relative z-20 w-full bg-[#10110F] text-[#FAFAF7] py-20 sm:py-32 lg:py-40 border-b border-white/10 select-none overflow-hidden"
     >
       <div className="w-full max-w-[1560px] mx-auto px-6 sm:px-10 lg:px-16 flex flex-col justify-between">
 

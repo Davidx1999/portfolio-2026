@@ -57,18 +57,18 @@ export default {
             },
             {
               name: 'transformOrigin',
-              title: 'Ponto de Origem do Zoom (Opcional)',
+              title: 'Ponto de Origem do Zoom Diagonal (Quinas)',
               type: 'string',
+              description: 'O zoom ocorre exclusivamente através de uma das 4 quinas diagonais.',
               options: {
                 list: [
-                  { title: 'Centro (Padrão)', value: 'center' },
-                  { title: 'Superior Esquerdo', value: 'topLeft' },
-                  { title: 'Superior Direito', value: 'topRight' },
-                  { title: 'Inferior Esquerdo', value: 'bottomLeft' },
-                  { title: 'Inferior Direito', value: 'bottomRight' },
+                  { title: 'Superior Esquerdo (Top-Left)', value: 'topLeft' },
+                  { title: 'Superior Direito (Top-Right)', value: 'topRight' },
+                  { title: 'Inferior Esquerdo (Bottom-Left)', value: 'bottomLeft' },
+                  { title: 'Inferior Direito (Bottom-Right)', value: 'bottomRight' },
                 ],
               },
-              initialValue: 'center',
+              initialValue: 'topLeft',
             },
             {
               name: 'fitMode',

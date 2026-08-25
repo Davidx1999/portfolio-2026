@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { motion, useScroll, useTransform, useSpring, useReducedMotion } from 'framer-motion';
+import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '../../../context/LanguageContext';
 import { useHeaderMetrics } from '../../../hooks/useHeaderMetrics';
 import { resolveLocalized } from '../../../utils/i18nField';
@@ -17,23 +17,23 @@ import { resolveLocalized } from '../../../utils/i18nField';
 // [1, 0, 0, 0] -> row 10: col 1
 // [0, 0, 1, 0] -> row 11: col 3
 const DEFAULT_SPATIAL_SLOTS = [
-  { row: 1, col: 1, origin: 'bottomLeft' },
-  { row: 1, col: 3, origin: 'bottomRight' },
+  { row: 1, col: 1, origin: 'topLeft' },
+  { row: 1, col: 3, origin: 'topRight' },
   { row: 2, col: 2, origin: 'topLeft' },
   { row: 2, col: 4, origin: 'topRight' },
   { row: 3, col: 1, origin: 'topLeft' },
   { row: 4, col: 2, origin: 'topLeft' },
   { row: 4, col: 3, origin: 'topRight' },
-  { row: 5, col: 4, origin: 'center' },
+  { row: 5, col: 4, origin: 'topRight' },
   { row: 6, col: 1, origin: 'bottomLeft' },
   { row: 6, col: 4, origin: 'bottomRight' },
   { row: 7, col: 2, origin: 'topLeft' },
   { row: 7, col: 3, origin: 'topRight' },
-  { row: 8, col: 1, origin: 'center' },
-  { row: 9, col: 2, origin: 'center' },
-  { row: 9, col: 4, origin: 'center' },
-  { row: 10, col: 1, origin: 'center' },
-  { row: 11, col: 3, origin: 'center' },
+  { row: 8, col: 1, origin: 'topLeft' },
+  { row: 9, col: 2, origin: 'topLeft' },
+  { row: 9, col: 4, origin: 'topRight' },
+  { row: 10, col: 1, origin: 'topLeft' },
+  { row: 11, col: 3, origin: 'topRight' },
 ];
 
 function FullBleedMosaicCell({ item, slot, index, _isLight, showBorder = true }) {
@@ -42,53 +42,57 @@ function FullBleedMosaicCell({ item, slot, index, _isLight, showBorder = true })
   const prefersReducedMotion = useReducedMotion();
   const cellRef = useRef(null);
 
-  // 1. Entry scroll: scales from 0.08 to 1.0 as it enters from bottom
+  const currentHeaderBottom = headerBottom || 54;
+
+  // 1. Entry / Bottom scroll:
+  // - When scrolling down: starts at scale 0.08 at 'start end' and reaches 1.0 at 'end end'.
+  // - When scrolling up: as soon as the cell bottom touches the bottom of viewport ('end end'),
+  //   it immediately starts shrinking synchronously down to 0.08 at 'start end'.
   const { scrollYProgress: entryProgress } = useScroll({
     target: cellRef,
-    offset: ['start end', 'start 70%'],
+    offset: ['start end', 'end end'],
   });
 
-  // 2. Exit scroll: starts EXACTLY when top of image touches the bottom of the header (headerBottom)
-  // and finishes scaling to 0.08 over a 110px scroll distance.
-  const exitTriggerStart = headerBottom || 54;
-  const exitTriggerEnd = exitTriggerStart - 110;
-
+  // 2. Exit / Header scroll: starts precisely when the top of the cell touches the bottom of the header
+  // and spans the full cell height until the bottom of the cell reaches the header
   const { scrollYProgress: exitProgress } = useScroll({
     target: cellRef,
-    offset: [`start ${exitTriggerStart}px`, `start ${exitTriggerEnd}px`],
+    offset: [`start ${currentHeaderBottom}px`, `end ${currentHeaderBottom}px`],
   });
 
-  // Spring-smoothed versions for fluid motion
-  const springConfig = { stiffness: 120, damping: 35, mass: 0.5 };
-  const smoothEntry = useSpring(entryProgress, springConfig);
-  const smoothExit = useSpring(exitProgress, springConfig);
+  // Synchronous 1:1 scroll transforms (no spring lag or delayed physics)
+  const entryScale = useTransform(entryProgress, [0, 1], [0.08, 1], { clamp: true });
+  const entryOpacity = useTransform(entryProgress, [0, 0.35], [0.2, 1], { clamp: true });
 
-  const entryScale = useTransform(smoothEntry, [0, 1], [0.08, 1], { clamp: true });
-  const entryOpacity = useTransform(smoothEntry, [0, 0.4], [0.3, 1], { clamp: true });
+  const exitScale = useTransform(exitProgress, [0, 1], [1, 0.08], { clamp: true });
+  const exitOpacity = useTransform(exitProgress, [0.75, 1], [1, 0.2], { clamp: true });
 
-  const exitScale = useTransform(smoothExit, [0, 1], [1, 0.08], { clamp: true });
-  const exitOpacity = useTransform(smoothExit, [0, 1], [1, 0.3], { clamp: true });
-
-  // Combined transforms: remains scale: 1 and opacity: 1 completely stable in the middle
+  // Combined transforms: remains scale 1.0 and opacity 1.0 completely solid in the middle
   const scale = useTransform(() => entryScale.get() * exitScale.get());
   const opacity = useTransform(() => entryOpacity.get() * exitOpacity.get());
 
+  // Vertical pinning ("trava ali"):
+  // As the cell scrolls up past the header, translating by exitProgress * 100% keeps the top
+  // of the image locked at currentHeaderBottom while the image shrinks into its diagonal corner!
+  const y = useTransform(exitProgress, [0, 1], ['0%', '100%'], { clamp: true });
+
+  const row = item.row || slot.row;
+  const col = item.column || slot.col;
+
+  // 4 Diagonal Corners ONLY: Top-Left, Top-Right, Bottom-Left, Bottom-Right
   const originMap = {
     topLeft: '0% 0%',
     topRight: '100% 0%',
     bottomLeft: '0% 100%',
     bottomRight: '100% 100%',
-    center: '50% 50%',
   };
 
-  const transformOrigin = originMap[item.transformOrigin || slot.origin || 'center'];
+  const rawOrigin = item.transformOrigin || slot.origin;
+  const transformOrigin = originMap[rawOrigin] || ((col === 1 || col === 2) ? '0% 0%' : '100% 0%');
 
   const caption = resolveLocalized(language === 'en' && item.caption_en ? item.caption_en : item.caption, language);
   const isContain = item.fitMode === 'contain';
   const isReduced = prefersReducedMotion;
-
-  const row = item.row || slot.row;
-  const col = item.column || slot.col;
 
   return (
     <div
@@ -104,6 +108,7 @@ function FullBleedMosaicCell({ item, slot, index, _isLight, showBorder = true })
           isReduced
             ? {}
             : {
+                y,
                 scale,
                 opacity,
                 transformOrigin,
