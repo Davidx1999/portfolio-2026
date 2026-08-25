@@ -6,7 +6,6 @@ import {
   Copy,
   Mail,
   MessageCircle,
-  Upload,
   AlertCircle,
   Clock,
 } from 'lucide-react';
@@ -113,8 +112,7 @@ export function Contact() {
     honeypot: '',
   });
 
-  const [attachmentName, setAttachmentName] = useState('');
-  const [attachmentError, setAttachmentError] = useState('');
+  const [formStartedAt] = useState(() => Date.now());
 
   const [submissionState, setSubmissionState] = useState({
     status: 'idle',
@@ -130,24 +128,6 @@ export function Contact() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleFileChange = (e) => {
-    const file = e.target.files?.[0];
-    setAttachmentError('');
-    if (!file) {
-      setAttachmentName('');
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      setAttachmentError(
-        isPt ? 'O arquivo excede o limite máximo de 5MB.' : 'File exceeds maximum limit of 5MB.'
-      );
-      setAttachmentName('');
-      e.target.value = '';
-      return;
-    }
-    setAttachmentName(file.name);
   };
 
   const handleSubmit = async (e) => {
@@ -169,95 +149,47 @@ export function Contact() {
 
     setSubmissionState({ status: 'submitting', message: '' });
 
-    const servicesListFormatted = selectedServices.length > 0 ? selectedServices.join(', ') : (isPt ? 'Não especificado' : 'Not specified');
     const formatValue = selectedFormat || (isPt ? 'Não especificado' : 'Not specified');
     const timelineValue = selectedTimeline || (isPt ? 'Não especificado' : 'Not specified');
     const budgetValue = selectedBudget || (isPt ? 'Não especificado' : 'Not specified');
 
-    const emailSubject = encodeURIComponent(
-      `New Project Inquiry // ${formData.name} ${formData.company ? `(${formData.company})` : ''}`
-    );
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          selectedServices,
+          selectedFormat: formatValue,
+          selectedTimeline: timelineValue,
+          selectedBudget: budgetValue,
+          selectedMarket: market,
+          selectedCurrency: currency,
+          language,
+          submittedAt: formStartedAt,
+          submissionId: crypto.randomUUID(),
+        }),
+      });
 
-    const emailBody = encodeURIComponent(
-      `Hello David,
-
-I would like to discuss a project. Here are the details:
-
---------------------------------------------------
-1. SERVICES OF INTEREST:
-${servicesListFormatted}
-
-2. PREFERRED FORMAT:
-${formatValue}
-
-3. TARGET TIMELINE:
-${timelineValue}
-
-4. ESTIMATED INVESTMENT RANGE:
-${budgetValue} (Currency: ${currency} | Market: ${market})
---------------------------------------------------
-
-PROJECT OVERVIEW & GOALS:
-${formData.description}
-
-CONTACT DETAILS:
-- Name: ${formData.name}
-- Email: ${formData.email}
-- Company: ${formData.company || 'N/A'}
-- Desired Deadline: ${formData.deadline || 'N/A'}
-- Reference Link: ${formData.referenceLink || 'N/A'}
-${attachmentName ? `- Attachment: ${attachmentName}` : ''}
-
---------------------------------------------------
-Sent via official portfolio (davidsalviano.com)
-`
-    );
-
-    const customEndpoint = import.meta.env.VITE_CONTACT_FORM_ENDPOINT;
-
-    if (customEndpoint) {
-      try {
-        const response = await fetch(customEndpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify({
-            ...formData,
-            selectedServices,
-            selectedFormat,
-            selectedTimeline,
-            selectedBudget: budgetValue,
-            selectedMarket: market,
-            selectedCurrency: currency,
-            attachmentName,
-          }),
-        });
-
-        if (response.ok) {
-          setSubmissionState({
-            status: 'success',
-            message: isPt
-              ? (talkData?.confirmationMessage || 'Mensagem recebida com sucesso. Entrarei em contato em breve.')
-              : (talkData?.confirmationMessage_en || 'Message received successfully. I’ll be in touch shortly.'),
-          });
-          return;
-        }
-      } catch (err) {
-        console.warn('Endpoint submission failed, using direct email fallback:', err);
+      if (!response.ok) {
+        throw new Error(`Contact request failed with status ${response.status}`);
       }
-    }
 
-    // Fallback mailto
-    const mailtoUrl = `mailto:${talkData?.email || 'davidsalviano52@gmail.com'}?subject=${emailSubject}&body=${emailBody}`;
-    window.open(mailtoUrl, '_self');
-
-    setTimeout(() => {
       setSubmissionState({
         status: 'success',
         message: isPt
-          ? 'Seu briefing foi estruturado e aberto no seu aplicativo de email. Caso não tenha aberto automaticamente, você também pode copiar meu email direto ao lado.'
-          : 'Your project brief was formatted and opened in your email client. If it did not open automatically, you can also copy my direct email on the left.',
+          ? (talkData?.confirmationMessage || 'Mensagem recebida com sucesso. Entrarei em contato em breve.')
+          : (talkData?.confirmationMessage_en || 'Message received successfully. I’ll be in touch shortly.'),
       });
-    }, 600);
+    } catch (error) {
+      console.error('Contact submission failed:', error);
+      setSubmissionState({
+        status: 'error',
+        message: isPt
+          ? 'Não foi possível enviar sua mensagem agora. Tente novamente ou use o email direto exibido ao lado.'
+          : 'Your message could not be sent right now. Please try again or use the direct email shown beside the form.',
+      });
+    }
   };
 
   // Content Selection
@@ -785,26 +717,6 @@ Sent via official portfolio (davidsalviano.com)
                     />
                   </div>
 
-                  <div className="flex flex-col gap-2">
-                    <span className="font-mono text-[11px] font-bold uppercase text-[#10110F]/70">
-                      {t('contact:field_attachment_label', 'Briefing / Attachments (Optional)')}
-                    </span>
-                    <label className="flex items-center gap-3 p-4 rounded-[14px] border border-dashed border-[#10110F]/25 bg-white hover:bg-[#FAFAF7] hover:border-[#10110F]/50 transition-colors cursor-pointer">
-                      <Upload size={18} className="text-[#10110F]/60" />
-                      <span className="font-sans text-xs text-[#10110F]/75">
-                        {attachmentName || t('contact:field_attachment_hint', 'PDF, Figma link or image up to 10MB')}
-                      </span>
-                      <input
-                        type="file"
-                        onChange={handleFileChange}
-                        accept=".pdf,.png,.jpg,.jpeg,.zip,.fig"
-                        className="sr-only"
-                      />
-                    </label>
-                    {attachmentError && (
-                      <span className="font-mono text-xs text-red-600 font-bold">{attachmentError}</span>
-                    )}
-                  </div>
                 </div>
 
                 {/* STATUS */}
