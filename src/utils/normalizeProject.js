@@ -77,7 +77,8 @@ export function normalizeContentBlock(block, locale = 'en', idx) {
   if (block.frameColor !== undefined) normalized.frameColor = block.frameColor;
   if (block.artifactType !== undefined) normalized.artifactType = block.artifactType;
   if (block.autoplay !== undefined) normalized.autoplay = block.autoplay;
-  if (block.loop !== undefined) normalized.loop = block.loop;
+  if (block.aspectRatioPreset !== undefined) normalized.aspectRatioPreset = block.aspectRatioPreset;
+  if (block.layoutMode !== undefined) normalized.layoutMode = block.layoutMode;
   normalized.showBorder = block.showBorder ?? block.hasBorder ?? true;
 
   // 2. Resolução de mídias e vídeos

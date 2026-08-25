@@ -7,6 +7,20 @@ export default {
   description: 'Galeria cinemática de scroll contínuo com comportamento de crescimento e redução (zoom progressivo 0.08 a 1.0).',
   fields: [
     {
+      name: 'aspectRatioPreset',
+      title: 'Proporção / Formato do Mosaico',
+      type: 'string',
+      description: 'Escolha entre Tela Cheia (Full Bleed 100vw) ou Container Proporcional (1440px × 960px em proporção 3:2).',
+      options: {
+        list: [
+          { title: 'Full Bleed (100vw · Tela Cheia)', value: 'fullBleed' },
+          { title: '1440 × 960px (Container Proporcional 3:2)', value: '1440x960' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'fullBleed',
+    },
+    {
       name: 'showBorder',
       title: 'Exibir Borda / Stroke nos Artefatos do Mosaico',
       type: 'boolean',

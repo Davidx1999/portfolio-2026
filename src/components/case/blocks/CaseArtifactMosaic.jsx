@@ -36,7 +36,7 @@ const DEFAULT_SPATIAL_SLOTS = [
   { row: 11, col: 3, origin: 'topRight' },
 ];
 
-function FullBleedMosaicCell({ item, slot, index, _isLight, showBorder = true }) {
+function FullBleedMosaicCell({ item, slot, index, _isLight, showBorder = true, is1440x960 = false }) {
   const { language } = useLanguage();
   const { headerBottom = 54 } = useHeaderMetrics();
   const prefersReducedMotion = useReducedMotion();
@@ -98,11 +98,15 @@ function FullBleedMosaicCell({ item, slot, index, _isLight, showBorder = true })
     <div
       ref={cellRef}
       style={{ gridRow: row, gridColumn: col }}
-      className={`relative w-full h-[50svh] overflow-hidden ${
+      className={`relative w-full ${
+        is1440x960
+          ? 'aspect-[3/4] h-auto min-h-[280px] max-h-[480px]'
+          : 'h-[50svh]'
+      } overflow-hidden ${
         showBorder ? 'border border-[rgba(244,243,238,0.08)] bg-[#10110F]' : 'border-0 bg-transparent'
       } z-10`}
     >
-      {/* Mídia em Escala Total (25vw × 50svh) */}
+      {/* Mídia em Escala Total (25vw × 50svh ou 360px × 480px) */}
       <motion.div
         style={
           isReduced
@@ -147,6 +151,7 @@ export function CaseArtifactMosaic({ block }) {
   const title = resolveLocalized(language === 'en' && block.title_en ? block.title_en : block.title, language);
   const isLight = block.theme === 'light';
   const showBorder = block.showBorder ?? block.hasBorder ?? true;
+  const is1440x960 = block.aspectRatioPreset === '1440x960' || block.aspectRatio === '1440x960' || block.layoutMode === '1440x960';
 
   const items = block.items;
 
@@ -186,25 +191,36 @@ export function CaseArtifactMosaic({ block }) {
       )}
 
       {/* ============================================================ */}
-      {/* 1. DESKTOP FULL-BLEED 4-COLUMN SPATIAL GRID (100vw × 50svh)  */}
-      {/* 2 linhas ocupam exatamente 100svh. Cada célula = 25vw × 50svh */}
+      {/* 1. DESKTOP 4-COLUMN SPATIAL GRID                             */}
+      {/* Full Bleed: (100vw × 50svh por célula)                       */}
+      {/* 1440x960: (max-w-[1440px] com 4 cols × 360px, altura 480px)  */}
       {/* ============================================================ */}
       <div
-        style={{
-          width: '100vw',
-          marginLeft: 'calc(50% - 50vw)',
-          marginRight: 'calc(50% - 50vw)',
-          gridTemplateColumns: 'repeat(4, 25vw)',
-          gridTemplateRows: `repeat(${maxRow}, 50svh)`,
-        }}
-        className="hidden md:grid w-screen max-w-none bg-[#10110F] overflow-hidden relative z-10"
+        style={
+          is1440x960
+            ? {
+                width: '100%',
+                maxWidth: '1440px',
+                margin: '0 auto',
+                gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+                gridTemplateRows: `repeat(${maxRow}, auto)`,
+              }
+            : {
+                width: '100vw',
+                marginLeft: 'calc(50% - 50vw)',
+                marginRight: 'calc(50% - 50vw)',
+                gridTemplateColumns: 'repeat(4, 25vw)',
+                gridTemplateRows: `repeat(${maxRow}, 50svh)`,
+              }
+        }
+        className="hidden md:grid w-full max-w-none bg-[#10110F] overflow-hidden relative z-10"
       >
         {items.map((item, idx) => {
           const slot =
             DEFAULT_SPATIAL_SLOTS[idx % DEFAULT_SPATIAL_SLOTS.length] || {
               row: idx + 1,
               col: (idx % 4) + 1,
-              origin: 'center',
+              origin: 'topLeft',
             };
           return (
             <FullBleedMosaicCell
@@ -214,26 +230,39 @@ export function CaseArtifactMosaic({ block }) {
               index={idx}
               isLight={isLight}
               showBorder={showBorder}
+              is1440x960={is1440x960}
             />
           );
         })}
       </div>
 
       {/* ============================================================ */}
-      {/* 2. TABLET / MOBILE FULL-BLEED 2-COLUMN RESPONSIVE GRID        */}
+      {/* 2. TABLET / MOBILE 2-COLUMN RESPONSIVE GRID                  */}
       {/* ============================================================ */}
       <div
-        style={{
-          width: '100vw',
-          marginLeft: 'calc(50% - 50vw)',
-          marginRight: 'calc(50% - 50vw)',
-        }}
-        className="grid grid-cols-2 md:hidden w-screen max-w-none bg-[#10110F] overflow-hidden relative z-10"
+        style={
+          is1440x960
+            ? {
+                width: '100%',
+                maxWidth: '1440px',
+                margin: '0 auto',
+              }
+            : {
+                width: '100vw',
+                marginLeft: 'calc(50% - 50vw)',
+                marginRight: 'calc(50% - 50vw)',
+              }
+        }
+        className={`grid grid-cols-2 md:hidden ${
+          is1440x960 ? 'w-full' : 'w-screen max-w-none'
+        } bg-[#10110F] overflow-hidden relative z-10`}
       >
         {items.map((item, idx) => (
           <div
             key={item._key || `mosaic-m-${idx}`}
-            className={`relative w-[50vw] h-[36svh] sm:h-[45svh] overflow-hidden ${
+            className={`relative w-full ${
+              is1440x960 ? 'aspect-[3/4]' : 'h-[36svh] sm:h-[45svh]'
+            } overflow-hidden ${
               showBorder ? 'border border-[rgba(244,243,238,0.08)] bg-[#10110F]' : 'border-0 bg-transparent'
             }`}
           >
