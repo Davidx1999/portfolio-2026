@@ -90,9 +90,9 @@ export function CaseTableOfContents({ sections = [] }) {
   };
 
   return (
-    <div className="hidden xl:block fixed right-8 top-1/2 -translate-y-1/2 z-30 pointer-events-none">
-      <div className="p-4 bg-[#10110F]/90 backdrop-blur-md border border-white/10 rounded-[14px] pointer-events-auto flex flex-col gap-2.5 shadow-2xl max-w-[220px]">
-        <span className="font-mono text-[9px] uppercase font-bold tracking-widest text-white/40 block mb-1">
+    <div className="hidden xl:block fixed right-4 sm:right-6 top-1/2 -translate-y-1/2 z-30 pointer-events-none">
+      <div className="p-3 py-2.5 bg-[#10110F]/90 backdrop-blur-md border border-white/10 rounded-[12px] pointer-events-auto flex flex-col gap-1.5 shadow-2xl w-[145px] max-w-[150px]">
+        <span className="font-mono text-[8.5px] uppercase font-bold tracking-widest text-white/40 block mb-0.5">
           {language === 'en' ? 'INDEX' : 'SUMÁRIO'}
         </span>
 
@@ -103,13 +103,13 @@ export function CaseTableOfContents({ sections = [] }) {
               key={sec.id}
               type="button"
               onClick={() => scrollToSection(sec.id)}
-              className={`text-left font-mono text-[10px] uppercase tracking-wider transition-all duration-200 flex items-center gap-2 cursor-pointer ${
-                isActive ? 'text-[#C4FF00] font-bold translate-x-1' : 'text-white/40 hover:text-white/80'
+              className={`text-left font-mono text-[9px] uppercase tracking-wider transition-all duration-200 flex items-center gap-1.5 cursor-pointer ${
+                isActive ? 'text-[#C4FF00] font-bold translate-x-0.5' : 'text-white/40 hover:text-white/80'
               }`}
             >
               <span
-                className={`w-1.5 h-1.5 rounded-full transition-all duration-200 shrink-0 ${
-                  isActive ? 'bg-[#C4FF00] scale-125 shadow-[0_0_8px_#C4FF00]' : 'bg-white/20'
+                className={`w-1 h-1 rounded-full transition-all duration-200 shrink-0 ${
+                  isActive ? 'bg-[#C4FF00] scale-125 shadow-[0_0_6px_#C4FF00]' : 'bg-white/20'
                 }`}
               />
               <span className="truncate">{sec.label}</span>
