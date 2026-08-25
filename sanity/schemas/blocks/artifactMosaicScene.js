@@ -8,13 +8,13 @@ export default {
   fields: [
     {
       name: 'aspectRatioPreset',
-      title: 'Proporção / Formato do Mosaico',
+      title: 'Proporção das Imagens do Mosaico',
       type: 'string',
-      description: 'Escolha entre Tela Cheia (Full Bleed 100vw) ou Container Proporcional (1440px × 960px em proporção 3:2).',
+      description: 'Escolha a proporção de enquadramento das imagens: 50svh (Padrão) ou 3:2 (1440 × 960px por imagem).',
       options: {
         list: [
-          { title: 'Full Bleed (100vw · Tela Cheia)', value: 'fullBleed' },
-          { title: '1440 × 960px (Container Proporcional 3:2)', value: '1440x960' },
+          { title: 'Padrão (50svh por linha)', value: 'fullBleed' },
+          { title: 'Proporção 3:2 por Imagem (1440 × 960)', value: '1440x960' },
         ],
         layout: 'radio',
       },
