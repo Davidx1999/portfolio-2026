@@ -1,136 +1,148 @@
-# 🗺️ Protótipos MAPEAR
+# ✦ David Salviano — Portfolio & Interface Architecture
 
-> Ambiente de prototipagem e desenvolvimento da interface do ecossistema **MAPEAR** (Plataforma de Avaliação, Gestão Curricular e Acompanhamento Educacional).
-
----
-
-## 📌 Sumário
-
-- [Visão Geral](#-visão-geral)
-- [Tecnologias Utilizadas](#-tecnologias-utilizadas)
-- [Design System & Design Tokens](#-design-system--design-tokens)
-- [Módulos & Funcionalidades](#-módulos--funcionalidades)
-- [Estrutura do Projeto](#-estrutura-do-projeto)
-- [Instalação e Execução Local](#-instalação-e-execução-local)
-- [Scripts Disponíveis](#-scripts-disponíveis)
-- [Deploy](#-deploy)
-- [Convenções e Boas Práticas](#-convenções-e-boas-práticas)
-
----
-
-## 🚀 Visão Geral
-
-O projeto **Protótipos MAPEAR** é uma aplicação React desenvolvida para validar, prototipar e documentar interfaces, fluxos de usuário e componentes visuais do ecossistema educacional MAPEAR.
-
-A aplicação conta com um fluxo integrado de **Design Tokens** (sincronizados a partir de definições do Figma em formato JSON) e uma arquitetura orientada a componentes que simula as jornadas completas de professores, gestores e estudantes.
+<div align="center">
+  <p align="center">
+    <strong>Portfólio de Product Design, Arquitetura de Interfaces e Sistemas Digitais</strong>
+  </p>
+  <p align="center">
+    <a href="https://davidsalvianodesign.com">davidsalvianodesign.com</a>
+  </p>
+  <p align="center">
+    <img src="https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black" alt="React 19" />
+    <img src="https://img.shields.io/badge/Vite-8-646CFF?style=flat-square&logo=vite&logoColor=white" alt="Vite 8" />
+    <img src="https://img.shields.io/badge/TailwindCSS-v4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind CSS v4" />
+    <img src="https://img.shields.io/badge/Sanity-v3-F03E2F?style=flat-square&logo=sanity&logoColor=white" alt="Sanity CMS" />
+    <img src="https://img.shields.io/badge/GSAP-Animations-88CE02?style=flat-square&logo=greensock&logoColor=white" alt="GSAP" />
+    <img src="https://img.shields.io/badge/i18n-EN%20%7C%20PT--BR-blue?style=flat-square" alt="i18n" />
+  </p>
+</div>
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## 📖 Visão Geral
 
-- **Core:** [React 18](https://react.dev/) + [Vite](https://vitejs.dev/)
-- **Estilização:** [Tailwind CSS](https://tailwindcss.com/) + CSS Custom Properties (Design Tokens)
-- **Ícones:** [Lucide React](https://lucide.dev/)
-- **Automação & Processamento de Tokens:** Node.js script (`scripts/build-tokens.cjs`)
-- **Deploy:** GitHub Pages via `gh-pages`
+Este projeto é o portfólio oficial de **David Salviano** (Senior Product Designer). Desenvolvido com foco em alta performance visual, microinterações refinadas, arquitetura de componentes escalável e suporte multilíngue nativo com pré-renderização de SEO para indexação completa por motores de busca e crawlers sociais.
 
----
+### 🌟 Destaques do Projeto
 
-## 🎨 Design System & Design Tokens
-
-O projeto adota uma arquitetura em camadas de tokens alinhada ao Figma:
-
-```
-MAPEAR Raw (Tokens Primitivos) 
-   └── MAPEAR Tokens (Tokens Semânticos / Contextuais)
-         └── MAPEAR Components (Tokens a Nível de Componente)
-               └── build-tokens.cjs ➔ src/styles/design-tokens.css
-```
-
-### Categorias de Tokens
-- **Raw:** Cores primitivas, tipografia base, espaçamentos brutos.
-- **Tokens Semânticos:** Cores de superfície, texto primário/secundário, estados interativos, feedback (sucesso, aviso, erro, informação).
-- **Componentes:** Configurações específicas para inputs, botões, cards, tabelas e modais.
+- 🎨 **Design & Microinterações**: Transições fluidas com GSAP, Framer Motion, Anime.js, rolagem inercial com Lenis e cursor contextual reativo.
+- 🌐 **Internacionalização Robusta (i18n)**: Roteamento dedicado por idioma (`/en` e `/pt`), sincronização automática com fallback e automação de tradução.
+- ⚡ **Headless CMS com Sanity**: Gerenciamento de estudos de caso, blocos dinâmicos e mídias ricas através de schemas modulares no Sanity Studio.
+- 🚀 **SEO & Prerender Automatizado**: Pipeline de build customizado que gera arquivos estáticos otimizados com tags OpenGraph, Twitter Cards, Canonical/Hreflang e JSON-LD Schema.org.
+- 📬 **API Serverless de Contato**: Envio seguro de mensagens através de Vercel Serverless Functions integradas ao Resend.
 
 ---
 
-## 📦 Módulos & Funcionalidades
+## 🛠️ Stack Tecnológica
 
-A plataforma cobre os principais fluxos do ciclo de avaliação e gestão escolar:
+### Core & Framework
+- **React 19** — Biblioteca para construção de interfaces reativas
+- **Vite 8** — Bundler ultrarrápido com Hot Module Replacement (HMR)
+- **React Router DOM 7** — Roteamento declarativo no client-side
 
-| Módulo | Descrição |
-|---|---|
-| **Dashboard** | Visão analítica geral, indicadores-chave, atalhos rápidos e notificações. |
-| **Currículos** | Gestão de matrizes curriculares, competências, habilidades e diretrizes pedagógicas. |
-| **Saberes** | Mapeamento e navegação de saberes, relações conceituais e grafos de dependência. |
-| **Banco de Tarefas** | Repositório de itens de avaliação, filtros por habilidade/dificuldade e criação de questões. |
-| **Avaliações** | Criação, parametrização, agendamento e gerenciamento de cadernos de prova. |
-| **Realização de Testes** | Interface de aplicação de testes (online e presencial), controle de tempo e acessibilidade. |
-| **Digitalização & Correção** | Leitura de folhas de resposta, correção assistida e validação de gabaritos. |
-| **Devolutivas Pedagógicas** | Relatórios de desempenho, matrizes de acerto/erro, mapas de calor e diagnósticos por turma/aluno. |
-| **Acompanhamento Escolar** | Monitoramento de frequência, engajamento e evolução contínua dos estudantes. |
-| **Gestão de Usuários** | Perfis de acesso, turmas, escolas e permissões de gestores e docentes. |
+### Estilização & UI
+- **Tailwind CSS v4** — Framework utilitário de estilização de última geração
+- **Lucide React** — Pacote de ícones minimalistas e consistentes
+- **Tipografia**: *Geist*, *Geist Mono* e *Libre Baskerville*
+
+### Animações & Experiência do Usuário
+- **GSAP (GreenSock)** & **Framer Motion** — Orquestração de animações complexas e transições de página
+- **Anime.js** — Animações vetoriais e efeitos interativos
+- **Lenis** — Smooth scrolling inercial
+
+### Gestão de Conteúdo (CMS)
+- **Sanity.io** (`@sanity/client`, `@sanity/image-url`) — Estrutura de conteúdo modular com schemas tipados para estudos de caso, blocos de mídia e seções institucionais.
+
+### Backend Serverless (Vercel Functions)
+- **Resend API** — Disparo de e-mails transacionais e formulário de contato.
+- **DeepL API** — Pipeline de automação de tradução de conteúdo.
 
 ---
 
-## 📂 Estrutura do Projeto
+## 📁 Estrutura de Diretórios
 
 ```plaintext
-prototipos_mapear/
-├── .agents/                    # Customizações de agentes e diretrizes locais
-├── MAPEAR Raw/                 # Definições JSON de tokens primitivos
-├── MAPEAR Tokens/              # Definições JSON de tokens semânticos
-├── MAPEAR Components/          # Definições JSON de tokens de componentes
-├── public/                     # Ativos estáticos públicos
-├── scripts/
-│   └── build-tokens.cjs        # Script de build dos tokens para CSS
+david-salviano-portfolio/
+├── api/                    # Serverless Functions (Vercel)
+│   ├── contact.js          # Endpoint de envio de e-mails via Resend
+│   └── translate.js        # Endpoint de tradução automática via DeepL
+├── sanity/                 # Sanity Studio (Headless CMS)
+│   ├── schemas/            # Schemas de dados (projetos, blocos modulares, páginas)
+│   └── sanity.config.js    # Configuração do Studio
+├── scripts/                # Scripts utilitários de build e manutenção
+│   ├── build-seo-prerender.js   # Pré-renderizador estático para SEO e OpenGraph
+│   ├── check-i18n-keys.js       # Validador de paridade de chaves i18n
+│   └── test-seo-http.js         # Validador HTTP de tags e rotas
 ├── src/
-│   ├── components/
-│   │   ├── layout/             # Header, Footer, Navegação
-│   │   ├── screens/            # Telas e fluxos dos módulos (Avaliações, Devolutivas, etc.)
-│   │   ├── ui/                 # Componentes reutilizáveis de interface (botões, cards, modais)
-│   │   └── variables_Figma/    # Mapeamento auxiliar de variáveis
-│   ├── data/                   # Mocks, constantes e estruturas de dados de apoio
-│   ├── styles/                 # Folhas de estilo e variáveis CSS geradas
-│   ├── App.jsx                 # Roteamento e orquestração de estados da aplicação
-│   ├── index.css               # Estilos globais e diretivas do Tailwind
-│   └── main.jsx                # Ponto de entrada da aplicação
-├── tailwind.config.js          # Configuração do Tailwind CSS integrado aos tokens
-├── vite.config.js              # Configurações do Vite bundler
-└── package.json                # Dependências e scripts do projeto
+│   ├── components/         # Componentes React reutilizáveis
+│   │   ├── case/           # Componentes de renderização de Case Studies
+│   │   ├── common/         # Elementos compartilhados (botões, cards, overlays)
+│   │   ├── home/           # Seções da página inicial (Hero, Grid, Galeria)
+│   │   ├── MouseFollower.jsx
+│   │   ├── Navbar.jsx
+│   │   ├── LoadingScreen.jsx
+│   │   └── SEOHead.jsx
+│   ├── config/             # Configurações globais
+│   ├── context/            # Contextos React (tema, estado global)
+│   ├── hooks/              # Custom React Hooks
+│   ├── i18n/               # Configuração do i18next e dicionários de tradução
+│   ├── pages/              # Páginas da aplicação (Home, Work, CaseStudy, About, Contact)
+│   ├── services/           # Clientes de API (Sanity, endpoints internos)
+│   ├── utils/              # Funções utilitárias e helpers
+│   ├── App.jsx             # Estrutura de rotas e providers
+│   ├── main.jsx            # Ponto de entrada React
+│   └── index.css           # Estilos globais e tokens de design
+├── public/                 # Assets públicos estáticos (ícones, imagens base)
+├── vercel.json             # Configuração de rotas, headers de segurança e reescritas
+└── vite.config.js          # Configuração do bundler Vite
 ```
 
 ---
 
-## 💻 Instalação e Execução Local
+## 🚀 Como Executar Localmente
 
 ### Pré-requisitos
-- [Node.js](https://nodejs.org/) (versão 18 ou superior recomendada)
-- [npm](https://www.npmjs.com/) ou [yarn](https://yarnpkg.com/)
+- **Node.js**: versão `18.x` ou superior
+- **npm** ou gerenciador de pacotes equivalente
 
-### Passo a passo
+### 1. Clonar e Instalar Dependências
 
-1. **Clone o repositório:**
-   ```bash
-   git clone https://github.com/SEU_USUARIO/prototipos_mapear.git
-   cd prototipos_mapear
-   ```
+```bash
+# Clone o repositório
+git clone https://github.com/DaviidSalviano/david-salviano-portfolio.git
 
-2. **Instale as dependências:**
-   ```bash
-   npm install
-   ```
+# Acesse o diretório
+cd david-salviano-portfolio
 
-3. **Gere os tokens de design:**
-   ```bash
-   npm run build:tokens
-   ```
+# Instale as dependências da aplicação principal
+npm install
 
-4. **Inicie o servidor de desenvolvimento:**
-   ```bash
-   npm run dev
-   ```
-   A aplicação estará disponível em `http://localhost:5173`.
+# (Opcional) Instale as dependências do Sanity Studio
+cd sanity && npm install && cd ..
+```
+
+### 2. Configurar Variáveis de Ambiente
+
+Crie um arquivo `.env` na raiz do projeto com base no `.env.example`:
+
+```env
+# Configurações do Sanity CMS
+VITE_SANITY_PROJECT_ID=pjq90dr2
+VITE_SANITY_DATASET=production
+VITE_SANITY_API_VERSION=2024-01-01
+
+# Configurações de Envio de E-mail (Serverless / Produção)
+RESEND_API_KEY=sua_chave_resend_aqui
+CONTACT_TO_EMAIL=seu_email_de_destino@dominio.com
+CONTACT_FROM_EMAIL=seu_email_verificado@dominio.com
+```
+
+### 3. Iniciar o Servidor de Desenvolvimento
+
+```bash
+npm run dev
+```
+O aplicativo estará disponível em `http://localhost:5173`.
 
 ---
 
@@ -138,32 +150,28 @@ prototipos_mapear/
 
 | Comando | Descrição |
 |---|---|
-| `npm run dev` | Inicia o servidor de desenvolvimento local no Vite. |
-| `npm run build:tokens` | Executa o script de geração de variáveis CSS a partir dos arquivos JSON de tokens. |
-| `npm run build` | Compila os tokens e realiza a build de produção na pasta `docs`. |
-| `npm run preview` | Pré-visualiza localmente a build de produção. |
-| `npm run deploy` | Executa a build e publica a pasta de distribuição no GitHub Pages via `gh-pages`. |
+| `npm run dev` | Inicia o servidor local de desenvolvimento Vite com HMR |
+| `npm run build` | Valida chaves i18n, compila o bundle de produção e executa o pré-renderizador de SEO |
+| `npm run preview` | Inicia um servidor local para testar o build de produção (`dist`) |
+| `npm run check:i18n` | Verifica se todas as chaves de tradução estão sincronizadas entre `en` e `pt-BR` |
+| `npm run test:seo` | Executa testes automatizados para validar meta tags, hreflang e OpenGraph |
+| `npm run lint` | Executa a análise estática com ESLint |
 
 ---
 
-## 🌐 Deploy
+## 🌍 Estratégia de SEO & Internacionalização
 
-O projeto está configurado para publicação automática no **GitHub Pages** utilizando a pasta de saída `docs/` ou a branch `gh-pages`:
-
-```bash
-npm run deploy
-```
-
----
-
-## 🎯 Convenções e Boas Práticas
-
-- **Design System First:** Utilize sempre classes utilitárias do Tailwind e variáveis de tokens (`var(--token-...)`) em vez de valores "hardcoded" de cores ou medidas.
-- **Acessibilidade:** Garanta contraste adequado (inclusive modo alto contraste) e suporte a navegação por teclado.
-- **Simulação Fiel:** Mantenha dados de mock ricos e realistas para demonstrar o comportamento dos componentes sob diferentes volumes de dados.
+1. **Roteamento Bilíngue**:
+   - `/en` — Versão em Inglês
+   - `/pt` — Versão em Português (Brasil)
+   - Redirecionamento e fallback baseados no idioma do navegador / persistência de preferência.
+2. **Build-Time SEO Pre-rendering**:
+   - O script `scripts/build-seo-prerender.js` gera páginas HTML estáticas dedicadas para cada rota e idioma, garantindo que web crawlers (Googlebot, LinkedIn Bot, Twitterbot, etc.) recebam metadados corretos de forma síncrona.
+3. **Structured Data**:
+   - Injeção automática de schemas JSON-LD (`Person`, `CreativeWork`, `WebSite`).
 
 ---
 
-<p align="center">
-  Desenvolvido para o ecossistema educacional <b>MAPEAR</b>.
-</p>
+## 🛡️ Licença
+
+Este projeto é de propriedade privada de **David Salviano**. Todos os direitos reservados.
