@@ -1,5 +1,57 @@
 {
+  "cleanUrls": true,
+  "trailingSlash": false,
   "redirects": [
+    {
+      "source": "/en/talk",
+      "destination": "/en/contact",
+      "permanent": true
+    },
+    {
+      "source": "/pt/talk",
+      "destination": "/pt/contact",
+      "permanent": true
+    },
+    {
+      "source": "/en/lets-talk",
+      "destination": "/en/contact",
+      "permanent": true
+    },
+    {
+      "source": "/pt/lets-talk",
+      "destination": "/pt/contact",
+      "permanent": true
+    },
+    {
+      "source": "/en/projects",
+      "destination": "/en/work",
+      "permanent": true
+    },
+    {
+      "source": "/pt/projects",
+      "destination": "/pt/work",
+      "permanent": true
+    },
+    {
+      "source": "/en/projects/:slug",
+      "destination": "/en/work/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/pt/projects/:slug",
+      "destination": "/pt/work/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/en/cases/:slug",
+      "destination": "/en/work/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/pt/cases/:slug",
+      "destination": "/pt/work/:slug",
+      "permanent": true
+    },
     {
       "source": "/work",
       "destination": "/en/work",
@@ -31,7 +83,37 @@
       "permanent": true
     },
     {
+      "source": "/talk",
+      "destination": "/en/contact",
+      "permanent": true
+    },
+    {
+      "source": "/lets-talk",
+      "destination": "/en/contact",
+      "permanent": true
+    },
+    {
+      "source": "/projects",
+      "destination": "/en/work",
+      "permanent": true
+    },
+    {
       "source": "/cases/:slug",
+      "destination": "/en/work/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/work/:slug",
+      "destination": "/en/work/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/project/:slug",
+      "destination": "/en/work/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/projects/:slug",
       "destination": "/en/work/:slug",
       "permanent": true
     },
@@ -44,12 +126,6 @@
       "source": "/aula-f75",
       "destination": "/en/work/aula-f75",
       "permanent": true
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/((?!api/).*)",
-      "destination": "/index.html"
     }
   ]
 }

@@ -33,3 +33,4 @@ sanity/.sanity
 sanity/dist/
 sanity/backups/
 backups/
+.vercel

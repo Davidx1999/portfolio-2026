@@ -305,7 +305,8 @@ export function normalizeProject(rawProject, locale = 'en') {
   // ── Fallbacks de SEO ───────────────────────────────────────────────────────
   const seoTitle = resolveLocalized(rawProject.seo?.title, locale) || `${displayTitle} | David Salviano`;
   const seoDescription = resolveLocalized(rawProject.seo?.description, locale) || displayDesc;
-  const seoOgImage = rawProject.seo?.ogImage ? resolveImageUrl(rawProject.seo.ogImage) : coverUrl;
+  const rawShareImage = rawProject.seo?.shareImage || rawProject.seo?.ogImage;
+  const seoShareImageUrl = rawShareImage ? resolveImageUrl(rawShareImage) : coverUrl;
 
   // ── Resolução de Campos Legados para compatibilidade reversa ──────────────
   const legacyOverview = resolveLocalized(rawProject.overview, locale);
@@ -380,7 +381,9 @@ export function normalizeProject(rawProject, locale = 'en') {
     seo: {
       title: seoTitle,
       description: seoDescription,
-      ogImage: seoOgImage,
+      shareImage: seoShareImageUrl,
+      shareImageUrl: seoShareImageUrl,
+      ogImage: seoShareImageUrl,
     },
   };
 }

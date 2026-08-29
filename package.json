@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/check-i18n-keys.js && vite build",
+    "build": "node scripts/check-i18n-keys.js && vite build && node scripts/build-seo-prerender.js",
+    "test:seo": "node scripts/test-seo-http.js",
     "check:i18n": "node scripts/check-i18n-keys.js",
     "lint": "eslint .",
     "preview": "vite preview"

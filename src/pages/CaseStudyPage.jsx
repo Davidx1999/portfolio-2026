@@ -15,6 +15,8 @@ import { CaseSolutionImpact } from '../components/case/CaseSolutionImpact';
 import { CaseReflection } from '../components/case/CaseReflection';
 import { CaseNextProject } from '../components/case/CaseNextProject';
 import { resolveLocalized } from '../utils/i18nField';
+import { useDocumentSEO } from '../hooks/useDocumentSEO';
+import { SITE_URL } from '../config/seo';
 
 /**
  * CaseStudyPage
@@ -33,16 +35,48 @@ export function CaseStudyPage() {
     window.scrollTo(0, 0);
   }, [slug]);
 
-  // Update Document Title & SEO Meta com fallback universal
-  useEffect(() => {
-    if (caseStudy) {
-      const displayTitle = resolveLocalized(caseStudy.title, language) || 'Untitled Project';
-      const metaTitle = resolveLocalized(caseStudy.seo?.title, language) || `${displayTitle} | David Salviano`;
-      document.title = metaTitle;
-    } else {
-      document.title = 'Case Study | David Salviano';
-    }
-  }, [caseStudy, language]);
+  // Derived metadata
+  const displayTitle = caseStudy ? (resolveLocalized(caseStudy.title, language) || 'Untitled Project') : '';
+  const metaTitle = caseStudy ? (resolveLocalized(caseStudy.seo?.title, language) || `${displayTitle} | David Salviano`) : '';
+  const metaDescription = caseStudy
+    ? (resolveLocalized(caseStudy.seo?.description, language) || resolveLocalized(caseStudy.shortDescription, language) || resolveLocalized(caseStudy.description, language) || `${displayTitle} Case Study by David Salviano.`)
+    : '';
+  const shareImage = caseStudy ? (caseStudy.seo?.shareImage || caseStudy.coverImage) : null;
+
+  // Schema.org CreativeWork JSON-LD
+  const structuredData = caseStudy
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'CreativeWork',
+        name: displayTitle,
+        headline: metaTitle,
+        description: metaDescription,
+        url: `${SITE_URL}/${language}/work/${slug}`,
+        image: shareImage,
+        author: {
+          '@type': 'Person',
+          name: 'David Salviano',
+          url: SITE_URL,
+        },
+        creator: {
+          '@type': 'Person',
+          name: 'David Salviano',
+        },
+        inLanguage: language === 'pt' ? 'pt-BR' : 'en',
+      }
+    : null;
+
+  useDocumentSEO({
+    title: loading ? 'Loading Case Study... | David Salviano' : caseStudy ? metaTitle : 'Case Study Not Found | David Salviano',
+    description: loading ? 'Loading case study details.' : caseStudy ? metaDescription : 'The requested case study could not be found.',
+    shareImage,
+    imageAlt: displayTitle,
+    type: 'article',
+    lang: language,
+    unprefixedPath: `/work/${slug}`,
+    noIndex: !loading && !caseStudy,
+    structuredData,
+  });
 
   // Build dynamic Table of Contents sections
   const tocSections = useMemo(() => {
