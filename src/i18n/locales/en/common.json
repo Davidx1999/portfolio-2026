@@ -28,5 +28,8 @@
   "action_copied": "Copied!",
   "action_copy": "Copy",
   "status_coming_soon": "Coming soon",
-  "status_available": "Accepting new projects"
+  "status_available": "Accepting new projects",
+  "consent_banner_text": "We use analytics cookies to understand traffic and improve portfolio experience. No personal data is ever sold.",
+  "consent_action_accept": "Accept",
+  "consent_action_decline": "Decline"
 }

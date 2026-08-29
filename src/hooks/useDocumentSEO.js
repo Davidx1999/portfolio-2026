@@ -34,9 +34,24 @@ export function useDocumentSEO({
     // 1. Update HTML lang
     document.documentElement.lang = lang === 'pt' ? 'pt-BR' : 'en';
 
-    // 2. Update Document Title
-    if (title) {
+    // 2. Update Document Title and broadcast deterministic SEO ready signal
+    if (title && !title.startsWith('Loading')) {
       document.title = title;
+      if (typeof window !== 'undefined') {
+        const currentPath = window.location.pathname + window.location.search;
+        window.__last_ready_seo = {
+          path: currentPath,
+          title,
+        };
+        window.dispatchEvent(
+          new CustomEvent('document_seo_ready', {
+            detail: {
+              path: currentPath,
+              title,
+            },
+          })
+        );
+      }
     }
 
     // Helper to update or create meta tags by name

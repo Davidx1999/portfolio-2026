@@ -21,9 +21,12 @@ import {
   LegacyCaseRedirect,
 } from './components/LanguageRouteWrapper';
 import { SEOHead } from './components/SEOHead';
+import { usePageTracking } from './hooks/usePageTracking';
+import { AnalyticsConsent } from './components/AnalyticsConsent';
 
 function AppContent() {
   useGlobalSmoothScroll();
+  usePageTracking();
   const [isLoading, setIsLoading] = useState(() => {
     if (typeof window === 'undefined') return false;
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -133,6 +136,9 @@ function AppContent() {
 
       {/* Global Route Curtain Transition Overlay */}
       <RouteCurtainOverlay />
+
+      {/* Analytics Cookie Consent Banner */}
+      <AnalyticsConsent />
     </div>
   );
 }

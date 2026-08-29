@@ -67,15 +67,15 @@ export function CaseStudyPage() {
     : null;
 
   useDocumentSEO({
-    title: loading ? 'Loading Case Study... | David Salviano' : caseStudy ? metaTitle : 'Case Study Not Found | David Salviano',
-    description: loading ? 'Loading case study details.' : caseStudy ? metaDescription : 'The requested case study could not be found.',
+    title: loading ? null : caseStudy ? metaTitle : 'Page Not Found | David Salviano',
+    description: loading ? null : caseStudy ? metaDescription : 'The requested page could not be found.',
     shareImage,
     imageAlt: displayTitle,
     type: 'article',
     lang: language,
     unprefixedPath: `/work/${slug}`,
     noIndex: !loading && !caseStudy,
-    structuredData,
+    structuredData: loading ? null : structuredData,
   });
 
   // Build dynamic Table of Contents sections

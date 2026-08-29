@@ -15,6 +15,7 @@ import { useLetsTalk } from '../hooks/useLetsTalk';
 import { useHeaderMetrics } from '../hooks/useHeaderMetrics';
 import { RollingText } from '../components/RollingText';
 import { getLocalizedBudgetOptions } from '../services/currencyLocalization';
+import { trackGenerateLead } from '../services/analytics';
 
 const LinkedInIcon = ({ size = 16, className = "" }) => (
   <svg
@@ -174,6 +175,9 @@ export function Contact() {
       if (!response.ok) {
         throw new Error(`Contact request failed with status ${response.status}`);
       }
+
+      // Register generate_lead in GA4 without any PII
+      trackGenerateLead();
 
       setSubmissionState({
         status: 'success',
