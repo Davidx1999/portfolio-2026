@@ -67,6 +67,6 @@ export function getHreflangLinks(unprefixedPath = '') {
   return [
     { hreflang: 'en', href: `${SITE_URL}/en${cleanPath}` },
     { hreflang: 'pt-BR', href: `${SITE_URL}/pt${cleanPath}` },
-    { hreflang: 'x-default', href: `${SITE_URL}/en${cleanPath}` },
+    { hreflang: 'x-default', href: `${SITE_URL}/pt${cleanPath}` },
   ];
 }

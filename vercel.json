@@ -53,18 +53,23 @@
       "permanent": true
     },
     {
+      "source": "/",
+      "destination": "/pt",
+      "permanent": true
+    },
+    {
       "source": "/work",
-      "destination": "/en/work",
+      "destination": "/pt/work",
       "permanent": true
     },
     {
       "source": "/cases",
-      "destination": "/en/work",
+      "destination": "/pt/work",
       "permanent": true
     },
     {
       "source": "/about",
-      "destination": "/en/about",
+      "destination": "/pt/about",
       "permanent": true
     },
     {
@@ -74,7 +79,7 @@
     },
     {
       "source": "/contact",
-      "destination": "/en/contact",
+      "destination": "/pt/contact",
       "permanent": true
     },
     {
@@ -84,47 +89,47 @@
     },
     {
       "source": "/talk",
-      "destination": "/en/contact",
+      "destination": "/pt/contact",
       "permanent": true
     },
     {
       "source": "/lets-talk",
-      "destination": "/en/contact",
+      "destination": "/pt/contact",
       "permanent": true
     },
     {
       "source": "/projects",
-      "destination": "/en/work",
+      "destination": "/pt/work",
       "permanent": true
     },
     {
       "source": "/cases/:slug",
-      "destination": "/en/work/:slug",
+      "destination": "/pt/work/:slug",
       "permanent": true
     },
     {
       "source": "/work/:slug",
-      "destination": "/en/work/:slug",
+      "destination": "/pt/work/:slug",
       "permanent": true
     },
     {
       "source": "/project/:slug",
-      "destination": "/en/work/:slug",
+      "destination": "/pt/work/:slug",
       "permanent": true
     },
     {
       "source": "/projects/:slug",
-      "destination": "/en/work/:slug",
+      "destination": "/pt/work/:slug",
       "permanent": true
     },
     {
       "source": "/mapear",
-      "destination": "/en/work/mapear",
+      "destination": "/pt/work/mapear",
       "permanent": true
     },
     {
       "source": "/aula-f75",
-      "destination": "/en/work/aula-f75",
+      "destination": "/pt/work/aula-f75",
       "permanent": true
     }
   ]

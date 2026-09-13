@@ -6,10 +6,10 @@
  */
 
 export const SUPPORTED_ROUTES = ['en', 'pt'];
-export const DEFAULT_ROUTE = 'en';
+export const DEFAULT_ROUTE = 'pt';
 
 export const SUPPORTED_LOCALES = ['en', 'pt-BR'];
-export const DEFAULT_LOCALE = 'en';
+export const DEFAULT_LOCALE = 'pt-BR';
 
 export const STORAGE_KEY_LANG = 'portfolio_lang';
 

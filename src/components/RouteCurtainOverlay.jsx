@@ -40,8 +40,9 @@ export function RouteCurtainOverlay() {
   // 1. MOVIMENTO INDEPENDENTE DO LABEL (t = 0)
   useEffect(() => {
     if (curtainState === 'covering' && labelRef.current) {
-      const fromX = isBackward ? '120px' : '-120px';
-      const toX = isBackward ? '-120px' : '120px';
+      const travel = window.matchMedia('(max-width: 639px)').matches ? 24 : 120;
+      const fromX = `${isBackward ? travel : -travel}px`;
+      const toX = `${isBackward ? -travel : travel}px`;
 
       animate(labelRef.current, {
         translateX: [fromX, toX],
@@ -131,9 +132,9 @@ export function RouteCurtainOverlay() {
           ref={maskRef}
           className="page-curtain__mask fixed inset-0 w-full h-[100dvh] flex items-center justify-center pointer-events-none z-20 overflow-hidden"
         >
-          <div ref={labelRef} className="page-curtain__label-track will-change-transform">
+          <div ref={labelRef} className="page-curtain__label-track w-[calc(100vw-64px)] sm:w-auto will-change-transform">
             <span
-              className="page-curtain__title block font-sans font-black uppercase tracking-[0.06em] text-[clamp(2.25rem,6.5vw,5rem)] leading-none text-center select-none whitespace-nowrap"
+              className="page-curtain__title block font-sans font-black uppercase tracking-[0.06em] text-[clamp(1.65rem,7vw,2.25rem)] sm:text-[clamp(2.25rem,6.5vw,5rem)] leading-[1.05] sm:leading-none text-center text-balance select-none whitespace-normal sm:whitespace-nowrap"
               style={{ color: 'var(--curtain-title-black, #10110F)' }}
             >
               {title}

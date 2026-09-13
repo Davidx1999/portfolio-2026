@@ -27,8 +27,34 @@ const USER_AGENTS = {
  * Local server simulating Vercel cleanUrls and static-first file delivery
  */
 function createVercelLikeServer() {
+  const vercelPath = path.join(rootDir, 'vercel.json');
+  let redirects = [];
+  if (fs.existsSync(vercelPath)) {
+    try {
+      const config = JSON.parse(fs.readFileSync(vercelPath, 'utf8'));
+      redirects = config.redirects || [];
+    } catch {
+      // ignore
+    }
+  }
+
   return http.createServer((req, res) => {
     const rawUrl = req.url.split('?')[0];
+
+    // 0. Check redirects from vercel.json
+    for (const r of redirects) {
+      const regexPattern = '^' + r.source.replace(/:slug/g, '([^/]+)') + '$';
+      const match = rawUrl.match(new RegExp(regexPattern));
+      if (match) {
+        let dest = r.destination;
+        if (r.destination.includes(':slug') && match[1]) {
+          dest = r.destination.replace(':slug', match[1]);
+        }
+        res.writeHead(r.permanent ? 308 : 307, { Location: dest });
+        return res.end();
+      }
+    }
+
     let filePath = path.join(distDir, rawUrl);
 
     // 1. Direct file match (e.g. /robots.txt, /sitemap.xml, /assets/...)
@@ -457,6 +483,85 @@ async function runTests() {
     // ── TEST 8: DOM Navigation Transition Simulation ───────────────────
     await test('Validação de limpeza de imageAlt e JSON-LD durante navegação no cliente', async () => {
       testDOMNavigationSimulation();
+    });
+
+    // ── TEST 9: Redirecionamento da raiz / sempre para /pt ─────────────
+    await test('Redirecionamento da raiz "/" sempre para "/pt"', async () => {
+      const resRoot = await makeRequest('/');
+      if (resRoot.statusCode !== 308 && resRoot.statusCode !== 307) {
+        throw new Error(`Esperado redirect 307/308 para "/", recebido ${resRoot.statusCode}`);
+      }
+      if (resRoot.headers.location !== '/pt') {
+        throw new Error(`Location esperado "/pt", recebido "${resRoot.headers.location}"`);
+      }
+    });
+
+    // ── TEST 10: Redirecionamento de rotas legadas sem prefixo para /pt ──
+    await test('Redirecionamento de rotas legadas (/work, /work/exoplanets-data, /about, /contact) para /pt', async () => {
+      const routesToTest = [
+        { path: '/work', expected: '/pt/work' },
+        { path: '/work/exoplanets-data', expected: '/pt/work/exoplanets-data' },
+        { path: '/about', expected: '/pt/about' },
+        { path: '/contact', expected: '/pt/contact' },
+        { path: '/cases/mapear', expected: '/pt/work/mapear' },
+      ];
+
+      for (const { path: routePath, expected } of routesToTest) {
+        const res = await makeRequest(routePath);
+        if (res.statusCode !== 308 && res.statusCode !== 307) {
+          throw new Error(`Rota "${routePath}" retornou status ${res.statusCode}, esperado redirect 307/308.`);
+        }
+        if (res.headers.location !== expected) {
+          throw new Error(`Rota "${routePath}" redirecionou para "${res.headers.location}", esperado "${expected}".`);
+        }
+      }
+    });
+
+    // ── TEST 11: Preservação integral das rotas explícitas /en e /pt ────
+    await test('Preservação integral das rotas explícitas /en e /pt (sem redirecionar)', async () => {
+      const resEn = await makeRequest('/en');
+      if (resEn.statusCode !== 200) {
+        throw new Error(`/en retornou status ${resEn.statusCode}, esperado 200.`);
+      }
+      if (!resEn.body.includes('lang="en"')) {
+        throw new Error('/en não contém lang="en".');
+      }
+
+      const resPt = await makeRequest('/pt');
+      if (resPt.statusCode !== 200) {
+        throw new Error(`/pt retornou status ${resPt.statusCode}, esperado 200.`);
+      }
+      if (!resPt.body.includes('lang="pt-BR"')) {
+        throw new Error('/pt não contém lang="pt-BR".');
+      }
+
+      const resCaseEn = await makeRequest('/en/work/mapear');
+      if (resCaseEn.statusCode !== 200) {
+        throw new Error(`/en/work/mapear retornou status ${resCaseEn.statusCode}, esperado 200.`);
+      }
+
+      const resCasePt = await makeRequest('/pt/work/mapear');
+      if (resCasePt.statusCode !== 200) {
+        throw new Error(`/pt/work/mapear retornou status ${resCasePt.statusCode}, esperado 200.`);
+      }
+    });
+
+    // ── TEST 12: Validação de x-default apontando para /pt ──────────────
+    await test('Validação de x-default hreflang apontando para /pt (idioma padrão)', async () => {
+      const resPt = await makeRequest('/pt');
+      if (!resPt.body.includes(`hreflang="x-default" href="${SITE_DOMAIN}/pt"`)) {
+        throw new Error('x-default em /pt não aponta para https://davidsalvianodesign.com/pt');
+      }
+
+      const resEn = await makeRequest('/en');
+      if (!resEn.body.includes(`hreflang="x-default" href="${SITE_DOMAIN}/pt"`)) {
+        throw new Error('x-default em /en não aponta para https://davidsalvianodesign.com/pt');
+      }
+
+      const resCasePt = await makeRequest('/pt/work/mapear');
+      if (!resCasePt.body.includes(`hreflang="x-default" href="${SITE_DOMAIN}/pt/work/mapear"`)) {
+        throw new Error('x-default em /pt/work/mapear não aponta para https://davidsalvianodesign.com/pt/work/mapear');
+      }
     });
   } finally {
     server.close();

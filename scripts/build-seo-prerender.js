@@ -261,7 +261,7 @@ Sitemap: ${SITE_URL}/sitemap.xml
     <loc>${SITE_URL}/${lang}${cleanPath}</loc>
     <xhtml:link rel="alternate" hreflang="en" href="${SITE_URL}/en${cleanPath}" />
     <xhtml:link rel="alternate" hreflang="pt-BR" href="${SITE_URL}/pt${cleanPath}" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}/en${cleanPath}" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}/pt${cleanPath}" />
     <changefreq>${route.changefreq}</changefreq>
     <priority>${route.priority}</priority>
   </url>`);
@@ -280,7 +280,7 @@ Sitemap: ${SITE_URL}/sitemap.xml
     <lastmod>${lastMod}</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="${SITE_URL}/en/work/${slug}" />
     <xhtml:link rel="alternate" hreflang="pt-BR" href="${SITE_URL}/pt/work/${slug}" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}/en/work/${slug}" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}/pt/work/${slug}" />
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>`);
@@ -314,7 +314,7 @@ ${sitemapUrls.join('\n')}
       const hreflangs = [
         { hreflang: 'en', href: `${SITE_URL}/en${cleanPath}` },
         { hreflang: 'pt-BR', href: `${SITE_URL}/pt${cleanPath}` },
-        { hreflang: 'x-default', href: `${SITE_URL}/en${cleanPath}` },
+        { hreflang: 'x-default', href: `${SITE_URL}/pt${cleanPath}` },
       ];
 
       const structuredData =
@@ -384,7 +384,7 @@ ${sitemapUrls.join('\n')}
       const hreflangs = [
         { hreflang: 'en', href: `${SITE_URL}/en/work/${slug}` },
         { hreflang: 'pt-BR', href: `${SITE_URL}/pt/work/${slug}` },
-        { hreflang: 'x-default', href: `${SITE_URL}/en/work/${slug}` },
+        { hreflang: 'x-default', href: `${SITE_URL}/pt/work/${slug}` },
       ];
 
       const structuredData = {
@@ -431,9 +431,9 @@ ${sitemapUrls.join('\n')}
 
   // 5.3 Prerender 404.html with noindex
   const notFoundHtml = injectHeadMetadata(baseHtmlTemplate, {
-    lang: 'en',
-    title: 'Page Not Found | David Salviano',
-    description: 'The requested page could not be found.',
+    lang: 'pt',
+    title: 'Página Não Encontrada | David Salviano',
+    description: 'A página solicitada não foi encontrada.',
     noIndex: true,
   });
   fs.writeFileSync(path.join(distDir, '404.html'), notFoundHtml, 'utf8');

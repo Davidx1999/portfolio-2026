@@ -7,7 +7,6 @@ import {
   routeToLocale,
   getHtmlLangForRoute,
   persistRoute,
-  getPersistedRoute,
 } from '../i18n/languageMapping';
 import { NotFound } from '../pages/NotFound';
 
@@ -42,29 +41,28 @@ export function LanguageRouteWrapper() {
 
 /**
  * RootRedirect
- * Redirects the root path / to /en (or user's saved preference).
+ * Unconditionally redirects the root path / to /pt, regardless of country,
+ * browser language, or saved preference.
  */
 export function RootRedirect() {
-  const targetRoute = getPersistedRoute() || DEFAULT_ROUTE;
-  return <Navigate to={`/${targetRoute}`} replace />;
+  return <Navigate to="/pt" replace />;
 }
 
 /**
  * LegacyRedirect
  * Redirects legacy top-level un-prefixed routes (e.g., /work, /about, /contact)
- * to their language-prefixed equivalent (e.g., /en/work).
+ * directly to their /pt equivalent (e.g., /pt/work).
  */
 export function LegacyRedirect({ to }) {
-  const targetRoute = getPersistedRoute() || DEFAULT_ROUTE;
-  return <Navigate to={`/${targetRoute}/${to}`} replace />;
+  return <Navigate to={`/pt/${to}`} replace />;
 }
 
 /**
  * LegacyCaseRedirect
- * Redirects legacy top-level case URLs (e.g., /cases/:slug) to /:lang/work/:slug.
+ * Redirects legacy top-level case URLs (e.g., /cases/:slug, /work/:slug)
+ * directly to /pt/work/:slug.
  */
 export function LegacyCaseRedirect() {
   const { slug } = useParams();
-  const targetRoute = getPersistedRoute() || DEFAULT_ROUTE;
-  return <Navigate to={`/${targetRoute}/work/${slug}`} replace />;
+  return <Navigate to={`/pt/work/${slug}`} replace />;
 }
