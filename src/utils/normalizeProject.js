@@ -180,6 +180,15 @@ export function normalizeContentBlock(block, locale = 'en', idx) {
       description: resolveLocalized(item.description, locale),
       evidenceType: item.evidenceType || 'Qualitativo',
     }));
+  } else if (Array.isArray(block.items) && block._type === 'toolsGrid') {
+    // 10. Ferramentas & Fontes de Dados (toolsGrid)
+    normalized.items = block.items.map((item, idx) => ({
+      _key: item._key || `tool-${idx}`,
+      name: item.name || '',
+      category: resolveLocalized(item.category, locale) || '',
+      description: resolveLocalized(item.description, locale) || '',
+      url: typeof item.url === 'string' ? item.url.trim() : (item.url || ''),
+    }));
   }
 
   // 10. Tópicos da Narrativa Sticky (stickyNarrative)
@@ -317,6 +326,11 @@ export function normalizeProject(rawProject, locale = 'en') {
   const legacyReflection = resolveLocalized(rawProject.reflection, locale);
   const legacyThesis = resolveLocalized(rawProject.thesis, locale);
 
+  // ── Resolução de Link Externo do Projeto no Ar ────────────────────────────
+  const rawExternalUrl = typeof rawProject.externalUrl === 'string' ? rawProject.externalUrl.trim() : '';
+  const externalUrl = rawExternalUrl || null;
+  const externalUrlLabel = resolveLocalized(rawProject.externalUrlLabel, locale) || null;
+
   return {
     ...rawProject,
     id: projectSlug,
@@ -330,6 +344,9 @@ export function normalizeProject(rawProject, locale = 'en') {
     duration: rawProject.duration || '',
     clientOrContext: rawProject.clientOrContext || rawProject.client || '',
     projectStatus: rawProject.projectStatus || 'completed',
+    externalUrl,
+    externalUrlLabel,
+    rawExternalUrlLabel: rawProject.externalUrlLabel || null,
     disciplines: Array.isArray(rawProject.disciplines) && rawProject.disciplines.length > 0
       ? resolveLocalized(rawProject.disciplines, locale)
       : (Array.isArray(rawProject.tags) ? resolveLocalized(rawProject.tags, locale) : []),

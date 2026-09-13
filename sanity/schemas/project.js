@@ -125,6 +125,25 @@ export default {
       initialValue: 'completed',
     },
     {
+      name: 'externalUrl',
+      title: 'Link do Projeto no Ar (Live URL)',
+      type: 'url',
+      group: 'projectInfo',
+      description: 'URL completa do projeto no ar (ex: https://www.escutha.com.br/). Se preenchido, exibe botão de acesso no cabeçalho do case.',
+      validation: (Rule) =>
+        Rule.uri({
+          scheme: ['http', 'https'],
+          allowRelative: false,
+        }),
+    },
+    {
+      name: 'externalUrlLabel',
+      title: 'Rótulo do Botão do Projeto no Ar (Opcional)',
+      type: 'localizedString',
+      group: 'projectInfo',
+      description: 'Texto do botão para abrir o projeto. Fallback padrão: "Open Live Project" (EN) / "Acessar Projeto no Ar" (PT).',
+    },
+    {
       name: 'featuredOnHome',
       title: 'Destacar na Landing Page (Featured Work)',
       type: 'boolean',

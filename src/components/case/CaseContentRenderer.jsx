@@ -21,6 +21,7 @@ import { CaseDecisionSection } from './blocks/CaseDecisionSection';
 import { CaseOutcomeSection } from './blocks/CaseOutcomeSection';
 import { CaseImageGallery } from './blocks/CaseImageGallery';
 import { CaseStickyNarrative } from './blocks/CaseStickyNarrative';
+import { CaseToolsGrid } from './blocks/CaseToolsGrid';
 
 /**
  * Registry de componentes visuais do frontend correspondentes aos schemas do Sanity.
@@ -55,6 +56,7 @@ const BLOCK_COMPONENTS = {
   processSteps: CaseProcessSteps,
   artifactShowcase: CaseArtifactShowcase,
   impactBlock: CaseImpact,
+  toolsGrid: CaseToolsGrid,
 
   // 5. Vídeos e Prototipagem
   prototypeVideo: CasePrototypeVideo,

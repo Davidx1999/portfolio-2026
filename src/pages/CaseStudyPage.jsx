@@ -13,8 +13,10 @@ import { CaseTableOfContents } from '../components/case/CaseTableOfContents';
 import { CaseContentRenderer } from '../components/case/CaseContentRenderer';
 import { CaseSolutionImpact } from '../components/case/CaseSolutionImpact';
 import { CaseReflection } from '../components/case/CaseReflection';
+import { CaseClosingCta } from '../components/case/CaseClosingCta';
 import { CaseNextProject } from '../components/case/CaseNextProject';
 import { resolveLocalized } from '../utils/i18nField';
+import { isValidHttpUrl } from '../utils/url';
 import { useDocumentSEO } from '../hooks/useDocumentSEO';
 import { SITE_URL } from '../config/seo';
 
@@ -163,6 +165,7 @@ export function CaseStudyPage() {
   }
 
   const hasModularBlocks = Array.isArray(caseStudy.contentBlocks) && caseStudy.contentBlocks.length > 0;
+  const hasValidExternalUrl = isValidHttpUrl(caseStudy?.externalUrl);
 
   return (
     <article className="w-full bg-[#10110F] text-[#FAFAF7] relative">
@@ -226,6 +229,9 @@ export function CaseStudyPage() {
             )}
           </>
         )}
+
+        {/* Segunda Chamada: Acesso ao Projeto no Ar (quando houver URL válida) */}
+        {hasValidExternalUrl && <CaseClosingCta caseStudy={caseStudy} />}
 
         {/* Continue Explorando (Navegação Circular de Cases) */}
         <CaseNextProject

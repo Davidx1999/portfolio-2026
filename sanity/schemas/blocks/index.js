@@ -20,6 +20,7 @@ import artifactShowcase from './artifactShowcase';
 import processSteps from './processSteps';
 import imageGrid from './imageGrid';
 import videoBlock from './videoBlock';
+import toolsGrid from './toolsGrid';
 
 export const blockSchemas = [
   textSection,
@@ -44,6 +45,7 @@ export const blockSchemas = [
   processSteps,
   imageGrid,
   videoBlock,
+  toolsGrid,
 ];
 
 export const contentBlockTypes = blockSchemas.map((b) => ({ type: b.name }));

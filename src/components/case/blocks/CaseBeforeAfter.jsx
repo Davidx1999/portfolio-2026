@@ -11,11 +11,13 @@ export function CaseBeforeAfter({ block }) {
   const prefersReducedMotion = useReducedMotion();
   const [sliderPosition, setSliderPosition] = useState(50);
   const [isSideBySide, setIsSideBySide] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef(null);
 
   const handleMove = useCallback((clientX) => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
+    if (rect.width <= 0) return;
     const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
     const percent = Math.max(0, Math.min((x / rect.width) * 100, 100));
     setSliderPosition(percent);
@@ -35,15 +37,50 @@ export function CaseBeforeAfter({ block }) {
   const isLight = block.theme === 'light';
   const showBorder = block.showBorder ?? block.hasBorder ?? true;
 
-  const handleTouchMove = (e) => {
-    if (e.touches.length > 0) {
-      handleMove(e.touches[0].clientX);
+  const handlePointerDown = (e) => {
+    if (e.button !== 0 && e.pointerType === 'mouse') return;
+    e.preventDefault();
+    setIsDragging(true);
+    handleMove(e.clientX);
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      // Safe fallback if pointer capture isn't supported
     }
   };
 
-  const handleMouseMove = (e) => {
-    if (e.buttons === 1) {
-      handleMove(e.clientX);
+  const handlePointerMove = (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    handleMove(e.clientX);
+  };
+
+  const handlePointerUp = (e) => {
+    if (isDragging) {
+      setIsDragging(false);
+      try {
+        if (e.currentTarget.hasPointerCapture && e.currentTarget.hasPointerCapture(e.pointerId)) {
+          e.currentTarget.releasePointerCapture(e.pointerId);
+        }
+      } catch {
+        // Safe fallback
+      }
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      setSliderPosition((prev) => Math.max(0, prev - 5));
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      setSliderPosition((prev) => Math.min(100, prev + 5));
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      setSliderPosition(0);
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      setSliderPosition(100);
     }
   };
 
@@ -97,7 +134,10 @@ export function CaseBeforeAfter({ block }) {
                   <img
                     src={block.beforeImage}
                     alt={beforeLabel}
-                    className="w-full h-full object-cover"
+                    draggable={false}
+                    onDragStart={(e) => e.preventDefault()}
+                    className="w-full h-full object-cover select-none pointer-events-none"
+                    style={{ WebkitUserDrag: 'none', userSelect: 'none' }}
                   />
                 </div>
                 <span className="font-mono text-xs font-bold uppercase tracking-wider text-white/60 mt-3">
@@ -116,7 +156,10 @@ export function CaseBeforeAfter({ block }) {
                   <img
                     src={block.afterImage}
                     alt={afterLabel}
-                    className="w-full h-full object-cover"
+                    draggable={false}
+                    onDragStart={(e) => e.preventDefault()}
+                    className="w-full h-full object-cover select-none pointer-events-none"
+                    style={{ WebkitUserDrag: 'none', userSelect: 'none' }}
                   />
                 </div>
                 <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#C4FF00] mt-3">
@@ -128,30 +171,47 @@ export function CaseBeforeAfter({ block }) {
             /* Modo Slider Interativo */
             <div
               ref={containerRef}
-              onMouseMove={handleMouseMove}
-              onTouchMove={handleTouchMove}
-              className={`relative w-full aspect-[16/10] rounded-[18px] overflow-hidden ${
+              role="slider"
+              aria-label={`${beforeLabel} / ${afterLabel}`}
+              aria-valuenow={Math.round(sliderPosition)}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              tabIndex={0}
+              onKeyDown={handleKeyDown}
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerCancel={handlePointerUp}
+              onDragStart={(e) => e.preventDefault()}
+              className={`relative w-full aspect-[16/10] rounded-[18px] overflow-hidden touch-none select-none ${
                 showBorder
                   ? `border ${isLight ? 'border-[#10110F]/15' : 'border-[rgba(244,243,238,0.18)]'} bg-[#151613] shadow-2xl`
                   : 'border-0 bg-transparent'
-              } select-none cursor-ew-resize group`}
+              } cursor-ew-resize group focus-visible:outline-2 focus-visible:outline-[#C4FF00]`}
+              style={{ WebkitUserDrag: 'none', userSelect: 'none', touchAction: 'none' }}
             >
               {/* Imagem Depois (Base) */}
               <img
                 src={block.afterImage}
                 alt={afterLabel}
-                className="absolute inset-0 w-full h-full object-cover"
+                draggable={false}
+                onDragStart={(e) => e.preventDefault()}
+                className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
+                style={{ WebkitUserDrag: 'none', userSelect: 'none' }}
               />
 
               {/* Imagem Antes (Recortada) */}
               <div
-                className="absolute inset-0 overflow-hidden"
+                className="absolute inset-0 overflow-hidden pointer-events-none select-none"
                 style={{ clipPath: `polygon(0 0, ${sliderPosition}% 0, ${sliderPosition}% 100%, 0 100%)` }}
               >
                 <img
                   src={block.beforeImage}
                   alt={beforeLabel}
-                  className="absolute inset-0 w-full h-full object-cover"
+                  draggable={false}
+                  onDragStart={(e) => e.preventDefault()}
+                  className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
+                  style={{ WebkitUserDrag: 'none', userSelect: 'none' }}
                 />
               </div>
 
@@ -161,16 +221,16 @@ export function CaseBeforeAfter({ block }) {
                 style={{ left: `${sliderPosition}%` }}
               >
                 {/* Knob Central */}
-                <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-[#10110F] border-2 border-[#C4FF00] flex items-center justify-center text-[10px] font-mono text-[#C4FF00] font-bold shadow-lg">
+                <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-[#10110F] border-2 border-[#C4FF00] flex items-center justify-center text-[10px] font-mono text-[#C4FF00] font-bold shadow-lg pointer-events-none select-none">
                   ↔
                 </div>
               </div>
 
               {/* Badges Flutuantes nos Cantos */}
-              <div className="absolute top-4 left-4 px-3 py-1 bg-[#10110F]/80 backdrop-blur-md border border-white/15 rounded-[6px] font-mono text-[10px] uppercase font-bold text-white/80 pointer-events-none">
+              <div className="absolute top-4 left-4 px-3 py-1 bg-[#10110F]/80 backdrop-blur-md border border-white/15 rounded-[6px] font-mono text-[10px] uppercase font-bold text-white/80 pointer-events-none select-none">
                 {beforeLabel}
               </div>
-              <div className="absolute top-4 right-4 px-3 py-1 bg-[#10110F]/80 backdrop-blur-md border border-[#C4FF00]/40 rounded-[6px] font-mono text-[10px] uppercase font-bold text-[#C4FF00] pointer-events-none">
+              <div className="absolute top-4 right-4 px-3 py-1 bg-[#10110F]/80 backdrop-blur-md border border-[#C4FF00]/40 rounded-[6px] font-mono text-[10px] uppercase font-bold text-[#C4FF00] pointer-events-none select-none">
                 {afterLabel}
               </div>
             </div>

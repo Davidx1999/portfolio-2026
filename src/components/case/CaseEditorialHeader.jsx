@@ -1,10 +1,12 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowLeft, ExternalLink } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { CurtainLink } from '../../context/RouteCurtainContext';
 import { RollingText } from '../RollingText';
 import { resolveLocalized } from '../../utils/i18nField';
+import { isValidHttpUrl } from '../../utils/url';
+import { CaseExternalUrlButton } from './CaseExternalUrlButton';
 
 const EASING = [0.22, 1, 0.36, 1];
 
@@ -25,6 +27,15 @@ export function CaseEditorialHeader({ caseStudy }) {
   if (!caseStudy) return null;
 
   const isCompact = caseStudy.caseDepth === 'compact';
+
+  const hasValidExternalUrl = isValidHttpUrl(caseStudy.externalUrl);
+  const rawExternalUrlLabel =
+    language === 'en' && caseStudy.externalUrlLabel_en
+      ? caseStudy.externalUrlLabel_en
+      : caseStudy.externalUrlLabel;
+  const resolvedExternalUrlLabel = resolveLocalized(rawExternalUrlLabel, language);
+  const fallbackExternalUrlLabel = language === 'en' ? 'Open Live Project' : 'Acessar Projeto no Ar';
+  const externalUrlButtonText = resolvedExternalUrlLabel?.trim() || fallbackExternalUrlLabel;
 
   const projectTypeLabels = {
     professionalProject: {
@@ -204,23 +215,19 @@ export function CaseEditorialHeader({ caseStudy }) {
             </motion.p>
           )}
 
-          {/* Link externo opcional */}
-          {caseStudy.externalUrl && (
+          {/* Link externo opcional para o projeto no ar */}
+          {hasValidExternalUrl && (
             <motion.div
               initial={prefersReducedMotion ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.4, delay: 0.18 }}
-              className="mt-4 mb-2"
+              className="mt-6 mb-2"
             >
-              <a
-                href={caseStudy.externalUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[8px] bg-white/5 hover:bg-[#C4FF00]/10 border border-white/10 hover:border-[#C4FF00]/40 text-[#C4FF00] font-mono text-xs uppercase font-bold tracking-wider transition-all"
-              >
-                <span>{language === 'en' ? 'Open Live Project' : 'Acessar Projeto no Ar'}</span>
-                <ExternalLink size={12} />
-              </a>
+              <CaseExternalUrlButton
+                url={caseStudy.externalUrl}
+                label={externalUrlButtonText}
+                projectTitle={displayTitle}
+              />
             </motion.div>
           )}
         </div>
